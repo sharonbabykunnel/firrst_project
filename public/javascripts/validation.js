@@ -19,7 +19,7 @@ function validatemail() {
           Emailerror.innerHTML = 'Email is Required';
           return false;
      }
-     if (!email.match(/^[A-Za-z0-9._-]+@[A-Za-z]+\.[a-z]{2,4}$/)) {
+     if (!email.match(/^[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[a-z]{2,4}$/)) {
           Emailerror.innerHTML = 'Invalid Email';
           return false;
      }
@@ -34,7 +34,7 @@ const validatpass = () => {
           passerror.innerHTML = 'invalid Password';
           return false;
      }
-     if (!pass.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()\-+.]).{6,20}$/)) {
+     if (!pass.match(/^(?=.*\d)(?=.*[a-z]).{6,20}$/)) {
           passerror.innerHTML = 'inavalid Password';
           return false;
          }
@@ -72,19 +72,28 @@ const validatSigninForm = () => {
 }
 
 const validatSignupForm = () => {
+     console.log('1')
      var submiterror = document.getElementById("submit-error");
-     if (!validatpass() || !validatemail() || !validatmobile() || !validatname()) {
-          submiterror.style.display = 'block';
-          submiterror.style.color = 'red';
-          submiterror.innerHTML = "Please Enter Correct Password.";
-          return false;
+     console.log('2')
+     if (
+       !validatname() ||
+       !validatemail() ||
+       !validatmobile() ||
+       !validatpass() ||
+       !checkPass()
+     ) {
+       console.log("");
+       submiterror.style.display = "block";
+       submiterror.style.color = "red";
+       submiterror.innerHTML = "Please Enter Correct Password.";
+       return false;
      }
      return true;
 }
 
 const validatEmailForm = () => {
   var submiterror1 = document.getElementById("submit-error1");
-  if (!validatname() || validatemail()) {
+  if (!validatname() || !validatemail()) {
     submiterror1.style.display = "block";
     submiterror1.style.color = "red";
     submiterror1.innerHTML = "Please Enter Corrrect Details.";
@@ -97,13 +106,19 @@ const validatEmailForm = () => {
   return true;
 };
 
-const checkpass = () => {
+const checkPass = () => {
      var pass = document.getElementById('login-pass').value;
      var cpass = document.getElementById('login-cpass').value;
-     if (pass !== cpass) {
-          cpass.innerHTML = "Password don't Match.";
+     var cpasserror =document.getElementById("cpass-error")
+     if (cpass.length === 0) {
+          cpasserror.innerHTML = "Conform Password";
           return false;
      }
+     if (pass !== cpass) {
+          cpasserror.innerHTML = "Password don't Match.";
+          return false;
+     }
+     cpasserror.innerHTML ="Conformed Password"
      return true;
 }
 

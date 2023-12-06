@@ -24,7 +24,7 @@ type="video/mp4" />
         <source src=".//assets/mp3/video.mp3" 
 type="audio/mpeg" />
       </audio> -->
-      <form action="/signup" method="post" class="form" onsubmit="return ValidaSignupForm()">
+      <form action="/signup" method="post" class="form" onsubmit="return validatSignupForm()">
         <h1 class="head">Login</h1>
 
         <div class="content">
@@ -34,6 +34,7 @@ type="audio/mpeg" />
             <div class="box-input">
               <input
                 type="string"
+                name="name"
                 onkeyup="validatname()"
                 class="input"
                 id="login-name"
@@ -50,6 +51,7 @@ type="audio/mpeg" />
             <div class="box-input">
               <input
                 type="string"
+                name="email"
                 onkeyup="validatemail()"
                 class="input"
                 id="login-email"
@@ -61,12 +63,12 @@ type="audio/mpeg" />
             </div>
             
           </div>
-          <a href="" class="forgot" onclick="return validatEmailForm()">Send OTP</a>
+          <!-- <a href="/verify" class="forgot" onclick="return validatEmailForm()">Send OTP</a> -->
           <!-- <label for="login-check" 
           class="tick-label">Send OTP</label> -->
-          <span id="submit-error1"></span>          
-          <button type="submit" class="button">
-            Verify OTP</button>
+          <!-- <span id="submit-error1"></span>           -->
+          <!-- <button type="submit" class="button">
+            Verify OTP</button> -->
             
             <div class="box">
                 <i class="ri-user-3-line login__icon"></i>
@@ -74,6 +76,7 @@ type="audio/mpeg" />
                 <div class="box-input">
                   <input
                     type="string"
+                    name="mobile"
                     onkeyup="validatmobile()"
                     class="input"
                     id="login-mobile"
@@ -93,6 +96,7 @@ type="audio/mpeg" />
             <div class="box-input">
               <input
                 type="password"
+                name="password"
                 onkeyup="validatpass()"
                 class="input"
                 id="login-pass"
@@ -112,7 +116,7 @@ type="audio/mpeg" />
             <div class="box-input">
               <input
                 type="password"
-                
+                onkeyup="checkPass()"
                 class="input"
                 id="login-cpass"
                 placeholder=" "
@@ -138,9 +142,12 @@ class="tick-label">Remember me</label> -->
 Password?</a> -->
         </div>
 
-        <button type="submit" class="button" onclick="return checkpass()">
+        <button type="submit" class="button" ">
 Login</button>
-
+<span id="submit-error"></span>
+<%if(typeof massage !=="undefined"){%>
+  <p><%= massage%></p>
+<%}%>
         <p class="register">Already have an account? 
 <a href="/signin">Signin</a></p>
       </form>

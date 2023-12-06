@@ -93,7 +93,7 @@ audio {
   text-align: center;
   font-size: var(--h1-font-size);
   font-weight: var(--font-medium);
-  margin-bottom: 2rem;
+  margin-bottom: rem;
 }
 .content,
 .box {
@@ -162,8 +162,12 @@ audio {
   width: 16px;
   height: 16px;
 }
+.sendOtp {
+  text-align: center;
+}
 .forgot {
   color: var(--white-color);
+  
 }
 .forgot:hover {
   text-decoration: underline;
