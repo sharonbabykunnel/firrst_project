@@ -1,0 +1,143 @@
+<%- include("../layouts/header.ejs")%>
+
+        <section class="content-main">
+            <div class="col">
+                <form onsubmit="return validatFromEditPage()" action="/admin/editProduct1" method="post"  enctype="multipart/form-data">
+                <div class="col-9">
+                    <div class="content-header">
+                        <h2 class="content-title">Edit Product Page</h2>
+                        <!-- <div>
+                            <button class="btn btn-light rounded font-sm mr-5 text-body hover-up type="submit"">Save to draft</button>
+                            <button class="btn btn-md rounded font-sm hover-up" type="submit">Publich</button>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class=" mb-4">
+                                <label for="product_title"  class="form-label">Product title</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title" value="<%= product.title %>" onkeyup="validatString('product_title','title_error','Title')">
+                                <span id="title_error"></span>
+                            </div>
+                                <div class="  mb-3">
+                                    <label for="product_color" class="form-label">Color</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_color" name="color" value="<%= product.color %>" onkeyup="validatString('product_color','color_error','Color')">
+                                    <span id="color_error"></span>
+                                </div>
+                                <input type="hidden" name="id"  value="<%= product._id %>">
+                                <div class="  mb-3">
+                                    <label for="product_size" class="form-label">Size</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_size" name="size" value="<%=product.size %>" onkeyup="validatString('product_size','size_error','Size')">
+                                    <span id="size_error"></span>
+                                </div>
+                                <div class=" mb-3">
+                                    <label for="product_brand" class="form-label">Brand</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand" value="<%= product.brand %>" onkeyup="validatString('product_brand','brand_error','Brand')">
+                                    <span id="brand_error"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                    <% for(let i=0; i<product.image.length; i++){%>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Image</label>
+                                    <img src="/images/<%= product.image[i] %>" alt="">
+                                    <!-- <input class="form-control" type="file" name="n" id="0" oninput="checkimg0()">
+                                    <input type="hidden" value=null id="n0" name="oldimage">
+                                    <a href="/admin/editProduct/image?id=<%= product.image[0] %>"></a> -->
+                                </div>
+                            </div>
+                        </div>
+                    <%}%>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                        <input type="file" class="form-control" name="image" multiple>
+                        </div>
+                    </div>  
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" class="form-control" rows="4" id="product_discription" name="discription" onkeyup="validatString('product_discription','discription_error','Discription')"><%= product.discription %></textarea>
+                                <span id="discription_error"></span>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+<!--                     <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Image</label>
+                                    <img src="/images/<%= product.image[0] %>" alt="">
+                                    <input class="form-control" type="file" name="n" id="0" oninput="checkimg0()">
+                                    <input type="hidden" value=null id="n0" name="oldimage">
+                                    <a href="/admin/editProduct/image?id=<%= product.image[0] %>"></a>
+                                </div>
+                            </div>
+                            <div class="card-body"> 
+                                <div>
+                                    <label class="form-label">Image</label>
+                                    <img src="/images/<%= product.image[1] %>" alt="">
+                                    <input class="form-control" type="file" name="n" id="1" oninput="checkimg1()">
+                                    <input type="hidden" value=null id="n1" name="oldimage">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Image</label>
+                                    <img src="/images/<%= product.image[2] %>" alt="">
+                                    <input class="form-control" type="file" name="n" id="2"  oninput="checkimg2()">
+                                    <input type="hidden" value=null id="n2" name="oldimage">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Image</label>
+                                    <img src="/images/<%= product.image[3] %>" alt="">
+                                    <input class="form-control" type="file" name="n" id="3" oninput="checkimg3()">
+                                    <input type="hidden" value=null id="n3" name="oldimage">
+                                </div>
+                            </div>
+
+                </div>  -->
+
+                <div class="col-lg-3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <label class="form-label">Price</label>
+                                <input type="text" placeholder="Type here" class="form-control" name="price" value="<%= product.price %>" id="product_price" onkeyup="validatString('product_price','price_error','Price')">
+                                <span id="price_error"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Status</label>
+                                <!-- <select class="form-select" name="status">
+                                    <option>Published</option>
+                                    <option>Draft</option>
+                                </select> -->
+                                <label class="form-label">Published</label>
+                                <input type="radio" name="status" value="Published" <% if(product.status === 'Published') {%>checked<%}%>
+                                <label class="form-label">Draft</label>
+                                <input type="radio" name="status" value="Draft" <% if(product.status === 'Draft') {%>checked<%}%>
+                            </div>
+                            <h5 class="mb-3">Categories</h5>
+                            <% for (let i=0; i<category.length; i++){%>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  id="product-cat<%=i%>" name="category" value="<%= category[i].name %>" <%for (let j=0; j<product.category.length; j++){ if(category[i].name === product.category[j]) {%>checked<%}}%>>
+                                    <label class="form-check-label" for="product-cat<%=i%>"> <%= category[i].name %> </label>
+                                </div>
+                            <%}%>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up" type="submit">Save</button>
+                    </div> <!-- card end// -->
+                </div>
+                <span id="form_error"></span>
+            </form>
+            <% if (message){%>
+            <p style="color: red;"><%=message%></p>
+            <%}%>
+            </div>
+        </section>
+        <!-- <script src="/javascripts/submitJs.js"></script> -->
+        <%- include("../layouts/footer.ejs")%>

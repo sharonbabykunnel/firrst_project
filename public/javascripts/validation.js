@@ -1,6 +1,6 @@
 const validatname = () => {
      var nameerror = document.getElementById("name-error");
-     var name = document.getElementById('login-name').value;
+     var name = document.getElementById('name').value;
      if (name.length === 0) {
           nameerror.innerHTML = 'Name is Required.';
           return false;
@@ -14,7 +14,7 @@ const validatname = () => {
 }
 function validatemail() {
      var Emailerror = document.getElementById("email-error");
-     var email = document.getElementById("login-email").value;
+     var email = document.getElementById("email").value;
      if (email.length === 0) {
           Emailerror.innerHTML = 'Email is Required';
           return false;
@@ -29,7 +29,7 @@ function validatemail() {
 
 const validatpass = () => {
      var passerror = document.getElementById("pass-error");
-     var pass = document.getElementById("login-pass").value;
+     var pass = document.getElementById("pass").value;
      if (pass.length === 0) {
           passerror.innerHTML = 'invalid Password';
           return false;
@@ -44,7 +44,7 @@ const validatpass = () => {
 
 const validatmobile = () => {
      var mobileerror = document.getElementById('mobile-error');
-     var mobile = document.getElementById('login-mobile').value;
+     var mobile = document.getElementById('mobile').value;
      if (!mobile.match(/[0-9]/)) {
           mobileerror.innerHTML = "Not a Number.";
           return false;
@@ -82,7 +82,6 @@ const validatSignupForm = () => {
        !validatpass() ||
        !checkPass()
      ) {
-       console.log("");
        submiterror.style.display = "block";
        submiterror.style.color = "red";
        submiterror.innerHTML = "Please Enter Correct Password.";
@@ -91,24 +90,24 @@ const validatSignupForm = () => {
      return true;
 }
 
-const validatEmailForm = () => {
-  var submiterror1 = document.getElementById("submit-error1");
-  if (!validatname() || !validatemail()) {
-    submiterror1.style.display = "block";
-    submiterror1.style.color = "red";
-    submiterror1.innerHTML = "Please Enter Corrrect Details.";
-    setTimeout(() => {
-      submiterror1.style.display = "none";
-    }, 3000);
-    return false;
-  }
-  submiterror1.innerHTML = "OTP Sended";
-  return true;
-};
+// const validatEmailForm = () => {
+//   var submiterror1 = document.getElementById("submit-error1");
+//   if (!validatname() || !validatemail()) {
+//     submiterror1.style.display = "block";
+//     submiterror1.style.color = "red";
+//     submiterror1.innerHTML = "Please Enter Corrrect Details.";
+//     setTimeout(() => {
+//       submiterror1.style.display = "none";
+//     }, 3000);
+//     return false;
+//   }
+//   submiterror1.innerHTML = "OTP Sended";
+//   return true;
+// };
 
 const checkPass = () => {
-     var pass = document.getElementById('login-pass').value;
-     var cpass = document.getElementById('login-cpass').value;
+     var pass = document.getElementById('pass').value;
+     var cpass = document.getElementById('cpass').value;
      var cpasserror =document.getElementById("cpass-error")
      if (cpass.length === 0) {
           cpasserror.innerHTML = "Conform Password";
@@ -137,7 +136,7 @@ const showPass = () => {
 }
 
 const showcPass = () => {
-  var cpass = document.getElementById("login-cpass");
+  var cpass = document.getElementById("cpass");
   if (cpass.type === "password") {
     cpass.type = "text";
     document.getElementById("login-eye2").className = "ri-eye-line login__eye";
@@ -147,3 +146,34 @@ const showcPass = () => {
       "ri-eye-off-line login__eye";
   }
 };
+
+const validatotp = () => {
+     var otp = document.getElementById('otp').value;
+     var otperror = document.getElementById('otp-error');
+     if (otp.length == 0) {
+          otperror.innerHTML = "WRON OTP";
+          return false;
+     }
+     if (!otp.match(/[A-Za-z0-9]/)) {
+          otperror.innerHTML = "wrong otp";
+          return false;
+     }
+     otperror.innerHTML = 'Enter OTP';
+     return true;
+}
+
+const otpform = () => {
+     console.log('2');
+     const submiterror = document.getElementById("submit-error");
+     console.log('1');
+     if (!validatotp) {
+       submiterror.style.display = "block";
+       submiterror.style.color = "red";
+       submiterror.innerHTML = "Enter OTP";
+       setTimeout(() => {
+         submiterror.style.display = "none";
+       }, 3000);
+       return false;
+     }
+     return true;
+}
