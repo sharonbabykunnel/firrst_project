@@ -52,3 +52,14 @@ var check = () => {
   checkimg2();
   checkimg3();
 }
+
+const calculatTotal = (product) => {
+  return product.reduce((total, product) => {
+    const productTotal = product.product_id.price * product.quantity;
+    return total + productTotal;
+  }, 0);
+}
+
+const display = () => {
+  
+}

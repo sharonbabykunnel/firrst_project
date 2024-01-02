@@ -3,11 +3,11 @@ const User = require('../model/userModel');
 const Product = require('../model/productModel');
 const Category = require('../model/categoryModel');
 const bcrypt = require('bcrypt');
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require('mongoose');
 
 const loadLogin = asyncHandler(async (req, res) => {
     try {
-        res.render('adminView/login');
+        res.render('auth/page-admin-login');
     } catch (error) {
         throw error;
     }
@@ -17,17 +17,19 @@ const verifyLogin = asyncHandler(async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log(email,password)
-        const adminData = await user.findOne({ email: email, is_admin: 1 });
-        console.log(adminData)
+        const adminData = await User.findOne({ email: email, is_admin: 1 });
         if (adminData) {
             const passwordMatch = await bcrypt.compare(password, adminData.password);
-            if (passwordMatch) {
-                res.redirect('/admin/dashboard');
+            if ( passwordMatch) {
+                req.session.admin = adminData;
+                res.redirect('/admin');
             } else {
-                res.render('adminView/login', { message: "Incorrect Password." });
+                console.log('2')
+                res.render('auth/page-admin-login', { message: "Incorrect Password." });
             }
         } else {
-            res.render('adminView/login', { message: "Your are not Admin." });
+            console.log('3')
+            res.render('auth/page-admin-login.ejs', { message: "Your are not Admin." });
         }
     } catch (error) {
         throw error;
@@ -36,20 +38,22 @@ const verifyLogin = asyncHandler(async (req, res) => {
 
 const loadDashboard = asyncHandler(async (req, res) => {
     try {
-        res.render('adminView/index');
+        const products = (await Product.find()).length;
+        const category = (await Category.find()).length;
+        res.render('adminView/index',{products, category});
     } catch (error) {
-        throw new error;
+        throw error;
     }
 })
 
 const loadUsers = asyncHandler(async (req, res) => {
     try {
-        var search = '';
+        let search = '';
         if (req.query.search) {
             search = req.query.search;
         }
-        var page =  req.query.page;
-        var limit = 5;
+        let page =  req.query.page;
+        let limit = 5;
         const userData = await User.find({
             is_admin: 0,
             $or: [
@@ -68,136 +72,41 @@ const loadUsers = asyncHandler(async (req, res) => {
             ]
         })
             .countDocuments();
-        res.render('adminView/page-users-list', { user: userData, totalPage: Math.ceil(count/limit), currentPage:page });
+        res.render('adminView/page-users-list', { user: userData, totalPage: Math.ceil(count/limit), currentPage:page ,search});
     } catch (error) {
-        throw new error;
+        throw error;
     }
 });
 
 const loadUserDetails = asyncHandler(async (req, res) => {
     try {
         const id = req.query.id;
-        const user = User.findById(id);
-        res.render("adminView/page-user-details", { user:user });
-  } catch (error) {
-    throw new error;
-  }
-});
-
-const loadProduct = asyncHandler(async (req, res) => {
-    try {
-        const product = await Product.find();
-        res.render('adminView/page-products-list',{product:product});
-    } catch (error) {
-        throw  error;
-    }
-})
-
-const loadEditProduct = asyncHandler(async (req, res) => {
-    try {
-        const id = req.query.id;
-        const data = await Product.findById(id);
-        const category = await Category.find();
-        res.render('adminView/page-product-edit', { product: data, category: category, message: '' });
-  } catch (error) {
-    throw  error;
-  }
-});
-
-const editProduct = asyncHandler(async (req, res) => {
-    try {
-        const { id, title, price, discription, color, size, brand, category, status } = req.body;
-        if (price < 1) {
-                    const data = await Product.findById(id);
-                    const category = await Category.find();
-                    res.render("adminView/page-product-edit", {
-                      product: data,
-                      category: category,
-                      message: "prise can't be under 1$",
-                    });
-        }
-        const data = await Product.findById(id);
-        if (req.files && req.files.length > 0) {
-           var image = req.files.map((image) => image.filename);
+        const objectId = mongoose.Types.ObjectId.isValid(id);
+        if (objectId) {
+            const user = User.findById(id);
+            res.render("adminView/page-user-details", { user:user });
         } else {
-           var image = data.image;
+            res.redirect('/*');
         }
-        console.log(id, image, data);
-
-        if (image) {
-        console.log(id,image,data)
-        }
-        // const imageArray = image.map((image, i) => image === '' ? data.image[i] : image );
-        await Product.findByIdAndUpdate({ _id: id },
-            {
-                $set: {
-                    title: title,
-                    price: price,
-                    color: color,
-                    brand: brand,
-                    category: category,
-                    discription: discription,
-                    size: size,
-                    status: status,
-                    image:image
-                }
-            })
-        res.redirect(`/admin/editProduct?id=${id}`)
-    } catch (error) {
-        throw error;
-    }
-});
-
-const deleteProduct = asyncHandler(async (req, res) => {
-    try {
-        const id = req.query.id;
-        await Product.findByIdAndDelete(id);
-        res.redirect('/admin/product');
-    } catch (error) {
-        throw error;
-    }
-})
-
-const loadAddProduct = asyncHandler(async (req, res) => {
-    try {
-        res.render('adminView/page-product-form-3');
   } catch (error) {
-    throw new error;
-  }
-});
-
-const addProduct = asyncHandler(async (req, res) => {
-    try {
-        const product_id = uuidv4();
-        const imageArray = req.files.map((image) => image.filename);
-        const { title, color, size, brand, discription, price, status, category, quantity } = req.body;
-        const product = new Product({
-            product_id: product_id,
-            title: title,
-            color: color,
-            size: size,
-            brand: brand,
-            quantity: quantity,
-            discription: discription,
-            image: imageArray,
-            price: price,
-            status: status,
-            category:category
-        });
-        product.save();
-        res.render('adminView/page-product-form-3', { message: "Prodect added Successfully!." });
-  } catch (error) {
-    throw  error;
+    throw error;
   }
 });
 
 const loadCategory = asyncHandler(async (req, res) => {
     try {
-        const { id } = req.query;
-        const Cate = await Category.findOne({ _id: id });
-        const category = await Category.find({});
-        console.log(Cate, category);
-        res.render("adminView/page-categories", { category: category, message: 'Category added Successfully', });
+        const { id, message, search } = req.query;
+        let Cate
+        if (id) { 
+            Cate = await Category.findById( id );
+        }
+        let query = {};
+        if (search) {
+            query.$or = [{ name: { $regex: new RegExp(search, 'i') } }, { discription: { $regex: new RegExp(search, 'i') } }];
+        }
+        let category = await Category.find(query);
+        
+        res.render("adminView/page-categories", { category: category, Cate:Cate, message: message, });
     } catch (error) {
         throw  error;
     }
@@ -206,26 +115,27 @@ const loadCategory = asyncHandler(async (req, res) => {
 const addCategory = asyncHandler(async (req, res) => {
     try {
         const { name, slug, discription, id } = req.body;
-        const Name = Category.findOne({ name: name });
-        // const Slug = Category.findOne({ slug: slug });
-        // const Dis = Category.fingOne({ discription: discription });
-        if (name === Name.name) {
-            res.render('adminView/page-category',{category:category,message:'This category is already Exist.'})
+        const Name = await Category.find({ name: name });
+        console.log(Name);
+        const Slug = await Category.findOne({ slug: slug });
+        if ( Name[0] && id != Name[0]?._id) {
+            res.redirect(`/admin/category?id=${id}&message='The Product is Already Exist'`);
         }
-        if (id) {
-            Category.findByIdAndUpdate({ _id: id }, { $set: { name: name, slug: slug, discription: discription ,category_id:category_id,order:order,status:status} });
-            res.redirect("/admin/category");
+        else if (Slug && id != Slug._id) {
+            res.redirect(`/admin/category?id=${id}&message='The Slug is already exist'`);
+        }
+        else if (id) {
+            await Category.findByIdAndUpdate( id , { $set: { name: name, slug: slug, discription: discription ,status:status} });
+            res.redirect(`/admin/category?&message='Category Updatd successfully'`);
         } else {
-        const category_id = uuidv4();
         const category = new Category({
           name: name,
           slug: slug,
           discription: discription,
-          category_id: category_id,
           status: status
         });
         category.save();
-        res.redirect("/admin/category"); 
+        res.redirect(`/admin/category?${id}&message='Category Added Successfully'`); 
         }
 
   } catch (error) {
@@ -236,9 +146,7 @@ const addCategory = asyncHandler(async (req, res) => {
 const deletCategory = asyncHandler(async (req, res) => {
   try {
       const id = req.query.id;
-      console.log(id)
-      const delet = await Category.findOneAndDelete({ _id: id });
-      console.log(delet,'deleted')
+      await Category.findOneAndDelete({ _id: id });
       res.redirect('/admin/category',);
   } catch (error) {
     throw  error;
@@ -259,20 +167,62 @@ const status = asyncHandler(async (req, res) => {
   }
 });
 
+const loadError = asyncHandler(async (req, res) => {
+  try {
+    res.render("userView/error-404");
+  } catch (error) {
+    throw error;
+  }
+});
+
+const forgotPassword = asyncHandler(async (req, res) => {
+    try {
+        res.render('auth/page-forgot-password');
+    } catch (error) {
+        throw error;
+    }
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const Email = await User.findOne({ email: email });
+        if (Email) {
+            const spassword = await bcrypt.hash(password, 10);
+            await User.updateOne({ email: email }, { $set: { password: spassword } });
+            res.redirect('/admin/login')
+        } else {
+            res.render('auth/page-forgot-password',{message:'Email Not registerd'})
+        }
+    } catch (error) {
+        throw error;
+    }
+});
+
+const logout = asyncHandler(async (req, res) => {
+    try {
+        console.log("logout");
+        console.log(req.session);
+        req.session.destroy();
+        console.log(req.session);
+        res.redirect('/admin/login');
+  } catch (error) {
+    throw error;
+  }
+});
+
 module.exports = {
     loadLogin,
     verifyLogin,
     loadDashboard,
     loadUsers,
     loadUserDetails,
-    loadProduct,
-    loadEditProduct,
-    editProduct,
-    deleteProduct,
-    loadAddProduct,
-    addProduct,
     loadCategory,
     addCategory,
     deletCategory,
     status,
+    loadError,
+    forgotPassword,
+    changePassword,
+    logout,
 };

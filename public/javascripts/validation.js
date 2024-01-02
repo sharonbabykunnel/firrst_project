@@ -19,7 +19,7 @@ function validatemail() {
           Emailerror.innerHTML = 'Email is Required';
           return false;
      }
-     if (!email.match(/^[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[a-z]{2,4}$/)) {
+     if (!email.match(/^[A-Za-z0-9._-]+@[A-Za-z0-9]+\.[a-zA-Z]{2,4}$/)) {
           Emailerror.innerHTML = 'Invalid Email';
           return false;
      }
@@ -34,7 +34,7 @@ const validatpass = () => {
           passerror.innerHTML = 'invalid Password';
           return false;
      }
-     if (!pass.match(/^(?=.*\d)(?=.*[a-z]).{6,20}$/)) {
+     if (!pass.match(/^(?=.*\d)(?=.*[a-z])(?=.*[!@#$%^&*]).{6,20}$/)) {
           passerror.innerHTML = 'inavalid Password';
           return false;
          }
@@ -110,14 +110,14 @@ const checkPass = () => {
      var cpass = document.getElementById('cpass').value;
      var cpasserror =document.getElementById("cpass-error")
      if (cpass.length === 0) {
-          cpasserror.innerHTML = "Conform Password";
+          cpasserror.innerHTML = "Confirm Password";
           return false;
      }
      if (pass !== cpass) {
           cpasserror.innerHTML = "Password don't Match.";
           return false;
      }
-     cpasserror.innerHTML ="Conformed Password"
+     cpasserror.innerHTML ="Password Confirmed "
      return true;
 }
 

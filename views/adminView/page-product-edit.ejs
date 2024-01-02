@@ -20,11 +20,16 @@
                                 <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title" value="<%= product.title %>" onkeyup="validatString('product_title','title_error','Title')">
                                 <span id="title_error"></span>
                             </div>
-                                <div class="  mb-3">
-                                    <label for="product_color" class="form-label">Color</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_color" name="color" value="<%= product.color %>" onkeyup="validatString('product_color','color_error','Color')">
-                                    <span id="color_error"></span>
-                                </div>
+                            <div class="  mb-3">
+                                <label for="product_quantity" class="form-label">Quantity</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_quantity" name="quantity" value="<%= product.quantity %>" onkeyup="validatString('product_quantity','quantity_error','Quantity')">
+                                <span id="quantity_error"></span>
+                            </div>
+                            <div class="  mb-3">
+                                <label for="product_color" class="form-label">Color</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="product_color" name="color" value="<%= product.color %>" onkeyup="validatString('product_color','color_error','Color')">
+                                <span id="color_error"></span>
+                            </div>
                                 <input type="hidden" name="id"  value="<%= product._id %>">
                                 <div class="  mb-3">
                                     <label for="product_size" class="form-label">Size</label>

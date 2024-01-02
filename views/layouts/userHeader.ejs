@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Ashion Template">
-    <meta name="keywords" content="Ashion, unica, creative, html">
+    <meta name="description" content="Fastcart Template">
+    <meta name="keywords" content="Fastcart, unica, creative, html">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Ashion | Template</title>
+    <title>Fastcart | Template</title>
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
@@ -26,10 +26,10 @@
 </head>
 
 <body>
-    <!-- Page Preloder -->
+    <!-- Page Preloder
     <div id="preloder">
         <div class="loader"></div>
-    </div>
+    </div> -->
 
     <!-- Offcanvas Menu Begin -->
     <div class="offcanvas-menu-overlay"></div>
@@ -37,20 +37,25 @@
         <div class="offcanvas__close">+</div>
         <ul class="offcanvas__widget">
             <li><span class="icon_search search-switch"></span></li>
-            <li><a href="#"><span class="icon_heart_alt"></span>
+            <li><a href=""><span class="icon_heart_alt"></span>
                 <div class="tip">2</div>
             </a></li>
-            <li><a href="#"><span class="icon_bag_alt"></span>
+            <li><a href="/cart"><span class="icon_bag_alt"></span>
                 <div class="tip">2</div>
             </a></li>
         </ul>
         <div class="offcanvas__logo">
-            <a href="./index.html"><img src="/img/logo.png" alt=""></a>
+            <a href="/"><img src="/img/logo.png" alt=""></a>
         </div>
         <div id="mobile-menu-wrap"></div>
         <div class="offcanvas__auth">
-            <a href="/signin">SignIN/a>
-            <a href="/signup">SignUP<a>
+        <% if (typeof user =="undefined"){%>
+            <a href="/signin">SignIN</a>
+            <a href="/signup">SignUP</a>
+            <%}else{%>
+                <span><%= user.name %></span>
+                <button class="btn-light"><a href="/logout">LogOut</a></button>
+                <%}%>
         </div>
     </div>
     <!-- Offcanvas Menu End -->
@@ -61,42 +66,49 @@
             <div class="row">
                 <div class="col-xl-3 col-lg-2">
                     <div class="header__logo">
-                        <a href="./index.html"><img src="/img/logo.png" alt=""></a>
+                        <a href="/">Fastcart</a>
                     </div>
                 </div>
                 <div class="col-xl-6 col-lg-7">
                     <nav class="header__menu">
                         <ul>
-                            <li class="active"><a href="./index.html">Home</a></li>
-                            <li><a href="#">Women’s</a></li>
-                            <li><a href="#">Men’s</a></li>
-                            <li><a href="./shop.html">Shop</a></li>
+                            <li class=""><a href="/">Home</a></li>
+                            <!-- <li><a href="#">Women’s</a></li> -->
+                            <!-- <li><a href="#">Men’s</a></li> -->
+                            <li><a href="/shop">Shop</a></li>
                             <li><a href="#">Pages</a>
                                 <ul class="dropdown">
-                                    <li><a href="./product-details.html">Product Details</a></li>
-                                    <li><a href="./shop-cart.html">Shop Cart</a></li>
-                                    <li><a href="./checkout.html">Checkout</a></li>
-                                    <li><a href="./blog-details.html">Blog Details</a></li>
+                                    <!-- <li><a href="">Product Details</a></li> -->
+                                    <li><a href="/cart">Shop Cart</a></li>
+                                    <li><a href="#">Checkout</a></li>
+                                    <li><a href="#">Blog Details</a></li>
                                 </ul>
                             </li>
-                            <li><a href="./blog.html">Blog</a></li>
-                            <li><a href="./contact.html">Contact</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3">
                     <div class="header__right">
                         <div class="header__right__auth">
-                            <a href="/signin">SignIN</a>
-                            <a href="/signup">SignUp</a>
+                            <% if(typeof user == "undefined"){%>
+                                <a href="/signin">SignIN</a>
+                                <a href="/signup">SignUp</a>
+                                <%}else{%>
+                                    <span><%=  user.name %></span>
+                                    <button class="btn-primary"><a href="/logout">LogOut</a></button>
+                                    <%}%>
                         </div>
                         <ul class="header__right__widget">
-                            <li><span class="icon_search search-switch">\</span></li>
-                            <li><a href="#"><span class="icon_heart_alt"></span>
-                                <div class="tip">2</div>
+                            <li><span class="icon_search search-switch"></span></li>
+                            <li><a href=""><span class="icon_heart_alt"></span>
+                                <!-- <div class="tip"></div> -->
                             </a></li>
-                            <li><a href="#"><span class="icon_bag_alt"></span>
-                                <div class="tip">2</div>
+                            <li><a href="/cart"><span class="icon_bag_alt"></span>
+                                <% if (typeof cartNum !== "undefined") {%>
+                                    <div class="tip"><%= cartNum %></div>
+                                    <%}%>
                             </a></li>
                         </ul>
                     </div>

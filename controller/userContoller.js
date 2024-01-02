@@ -5,6 +5,7 @@ const Cart = require('../model/cartModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const otpGenerator = require('otp-generator');
+const mongoose = require('mongoose');
 const session = require('express-session');
 
 
@@ -35,7 +36,7 @@ const loadSignin = asyncHandler(async (req, res) => {
         res.render('auth/page-account-login');
         
     } catch (error) {
-        throw new error;
+        throw error;
     }
 })
 
@@ -48,20 +49,26 @@ const verifySignin = asyncHandler(async (req, res) => {
             if (userData) {
                 const passwordMatch =  bcrypt.compare(password, userData.password);
                 if (passwordMatch) {
-                    req.session.user.id = userData._id;
+                    req.session.user = userData;
                     res.redirect('/home');
                 } else {
-                    res.render('userView/signin', { massage: "Incorrect password.Please Retry." });
+                    res.render("auth/page-account-login", {
+                      message: "Incorrect password.Please Retry.",
+                    });
                 }
             } else {
-                res.render('userView/signin',{massage:"Email and Password are not Correct."})
+                res.render("auth/page-account-login", {
+                  message: "Email and Password are not Correct.",
+                });
             }
         } else {
-            res.render('userView/signin', { massage: "Email and Password are not Found!.." });
+            res.render('auth/page-account-login', {
+                message: "Email and Password are not Found!.."
+            });
         }
         
     } catch (error) {
-        throw new error;
+        throw  error;
     }
 })
 
@@ -69,7 +76,7 @@ const loadSignup = asyncHandler(async (req, res) => {
     try {
         res.render('auth/page-account-register');
     } catch (error) {
-        throw new error;
+        throw error;
     }
 })
 
@@ -123,19 +130,20 @@ const verifySignup = asyncHandler(async(req, res)=> {
 
 const loadHome = asyncHandler(async (req, res) => {
     try {
+        const user = req.session.user;
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
         const product = await Product.find();
-        console.log(product);
-        res.render('userView/index',{product:product});
+        res.render('userView/index', { product, user, cartNum });
     } catch (error) {
-        throw new error;
+        throw error;
     }
-})
+});
 
 const loadOtp = asyncHandler(async (req, res) => {
     try {
         res.render("auth/otp");
     } catch (error) {
-        throw new error;
+        throw error;
     }
 })
 
@@ -181,7 +189,7 @@ const sentOtp = asyncHandler(async (email, otp) => {
             form: process.env.USER,
             to: email,
             subject: "Verify Your Signup",
-            text: `${otp} is $}`,
+            text: `Your OTP id ${otp} `,
         };
         transporter.sendMail(mailOptios, (error, info) => {
             if (error) {
@@ -189,7 +197,6 @@ const sentOtp = asyncHandler(async (email, otp) => {
             } else {
                 req.session.user.OTP = otp;
                 console.log("email send successfully!");
-                console.log("massage sent:%s", info.massageId);
             }
         });
     } catch (error) {
@@ -199,19 +206,30 @@ const sentOtp = asyncHandler(async (email, otp) => {
 
 const loguot = asyncHandler(async (req, res) => {
     try {
-        res.session.distroy;
-    res.render("userView/index");
+        req.session.destroy();
+    res.redirect("/");
   } catch (error) {
-    throw new error;
+    throw  error;
   }
 });
 
 const loadProductDetails = asyncHandler(async (req, res) => {
     try {
+        const user = req.session.user;
         const id = req.params.id;
-        const product = await Product.findById(id)
-        console.log(id, product);
-        res.render('userView/product-details.ejs', { product: product });
+        const cart = await Cart.findOne({ user_id: user._id })
+        const cartData = cart?.product.find((product) => product.product_id == id);
+        console.log(cartData,'cartttt');
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+        const objectId = mongoose.Types.ObjectId.isValid(id)
+        if (objectId) {
+            const product = await Product.findById(id);
+            console.log(product,"prrrrr");
+            const products = await Product.find()
+            res.render('userView/product-details.ejs', { product, products,user,cartNum, cartData }); 
+        } else {
+           res.redirect('/*')
+        }
     } catch (error) {
         throw error;
     }
@@ -219,27 +237,118 @@ const loadProductDetails = asyncHandler(async (req, res) => {
 
 const loadCart = asyncHandler(async (req, res) => {
     try {
-        const user = req.session.user.id;
-        const cart = Cart.findOne({ user_id: user });
-        res.render('userView/shop-cart', { cart: cart });
+        const user = req.session.user;
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+        const cart = await Cart.findOne({ user_id: user._id }).populate('product.product_id');
+        const product = cart?.product;
+        const calculatTotal = (product) => {
+            return product.reduce((total, product) => {
+                const productTotal = product.product_id.price * product.quantity;
+                return total + productTotal;
+            }, 0);
+        };
+        res.render('userView/shop-cart', {cart, product,user, calculatTotal,cartNum });
+    } catch (error) {
+        throw error;
+    }
+});
+
+const addToCart = asyncHandler(async (req, res) => {
+    try {
+        const product_id = req.query.id;
+        console.log(product_id,"poooooo");
+        const quantity = req.body.quantity;
+        console.log(quantity,'qqqqqqqqqqqqqqqq');
+        const user_id = req.session.user._id;
+        const objectId = mongoose.Types.ObjectId.isValid(product_id);
+        if (objectId) {
+            let cart = await Cart.findOne({ user_id: user_id });
+          if (!cart) {
+              const cartData = new Cart({ user_id: user_id, product: [] });
+              await cartData.save();
+              cart = cartData;
+          }
+          const productIndex =  cart.product.findIndex((product) => product.product_id == product_id);
+            if (productIndex == -1) {
+                cart.product.push({ quantity ,product_id});
+                console.log(productIndex,cart.product)
+            } else {
+                if (cart.product[productIndex].quantity == quantity) {
+                    cart.product[productIndex].quantity += 1;
+                } else {
+                    cart.product[productIndex].quantity = quantity;
+                }
+                  
+                console.log(cart.product,product_id)
+          }
+          await cart.save();
+          res.redirect('/cart')  
+        } else {
+            res.redirect('/*');
+        }
   } catch (error) {
     throw error;
   }
 });
 
-const addToCart = asyncHandler(async (req, res) => {
+const deleteCart = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user._id;
+        const product_id = req.query.id;
+        const objectId = mongoose.Types.ObjectId.isValid(product_id);
+        if (objectId) {
+            await Cart.updateOne({ user_id: user }, { $pull: { product: { _id: product_id } } } );
+            res.redirect('/cart');   
+        } else {
+            res.redirect('/*'); 
+        }
+    } catch (error) {
+        throw error;
+    }
+})
+
+const loadError = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user;
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+    res.render("userView/error-404",{user,cartNum});
+  } catch (error) {
+    throw error;
+  }
+});
+
+const loadShop = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user;
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+        const product = await Product.find();
+        res.render("userView/shop",{user,product,cartNum});
+  } catch (error) {
+    throw error;
+  }
+});
+
+const forgotPassword = asyncHandler(async (req, res) => {
   try {
-      const id = req.params.id;
-      const user_id = req.session.user.id;
-      const product = await Product.findById(id);
-      console.log(id, product);
-      const cartData = new Cart({
-          user_id: user_id,
-          product_id: id,
+    res.render("auth/page-fp");
+  } catch (error) {
+    throw error;
+  }
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const Email = await User.findOne({ email: email });
+    if (Email) {
+      const spassword = await bcrypt.hash(password, 10);
+      await User.updateOne({ email: email }, { $set: { password: spassword } });
+      res.redirect("/signin");
+    } else {
+      res.render("auth/page-fp", {
+        message: "Email Not registerd",
       });
-      cartData.save();
-      // res.render("userView/product-details.ejs", { product: product });
-      res.redirect('/')
+    }
   } catch (error) {
     throw error;
   }
@@ -257,5 +366,10 @@ module.exports = {
     loguot,
     loadProductDetails,
     loadCart,
-    addToCart
+    addToCart,
+    deleteCart,
+    loadError,
+    loadShop,
+    forgotPassword,
+    changePassword,
 };

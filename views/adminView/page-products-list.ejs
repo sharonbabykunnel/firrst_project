@@ -50,7 +50,7 @@
                                 <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
                                     <a class="itemside" href="/admin/product-details/id=<%= product[i].product_id %>">
                                         <div class="left">
-                                            <img src="/images/<%= product[i].image[1] %>" class="img-sm img-thumbnail" alt="Item">
+                                            <img src="/images/<%= product[i].image[0] %>" class="img-sm img-thumbnail" alt="Item">
                                         </div>
                                         <div class="info">
                                             <h6 class="mb-0"><%= product[i].title %></h6>
@@ -61,11 +61,16 @@
                                 <div class="col-lg-2 col-sm-2 col-4 col-status">
                                     <span class="badge rounded-pill alert-success"><%= product[i].status %></span>
                                 </div>
+                                <div class="col-lg-2 col-sm-2 col-4 col-status">
+                                    <% if (product[i].quantity == 0)  { %>
+                                    <span class="badge rounded-pill alert-warning">out of stock</span> <% }else{ %>
+                                    <span class="badge rounded-pill alert-success"><%= product[i].quantity %> item Left</span> <% } %>
+                                </div>
                                 <div class="col-lg-1 col-sm-2 col-4 col-date">
                                     <span></span>
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                    <a href="/admin/editProduct?id=<%= product[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                                    <a href="/admin/editProduct?id=<%= product[i]._id %>" class="btn btn-sm font-sm rounded btn-brand pr-25">
                                         <i class="material-icons md-edit"></i> Edit
                                     </a>
                                     <a href="/admin/deleteProduct?id=<%= product[i]._id %>" class="btn btn-sm font-sm btn-light rounded">

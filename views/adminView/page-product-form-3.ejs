@@ -2,7 +2,7 @@
 
         <section class="content-main">
             <div class="row">
-                <form action="/admin/addProduct" method="post" enctype="multipart/form-data">
+                <form action="/admin/addProduct" method="post" enctype="multipart/form-data" onsubmit="return validatFromEditPage()">
                 <div class="col-9">
                     <div class="content-header">
                         <h2 class="content-title">Add New Product</h2>
@@ -17,25 +17,30 @@
                         <div class="card-body">
                             <div class="mb-4">
                                 <label for="product_title"  class="form-label">Product title</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title">
+                                <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title" onkeyup="validatString('product_title','title_error','Title')">
+                                <span id="title_error"></span>
                             </div>
                             <div class="row gx-3">
                                 <div class="col-md-4  mb-3">
-                                    <label for="product_sku" class="form-label">Quantity</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_sku" name="Quantity">
+                                    <label for="product_quantity" class="form-label">Quantity</label>
+                                    <input type="number" placeholder="Type here" class="form-control" id="product_quantity" name="quantity" onkeyup="validatString('product_quantity','quantity_error','Quantity')">
+                                    <span id="quantity_error"></span>
                                 </div>
                                 <div class="col-md-4  mb-3">
                                     <label for="product_color" class="form-label">Color</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_color" name="color">
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_color" name="color" onkeyup="validatString('product_color','color_error','Color')">
+                                    <span id="color_error"></span>
                                 </div>
                                 <div class="col-md-4  mb-3">
                                     <label for="product_size" class="form-label">Size</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_size" name="size">
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_size" name="size" onkeyup="validatString('product_size','size_error','Size')">
+                                    <span id="size_error"></span>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <label for="product_brand" class="form-label">Brand</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand">
+                                <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand" onkeyup="validatString('product_brand','brand_error','Brand')">
+                                <span id="brand_error"></span>
                             </div>
                         </div>
                     </div> <!-- card end// -->
@@ -43,7 +48,8 @@
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" class="form-control" rows="4" name="discription"></textarea>
+                                <textarea placeholder="Type here" class="form-control" rows="4" id="product_dis" name="discription" onkeyup="validatString('product_dis','dis_error','Discription')"></textarea>
+                                <span id="dis_error"></span>
                             </div>
                         </div>
                     </div> <!-- card end// -->
@@ -61,7 +67,8 @@
                         <div class="card-body">
                             <div class="mb-4">
                                 <label class="form-label">Price</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="price">
+                                <input type="number" placeholder="Type here" class="form-control" name="price" id="product_price" onkeyup="validatString('product_price','price_error','Price')">
+                                <span id="price_error"></span>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Status</label>
@@ -72,7 +79,8 @@
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Categories</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="category">
+                                <input type="text" placeholder="Type here" class="form-control" name="category" id="product_categories" onkeyup="validatString('product_categories','categorie_error','Categorie')">
+                                <span id="categorie_error"></span>
                             </div>
                             <!-- <div class="mb-4">
                                 <label class="form-label">Tags</label>
@@ -115,6 +123,7 @@
                         <button class="btn btn-light rounded font-sm mr-5 text-body hover-up type="submit"">Save to draft</button>
                     </div> <!-- card end// -->
                 </div>
+                <span id="form_error"></span>
             </form>
             </div>
             <% if (typeof message !== 'undefined'){ %>

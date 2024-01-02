@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="breadcrumb__links">
-                        <a href="./index.html"><i class="fa fa-home"></i> Home</a>
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
                         <span>Shopping cart</span>
                     </div>
                 </div>
@@ -14,7 +14,8 @@
         </div>
     </div>
     <!-- Breadcrumb End -->
-
+    
+    <% if(product){%>
     <!-- Shop Cart Section Begin -->
     <section class="shop-cart spad">
         <div class="container">
@@ -31,14 +32,14 @@
                                     <th></th>
                                 </tr>
                             </thead>
-                            <% if(product){%>
                                 <tbody>
                                 <%for(let i=0; i<product.length; i++){ %>
                                     <tr>
-                                        <td class="cart__product__item">
-                                            <img src="img/shop-cart/cp-1.jpg" alt="">
+                                        <td class="cart__product__item"><a href="/productDetails/<%=product[i]?.product_id?._id %>">
+                                            <img src="images/<%= product[i]?.product_id?.image[0] %>" alt="" width="100 px">
+                                        </a>
                                             <div class="cart__product__item__title">
-                                                <h6>Chain bucket bag</h6>
+                                                <h6><%= product[i].product_id?.title%></h6>
                                                 <div class="rating">
                                                     <i class="fa fa-star"></i>
                                                     <i class="fa fa-star"></i>
@@ -48,18 +49,18 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="cart__price">$ 150.0</td>
+                                        <td class="cart__price">$<%= product[i].product_id?.price %></td>
                                         <td class="cart__quantity">
-                                            <div class="pro-qty">
-                                                <input type="text" value="1">
-                                            </div>
+                                            <!-- <div class="pro-qty"> -->
+                                                <!-- <input type="text" value="<%= product[i].quantity %>" name="quantity"> -->
+                                                <span><%= product[i].quantity %></span>
+                                            <!-- </div> -->
                                         </td>
-                                        <td class="cart__total">$ 300.0</td>
-                                        <td class="cart__close"><span class="icon_close"></span></td>
+                                        <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.price * product[i].quantity %></td>
+                                        <td class="cart__close"><a href="/deleteCart?id=<%= product[i]._id %>"><span class="icon_close"></span></a></td>
                                     </tr>
                                 <%}%>
                             </tbody>
-                            <%}%>
                         </table>
                     </div>
                 </div>
@@ -67,14 +68,14 @@
             <div class="row">
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="cart__btn">
-                        <a href="#">Continue Shopping</a>
+                        <a href="/">Continue Shopping</a>
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
+                <!-- <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="cart__btn update__btn">
-                        <a href="#"><span class="icon_loading"></span> Update cart</a>
+                        <a href="/updateCart?quantity=quantity"><span class="icon_loading"></span> Update cart</a>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="row">
                 <div class="col-lg-6">
@@ -90,8 +91,8 @@
                     <div class="cart__total__procced">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ 750.0</span></li>
-                            <li>Total <span>$ 750.0</span></li>
+                            <li>Subtotal <span>$ <%= calculatTotal(product) %></span></li>
+                            <li>Total <span id="total" >$ <%= calculatTotal(product) %></span></li>
                         </ul>
                         <a href="#" class="primary-btn">Proceed to checkout</a>
                     </div>
@@ -100,7 +101,10 @@
         </div>
     </section>
     <!-- Shop Cart Section End -->
+                            <%}else{%>
 
+<p>No cart product</p>
+                            <%}%>
     <!-- Instagram Begin -->
     <div class="instagram">
         <div class="container-fluid">
@@ -109,7 +113,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-1.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>
@@ -117,7 +121,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-2.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>
@@ -125,7 +129,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-3.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>
@@ -133,7 +137,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-4.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>
@@ -141,7 +145,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-5.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>
@@ -149,7 +153,7 @@
                     <div class="instagram__item set-bg" data-setbg="img/instagram/insta-6.jpg">
                         <div class="instagram__text">
                             <i class="fa fa-instagram"></i>
-                            <a href="#">@ ashion_shop</a>
+                            <a href="#">@ Fastcart_shop</a>
                         </div>
                     </div>
                 </div>

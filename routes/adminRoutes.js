@@ -2,24 +2,29 @@ const express = require("express");
 const rout = express.Router();
 const admin = require("../controller/adminController");
 const upload = require('../multer/multer');
+const adminAuth = require('../middleware/adminAuth');
+const product = require('../controller/productController');
 
-rout.get("/", admin.loadDashboard);
-rout.get("/login", admin.loadLogin);
-rout.get("/product", admin.loadProduct);
-rout.get("/users", admin.loadUsers);
-rout.get('/userDetails',admin.loadUserDetails)
-rout.get("/editProduct", admin.loadEditProduct);
-rout.get("/addProduct", admin.loadAddProduct);
-rout.get('/category',admin.loadCategory)
-rout.get("/deleteCategory", admin.deletCategory);
-rout.get("/deleteProduct", admin.deleteProduct);
-rout.get("/status", admin.status);
-
+rout.get("/", adminAuth.isAdminLogged, admin.loadDashboard);
+rout.get("/login", adminAuth.isAdminNot, admin.loadLogin);
+rout.get("/product", adminAuth.isAdminLogged, product.loadProduct);
+rout.get("/users", adminAuth.isAdminLogged, admin.loadUsers);
+rout.get("/userDetails", adminAuth.isAdminLogged, admin.loadUserDetails);
+rout.get("/editProduct", adminAuth.isAdminLogged, product.loadEditProduct);
+rout.get("/addProduct", adminAuth.isAdminLogged, product.loadAddProduct);
+rout.get("/category", adminAuth.isAdminLogged, admin.loadCategory);
+rout.get("/deleteCategory", adminAuth.isAdminLogged, admin.deletCategory);
+rout.get("/deleteProduct", adminAuth.isAdminLogged, product.deleteProduct);
+rout.get("/status", adminAuth.isAdminLogged, admin.status);
+rout.get("/forgotPassword", adminAuth.isAdminNot, admin.forgotPassword);
+rout.get("/logout", admin.logout);
 
 rout.post("/", admin.verifyLogin);
-rout.post("/editProduct1",upload.array('image',4), admin.editProduct);
-rout.post("/addCategory",upload.array('image',4), admin.addCategory);
-rout.post("/addProduct", admin.addProduct);
+rout.post("/editProduct1",upload.array('image',4), product.editProduct);
+rout.post("/addProduct",upload.array('image',4), product.addProduct);
+rout.post("/addCategory", admin.addCategory);
+rout.post('/login', admin.verifyLogin);
+rout.post("/changePassword", admin.changePassword);
 
 
 module.exports = rout;
