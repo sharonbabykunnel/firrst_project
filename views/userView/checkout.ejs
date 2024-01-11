@@ -1,0 +1,389 @@
+<%-include('../layouts/userHeader.ejs') %>
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Shopping cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6"  style="display: none;" id="coupon">
+                    <div class="discount__content">
+                        <h6>Discount codes</h6>
+                        <form action="/cart/coupon">
+                            <input type="text" placeholder="Enter your coupon code">
+                            <button type="submit" class="site-btn">Apply</button>
+                        </form>
+                        <h4 onclick="removecoupon()">BACK</h4>
+                    </div>
+                </div>
+                <div class="col-lg-12" id="question">
+                    <h6 class="coupon__link" onclick="addcoupon()"><span class="icon_tag_alt"></span> <a href="#">Have a coupon?</a> Click
+                    here to enter your code.</h6>
+                </div>
+            </div>
+            
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h5>Billing detail</h5>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="checkout__form__input">
+                                    <p>Hous Name/Buliding Number <span>*</span></p>
+                                    <input type="text" name="building" id="building">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Land Mark <span>*</span></p>
+                                    <input type="text" name="landmark" id="landmark">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Streat <span>*</span></p>
+                                    <input type="text" name="streat" id="streat">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Country <span>*</span></p>
+                                    <input type="text" name="country" id="country">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>State <span>*</span></p>
+                                    <input type="text" name="state" id="state">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>District <span>*</span></p>
+                                    <input type="text" name="district" id="district">
+                                    <span id="_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Postcode <span>*</span></p>
+                                    <input type="text" name="pincode" id="pincode">
+                                    <input type="hidden" id="status" name="status" value="Pending">
+                                    <span id="_error"></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                    <div class="checkout__form__input">
+                                        <p>Oder notes <span>*</span></p>
+                                        <input type="text"
+                                        placeholder="Note about your order, e.g, special noe for delivery" name="notes" id="notes" >
+                                    <span id="_error"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="checkout__order">
+                                <h5>Your order</h5>
+                                <div class="checkout__order__product">
+                                    <ul>
+                                        <li>
+                                            <span class="top__text">Product</span>
+                                            <span class="top__text__right">Total</span>
+                                        </li>
+                                        <% if (Array.isArray(product)){ %> 
+                                        <%for(let i=0; i<product.length; i++){%>
+                                            <li><%= i+1 %>.   <%= product[i].product_id.title %> <span>$ <%= product[i].product_id.price %></span></li><%}%>
+                                        <%}else{%>
+                                            <li><%= 1 %>.   <%= product.title %> <span>$ <%= product.price %></span></li>
+                                            <%}%>
+                                    </ul>
+                                </div>
+                                <div class="checkout__order__total">
+                                    <ul>
+                                        <li>Subtotal <span>$<span id="stotal"> <%= calculatTotal %></span></span></li>
+                                        <% if(typeof discount !="undefined"){%>
+                                            <li>Total <span>$<span id="total" > <%= calculatTotal -(calculatTotal * discount /100) %></span></span></li>  
+                                            <%}else{%>
+                                            <li>Total <span>$<span id="total" > <%= calculatTotal  %></span></span></li><%}%>
+                                    </ul>
+                                </div>
+                                <div class="checkout__order__widget">
+                                    <!-- <label for="o-acc">
+                                        Create an acount?
+                                        <input type="checkbox" id="o-acc">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <p>Create am acount by entering the information below. If you are a returing customer
+                                    login at the top of the page.</p> -->
+                                    <label for="check-payment">
+                                        COD
+                                        <input type="radio" id="check-payment" name="payment" value="COD">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label for="paypal">
+                                        paypal
+                                        <input type="radio" id="paypal" name="payment" value="paypal">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <input type="hidden" name="discount"  value="<%= discount %>">
+                                    <label for="razorpay">
+                                        razorpay
+                                        <input type="radio" id="razorpay" name="payment" value="razorpay">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <!-- <label for="paypal">
+                                        razorpay
+                                        <input type="radio" id="paypal" name="payment">
+                                        <span class="checkmark"></span>
+                                    </label> -->
+                                </div>
+                                <button type="submit" class="site-btn" onclick="checkout()">Place oder</button>
+                            </div>
+                        </div>
+                    </div>
+                
+            </div>
+        </section>
+        <!-- Checkout Section End -->
+
+        <!-- Instagram Begin -->
+        <div class="instagram">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-1.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-2.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-3.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-4.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-5.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-6.jpg">
+                            <div class="instagram__text">
+                                <i class="fa fa-instagram"></i>
+                                <a href="#">@ ashion_shop</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+           function checkout() {
+            console.log("dd");
+        var ele = document.getElementsByName('payment');
+        // var payment = ""
+        for (i = 0; i < ele.length; i++) {
+            if (ele[i].checked) 
+            payment = ele[i].value;
+        }
+        let stotal = Number(document.getElementById('stotal').innerHTML)
+        let total = Number(document.getElementById('total').innerHTML)
+        // let discount = document.getElementById('discount').value
+        let building = document.getElementById('building').value
+        let landmark = document.getElementById('landmark').value
+        let streat = document.getElementById('streat').value
+        let district = document.getElementById('district').value
+        let country = document.getElementById('country').value
+        let pincode = document.getElementById('pincode').value
+        let state = document.getElementById('state').value
+        let notes = document.getElementById('notes').value
+        let status = document.getElementById('status').value
+        let obj = {
+            stotal,total,district,building,landmark,streat,country,pincode,state,notes,status,payment
+        }
+
+        fetch('/cart/placeOrder?id=<%= product._id %>&quantity=<%=quantity %>', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(obj)
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            console.log(data);
+            if (data.payment == 'COD') {
+                location.href = '/order-success'
+            }
+            else if (data.payment == 'razorpay') {
+                razorpayPayment(data.responce, data.user)
+            } else if (data.payment == 'paypal') {
+                console.log(data.link,"jj");
+                location.href = data.link
+            }
+        })
+    }
+
+
+
+
+    function razorpayPayment(order, user) {
+        var options = {
+            "key":"rzp_test_dka3Pol1L9thKD",
+            "amount": order.amount,
+            "currency": "INR",
+            "name": "Fcart",
+            "description": "Test Transaction",
+            "image": "https://previews.123rf.com/images/subhanbaghirov/subhanbaghirov1605/subhanbaghirov160500087/56875269-vector-light-bulb-icon-with-concept-of-idea-brainstorming-idea-illustration-.jpg",
+            "order_id": order.id,
+            "handler": function (response) {
+                console.log(response,order,"funnn")
+                verifyPayment(response, order)
+            },
+            "prefill": {
+                "name": user.name,
+                "email": user.email,
+                "contact": user.mobile
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options)
+        
+        rzp1.on('payment.failed', function (response) {
+            alert(response.error.code);
+        })
+        rzp1.open()
+    }
+
+
+
+    function verifyPayment(payment, order) {
+        console.log(payment,order,"kj");
+        fetch('/razorpay-success', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                payment,
+                order
+            })
+        }).then((res) => {
+            
+            return res.json()
+        }).then((response) => {
+            console.log(response,'rrrrrrrrrrrrrrrrrrrrr');
+            if (response.status) {
+                console.log(response.status,"kl");
+                location.href = `/order-success/${response.order}`
+            } else {
+                alert('payment failed')
+            }
+        }).catch((error) => {
+        // Handle any errors that occur during the fetch or parsing of JSON
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+
+    }
+
+
+    function applyCoupon() {
+        let code = document.getElementById('coupon_code').value
+        let total = document.getElementById('original_amount').value
+        fetch('/coupon-check', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                code, total
+            })
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            let { result } = data
+            console.log(result)
+            if (result) {
+                if (result == 'coupon used') {
+                    document.getElementById('discount').innerHTML = 0
+                    document.getElementById('offer_amount').innerHTML = total
+                    document.getElementById('coupon_applied').value = ''
+                    document.getElementById('coupon_error').innerHTML = 'coupon used'
+                    document.getElementById('coupon_error').style.visibility = 'visible'
+                } else {
+                    console.log(data.result)
+                    document.getElementById('discount').innerHTML = result.discount
+                    document.getElementById('offer_amount').innerHTML = result.answer
+                    document.getElementById('coupon_applied').value = code
+                    document.getElementById('coupon_error').style.visibility = 'hidden'
+                }
+            }
+            else {
+                document.getElementById('discount').innerHTML = 0
+                document.getElementById('offer_amount').innerHTML = total
+                document.getElementById('coupon_applied').value = ''
+                document.getElementById('coupon_error').innerHTML = 'Invalid coupon'
+                document.getElementById('coupon_error').style.visibility = 'visible'
+            }
+        })
+    }
+
+    function getAddress(address_no) {
+        fetch('/getaddress', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                address_no
+            })
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            document.getElementById('housename').value = data.address.housename
+            document.getElementById('locality').value = data.address.locality
+            document.getElementById('landmark').value = data.address.landmark
+            document.getElementById('city').value = data.address.city
+            document.getElementById('district').value = data.address.district
+            document.getElementById('pincode').value = data.address.pincode
+        })
+    }
+        </script>
+        <!-- Instagram End -->
+<%- include('../layouts/userFooter.ejs') %>

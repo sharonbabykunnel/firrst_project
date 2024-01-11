@@ -71,6 +71,11 @@
                                 <span id="price_error"></span>
                             </div>
                             <div class="mb-4">
+                                <label class="form-label">Discount</label>
+                                <input type="number" placeholder="0%" class="form-control" name="discount" id="product_discount" value="0" onkeyup="validatString('product_discount','discount','Discount')">
+                                <span id="discount_error"></span>
+                            </div>
+                            <div class="mb-4">
                                 <label class="form-label">Status</label>
                                 <select class="form-select" name="status">
                                     <option>Published</option>

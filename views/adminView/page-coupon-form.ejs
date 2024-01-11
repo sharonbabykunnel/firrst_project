@@ -1,0 +1,59 @@
+<%- include("../layouts/header.ejs") %>
+        <section class="content-main">
+            <div class="row">
+                <div class="col-lg-6">
+                    <form action="/admin/addCoupon" method="post" onsubmit=" return validatCouponForm()">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="col-9">
+                                <div class="content-header">
+                                    <h2 class="content-title">Add Coupon</h2>
+                                    <span id="form_error"></span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="product_title" class="form-label">Coupon Code</label>
+                                <input type="hidden" name="id" value="<%= typeof coupon == 'undefined' ? '' : coupon?._id %>">
+                                <input type="text" name="code" placeholder="Type here" class="form-control" id="product_code" onkeyup="validatString('product_code','code_error','Code')" value="<%= typeof coupon == 'undefined' ? '' : coupon?.code %>">
+                                <span id="code_error"><%= typeof message == 'undefined' ? '' : message %></span>
+                            </div>
+                            <div class="row gx-3">
+                                <div class="col-md-4  mb-3">
+                                    <label for="product_sku" class="form-label">Created Date</label>
+                                    <input type="date" name="createdDate" placeholder="Type here" class="form-control" id="product_sku" value="<%= typeof coupon == 'undefined' ? '' : coupon?.createdDate %>">
+                                </div>
+                                <div class="col-md-4  mb-3">
+                                    <label for="product_color" class="form-label">Expiery Date</label>
+                                    <input type="date" name="expiryDate" placeholder="Type here" class="form-control" id="product_color" value="<%= typeof coupon == 'undefined' ? '' : coupon?.expiryDate %>">
+                                </div>
+                                <div class="col-md-4  mb-3">
+                                    <label for="product_size" class="form-label">Discount</label>
+                                    <input type="number" name="discount" placeholder="Type here" class="form-control" id="product_discount" value="<%= typeof coupon == 'undefined' ? '' : coupon?.discount %>" onkeyup="validatNum('product_discount','discount_error','Discount')">
+                                    <span id="discount_error"></span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                 <label class="form-label">Description</label>
+                                <textarea placeholder="Type here" name="discription" class="form-control" rows="4" id="coupon_dis" onkeyup="validatString('coupon_dis','dis_error','discription')"><%= typeof coupon == 'undefined' ? '' : coupon?.discription %></textarea>
+                                <span id="dis_error"></span>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" >
+                                    <option  >Activate</option>
+                                    <option >Deactivate</option>
+                                </select>
+                            </div>
+                            <div class="col-9">
+                                <div class="content-header">
+                                    <div>
+                                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- card end// -->
+                </form>
+            </div>
+        </section>
+<%- include("../layouts/footer.ejs") %>

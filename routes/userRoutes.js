@@ -1,6 +1,9 @@
 const express = require("express");
 const rout = express.Router();
 const user = require("../controller/userContoller");
+const product = require('../controller/productController');
+const coupon = require("../controller/couponController");
+const order = require("../controller/orderController");
 const auth = require('../middleware/auth');
 
 rout.get("/", user.loadHome);
@@ -14,14 +17,30 @@ rout.get("/productDetails/:id", auth.isLogged, user.loadProductDetails);
 rout.get('/cart',auth.isLogged, user.loadCart);
 rout.get('/addtoCart', auth.isLogged, user.addToCart);
 rout.get('/deleteCart', auth.isLogged, user.deleteCart);
-rout.get("/verify", auth.isNOtLogged, user.loadOtp);
+rout.get("/verify", user.loadOtp);
 rout.get('/shop', auth.isLogged,user.loadShop);
 rout.get("/forgotPassword", auth.isNOtLogged, user.forgotPassword);
+rout.get("/wishlist", auth.isLogged, user.loadwislist);
+rout.get("/addtoWishlist", auth.isLogged, user.addtoWishlist);
+rout.get("/removeWishlist", auth.isLogged, user.removeWishlist);
+rout.get("/checkout", auth.isLogged, user.loadCheckout);
+rout.get("/order-success/:id", order.loadSucsses);
+rout.get("/paypal-success/:orderId", order.paypal);
+rout.get("/order", order.loadOrder);
+rout.get("/invoice/:id", order.orderInvoice);
+rout.get("/wallet", order.loadWallet);
 
+rout.post("/razorpay-success", order.razorpaySuccess);
+rout.post("/cart/coupon", coupon.applyCoupon);
+rout.post("/addReview", auth.isLogged, product.rating);
 rout.post("/signup", user.verifySignup);
 rout.post("/signin", user.verifySignin);
 rout.post('/verify', user.verifyotp);
 rout.post('/changePassword', user.changePassword);
 rout.post("/addtoCart", auth.isLogged, user.addToCart);
+rout.post("/cancelOrder/:id", order.cancelOrder);
+rout.post("/returnOrder/:id", order.returnOrder);
+rout.post("/cart/placeOrder", order.placeOrder);
+rout.post("/home/:category", user.getProducts);
 
 module.exports = rout;

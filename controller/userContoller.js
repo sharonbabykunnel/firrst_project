@@ -2,6 +2,8 @@ const asyncHandler = require('express-async-handler');
 const User = require('../model/userModel');
 const Product = require('../model/productModel');
 const Cart = require('../model/cartModel');
+const Wishlist = require('../model/wishlistModel');
+const Category = require("../model/categoryModel");
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const otpGenerator = require('otp-generator');
@@ -131,12 +133,40 @@ const verifySignup = asyncHandler(async(req, res)=> {
 const loadHome = asyncHandler(async (req, res) => {
     try {
         const user = req.session.user;
+        const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
         const product = await Product.find();
-        res.render('userView/index', { product, user, cartNum });
+        res.render('userView/index', { product, user, cartNum, wishlist });
     } catch (error) {
         throw error;
     }
+});
+
+const getProducts = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session.user;
+    console.log(req.params.category,"ii", req.body.category,"kk");
+      const category = req.body.category ;
+      console.log(category,"cat");
+    const wishlist = await Wishlist.findOne(
+      { user_id: user?._id },
+      { product: 1 }
+    );
+    let product = [];
+    const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
+      ?.length;
+    if (category == 'all') {
+       product = await Product.find();
+    } else {
+       product = await Product.find({
+        category: { $all: req.body.category },
+      });
+      
+    }      console.log(product,"pro");
+    res.json( { product, user, cartNum, wishlist });
+  } catch (error) {
+    throw error;
+  }
 });
 
 const loadOtp = asyncHandler(async (req, res) => {
@@ -217,6 +247,9 @@ const loadProductDetails = asyncHandler(async (req, res) => {
     try {
         const user = req.session.user;
         const id = req.params.id;
+        const message = req.query.message;
+        console.log(message);
+        const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
         const cart = await Cart.findOne({ user_id: user._id })
         const cartData = cart?.product.find((product) => product.product_id == id);
         console.log(cartData,'cartttt');
@@ -225,8 +258,8 @@ const loadProductDetails = asyncHandler(async (req, res) => {
         if (objectId) {
             const product = await Product.findById(id);
             console.log(product,"prrrrr");
-            const products = await Product.find()
-            res.render('userView/product-details.ejs', { product, products,user,cartNum, cartData }); 
+            const products = await Product.find({_id:{$ne:id}})
+            res.render('userView/product-details.ejs', { product, products,user,cartNum, cartData,message,wishlist }); 
         } else {
            res.redirect('/*')
         }
@@ -237,17 +270,19 @@ const loadProductDetails = asyncHandler(async (req, res) => {
 
 const loadCart = asyncHandler(async (req, res) => {
     try {
+        const { discount, message } = req.query;
+        console.log(discount,"discount");
         const user = req.session.user;
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
         const cart = await Cart.findOne({ user_id: user._id }).populate('product.product_id');
         const product = cart?.product;
         const calculatTotal = (product) => {
             return product.reduce((total, product) => {
-                const productTotal = product.product_id.price * product.quantity;
+                const productTotal = product.product_id?.price * product.quantity;
                 return total + productTotal;
             }, 0);
         };
-        res.render('userView/shop-cart', {cart, product,user, calculatTotal,cartNum });
+        res.render('userView/shop-cart', {cart, product,user, calculatTotal,cartNum, discount, message });
     } catch (error) {
         throw error;
     }
@@ -257,7 +292,8 @@ const addToCart = asyncHandler(async (req, res) => {
     try {
         const product_id = req.query.id;
         console.log(product_id,"poooooo");
-        const quantity = req.body.quantity;
+        const quantity = req.body.quantity || req.query.quantity;
+        console.log(req.body.quantity ,req.query.quantity);
         console.log(quantity,'qqqqqqqqqqqqqqqq');
         const user_id = req.session.user._id;
         const objectId = mongoose.Types.ObjectId.isValid(product_id);
@@ -268,15 +304,16 @@ const addToCart = asyncHandler(async (req, res) => {
               await cartData.save();
               cart = cartData;
           }
-          const productIndex =  cart.product.findIndex((product) => product.product_id == product_id);
+          const productIndex =  cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);
             if (productIndex == -1) {
                 cart.product.push({ quantity ,product_id});
                 console.log(productIndex,cart.product)
             } else {
-                if (cart.product[productIndex].quantity == quantity) {
-                    cart.product[productIndex].quantity += 1;
-                } else {
+                if (quantity) {
+                    console.log('enterd');
                     cart.product[productIndex].quantity = quantity;
+                } else {
+                    cart.product[productIndex].quantity += 1;
                 }
                   
                 console.log(cart.product,product_id)
@@ -320,9 +357,11 @@ const loadError = asyncHandler(async (req, res) => {
 const loadShop = asyncHandler(async (req, res) => {
     try {
         const user = req.session.user;
+        const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-        const product = await Product.find();
-        res.render("userView/shop",{user,product,cartNum});
+      const product = await Product.find();
+      const category = await Category.find();
+        res.render("userView/shop",{user,product,cartNum,wishlist, category});
   } catch (error) {
     throw error;
   }
@@ -354,7 +393,117 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {
+const loadwislist = asyncHandler(async (req, res) => {
+  try {
+      const user = req.session.user;
+        const wishlist = await Wishlist.findOne(
+          { user_id: user?._id },
+          { product: 1 }
+        );
+      const product = await Wishlist.findOne({ user_id: user?._id }).populate("product");
+      console.log(product);
+      res.render('userView/wishlist',{product, wishlist});
+  } catch (error) {
+    throw error;
+  }
+});
+
+const addtoWishlist = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user;
+        const  product_id  = req.query.id;
+        let wishlist = await Wishlist.findOne({ user_id: user?._id });
+        if (!wishlist) {
+            const wish = new Wishlist({ user_id: user._id, product: [] });
+            await wish.save();
+            wishlist = wish;
+        }
+        console.log(wishlist);
+        const productIndex = wishlist.product.findIndex((item) => item == product_id);
+        console.log(productIndex);
+        if (productIndex == -1) {
+            wishlist.product.push( product_id );
+        } else {
+            wishlist.product.splice(productIndex, 1);
+        }
+        await wishlist.save()
+    } catch (error) {
+        throw error;
+    }
+})
+
+const removeWishlist = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session.user;
+    const product_id = req.query.id;
+    let wishlist = await Wishlist.findOne({ user_id: user?._id });
+    if (!wishlist) {
+      const wish = new Wishlist({ user_id: user._id, product: [] });
+      await wish.save();
+      wishlist = wish;
+    }
+    console.log(wishlist);
+    const productIndex = wishlist.product.findIndex((item) => item == product_id);
+    console.log(productIndex);
+    if (productIndex == -1) {
+      wishlist.product.push(product_id);
+    } else {
+      wishlist.product.splice(productIndex, 1);
+    }
+      await wishlist.save();
+      res.redirect(`/wishlist?id=${product_id}`);
+  } catch (error) {
+    throw error;
+  }
+});
+
+const addReview = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user;
+        const { star, review } = req.body;
+        const id = req.query.id;
+        console.log(id);
+        const product = await Product.findByIdAndUpdate(id, { $push: { rating: { star, review, postedby: user._id } } });
+        console.log(product, 'kkk');
+        res.redirect('/productDetails/' + id);
+    } catch (error) {
+        throw error;
+    }
+});
+
+const loadCheckout = asyncHandler(async (req, res) => {
+    try {
+        const user = req.session.user;
+        const { discount, message, id, quantity } = req.query;
+        if (id) {
+            if (quantity < 1) {
+                res.redirect(`/productDetails/${id}?message='quantity cant be lessthan 1'`)
+            } else {
+                
+                var product = await Product.findOne({ _id: id });
+                var calculatTotal = product.price * quantity
+            }
+        } else {
+            var cart = await Cart.findOne({ user_id: user._id }).populate(
+              "product.product_id"
+            );
+            var product = cart?.product;
+            var calculatTotal = cart.product.reduce((total, product) => {
+              const productTotal = product.product_id?.price * product.quantity;
+              return total + productTotal;
+            }, 0);
+        }
+        console.log(discount, "discount");
+        
+        
+      const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+      res.render("userView/checkout",{product,cartNum,user,cart,calculatTotal,discount,quantity});
+  } catch (error) {
+    throw error;
+  }
+});
+
+  module.exports = {
     loadHome,
     loadSignin,
     verifySignin,
@@ -372,4 +521,10 @@ module.exports = {
     loadShop,
     forgotPassword,
     changePassword,
+    loadwislist,
+    addtoWishlist,
+    removeWishlist,
+    addReview,
+    loadCheckout,
+    getProducts
 };

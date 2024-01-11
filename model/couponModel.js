@@ -16,15 +16,15 @@ const couponSchema = new mongoose.Schema({
   },
   createdDate: {
     type: Date,
+    default: Date.now,
     require: true,
-    default: Date.now(),
   },
   expiryDate: {
     type: Date,
     required: true,
   },
   status: {
-    type: Boolean,
+    type: String,
     default: false,
   },
 });

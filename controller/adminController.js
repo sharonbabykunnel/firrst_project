@@ -52,8 +52,8 @@ const loadUsers = asyncHandler(async (req, res) => {
         if (req.query.search) {
             search = req.query.search;
         }
-        let page =  req.query.page;
-        let limit = 5;
+        const page =  req.query.page;
+        const limit = 5;
         const userData = await User.find({
             is_admin: 0,
             $or: [
@@ -104,9 +104,9 @@ const loadCategory = asyncHandler(async (req, res) => {
         if (search) {
             query.$or = [{ name: { $regex: new RegExp(search, 'i') } }, { discription: { $regex: new RegExp(search, 'i') } }];
         }
-        let category = await Category.find(query);
+        const category = await Category.find(query);
         
-        res.render("adminView/page-categories", { category: category, Cate:Cate, message: message, });
+        res.render("adminView/page-categories", { category, Cate, message, });
     } catch (error) {
         throw  error;
     }
@@ -116,7 +116,6 @@ const addCategory = asyncHandler(async (req, res) => {
     try {
         const { name, slug, discription, id } = req.body;
         const Name = await Category.find({ name: name });
-        console.log(Name);
         const Slug = await Category.findOne({ slug: slug });
         if ( Name[0] && id != Name[0]?._id) {
             res.redirect(`/admin/category?id=${id}&message='The Product is Already Exist'`);
@@ -150,6 +149,21 @@ const deletCategory = asyncHandler(async (req, res) => {
       res.redirect('/admin/category',);
   } catch (error) {
     throw  error;
+  }
+});
+
+const unlistCategory = asyncHandler(async (req, res) => {
+  try {
+      const { id, status } = req.query;
+      console.log(req.query);
+    if (status == 'true') {
+      await Category.findByIdAndUpdate({ _id: id }, { $set: { is_unlisted: 0 } });
+    } else {
+      await Category.findByIdAndUpdate({ _id: id }, { $set: { is_unlisted: 1 } });
+    }
+    res.redirect("/admin/category");
+  } catch (error) {
+    throw error;
   }
 });
 
@@ -220,9 +234,11 @@ module.exports = {
     loadCategory,
     addCategory,
     deletCategory,
+    unlistCategory,
     status,
     loadError,
     forgotPassword,
     changePassword,
     logout,
+
 };

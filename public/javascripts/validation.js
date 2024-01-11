@@ -77,7 +77,7 @@ const validatSignupForm = () => {
      console.log('2')
      if (
        !validatname() ||
-       !validatemail() ||
+       !validatemail() || 
        !validatmobile() ||
        !validatpass() ||
        !checkPass()

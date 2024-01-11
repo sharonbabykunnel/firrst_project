@@ -13,7 +13,10 @@ const categorySchema = new mongoose.Schema({
     status: {
         type: String,
         require: true,
-        default:0
+    },
+    is_unlisted: {
+        type: Boolean,
+        default:1
     },
     slug: {
         type:String,

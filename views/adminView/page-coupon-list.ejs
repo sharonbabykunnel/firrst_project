@@ -1,0 +1,53 @@
+<%- include('../layouts/header.ejs') %>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Coupons</h2>
+                </div>
+                <div>
+                    <a href="/admin/addcoupon" class="btn btn-primary btn-sm rounded">Create new</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 col-4">
+                            <input type="date" value="02.05.2021" class="form-control">
+                        </div>
+                    </div>
+                </header> <!-- card-header end// -->
+                <div class="card-body">
+                    <% for(let i=0; i<coupon.length; i++){%>
+                    <article class="itemlist">
+                        <div class="row align-items-center text-center">
+                            <div class="col-lg-3 col-sm-4 col-8  col-name p-0">
+                            <!-- <div class="info"> -->
+                                <h6 class="mb-0"><%= coupon[i].discription %></h6>
+                            <!-- </div> -->
+                            </div>
+                            <div class="col-lg-1 col-sm-2 p-0 col-4 col-price "> <span><%= coupon[i].discount %>%Off</span> </div>
+                            <div class="col-lg-1 col-sm-2 p-0 col-4 col-price"> <span><%= coupon[i].code %></span> </div>
+                            <div class="col-lg-1 col-sm-2 col-4 col-status">
+                                <a href="/admin/couponStatus?id=<%= coupon[i]._id %>&status=<%= coupon[i].status %>"><span class="badge rounded-pill alert-success"><%= coupon[i].status %></span></a>
+                            </div>
+                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-date">
+                                <span><%= coupon[i].createdDate %></span>
+                            </div>
+                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-date">
+                                <span><%= coupon[i].expiryDate %></span>
+                            </div>
+                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-action text-end">
+                                <a href="/admin/addCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                                    <i class="material-icons md-edit"></i> Edit
+                                </a>
+                                <a href="/admin/deleteCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm btn-light rounded">
+                                    <i class="material-icons md-delete_forever"></i> Delete
+                                </a>
+                            </div>
+                        </div> <!-- row .// -->
+                    </article> <!-- itemlist  .// -->
+                    <%}%> 
+                </div> <!-- card-body end// -->
+            </div> <!-- card end// -->
+        </section> <!-- content-main end// -->
+<%- include('../layouts/footer.ejs') %>

@@ -3,10 +3,10 @@ const userRouter = require('./routes/userRoutes');
 const adminRouter = require('./routes/adminRoutes.js');
 const path = require('path');
 const mongoose = require('mongoose');
-const dotenv = require("dotenv").config()
 const session = require('express-session');
 const nocache = require('nocache');
 const cookiePaser = require('cookie-parser');
+require("dotenv").config()
 
 const app = express();
 const PORT = process.env.PORT;

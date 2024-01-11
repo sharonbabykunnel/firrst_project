@@ -28,10 +28,9 @@ const addProduct = asyncHandler(async (req, res) => {
       status,
       category,
       quantity,
+      discount
     } = await req.body;
-    console.log(req.body);
     let Title = await Product.findOne({ title: title });
-    console.log(Title,"kjook");
     if (Title) {
       res.redirect('/admin/addProduct?message=Product is Already Exist.');
     } else if (Number(quantity)<1 || isNaN(Number(quantity))) {
@@ -52,6 +51,7 @@ const addProduct = asyncHandler(async (req, res) => {
         price: price,
         status: status,
         category: category,
+        discount
       });
       product.save();
       res.render("adminView/page-product-form-3", {
@@ -115,6 +115,7 @@ const editProduct = asyncHandler(async (req, res) => {
       category,
       quantity,
       status,
+      discount,
     } = req.body;
     const Title = await Product.findOne({ title: title, _id: { $ne: id } });
     const data = await Product.findById(id);
@@ -168,6 +169,7 @@ const editProduct = asyncHandler(async (req, res) => {
             size: size,
             status: status,
             image: image,
+            discount,
           },
         }
       );
@@ -180,6 +182,30 @@ const editProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const rating = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session.user;
+    const { review, star } = req.body;
+    const id = req.query.id;
+    const product = await Product.findById(id);
+    const alreadyRated = product.rating.find((userId) => userId.postedby == user._id);
+    if (alreadyRated) {
+      await Product.updateOne({ rating: { $elemMatch: alreadyRated } }, { $set: { "rating.$.star": star,"rating.$.review":review } });
+    } else {
+      await Product.findByIdAndUpdate(id, { $push: { rating: { review,star, postedby: user._id } } }, { new: true });
+    }
+    const getallratings = await Product.findById(id)
+    const ratingsum = getallratings.rating.map((item) => item.star).reduce((prev, curr) => prev + curr, 0);
+    const ratingcount = getallratings.rating.length || 1;
+    const totalrating = Math.round(ratingsum / ratingcount);
+    await Product.findByIdAndUpdate(id, { totalrating }, { new: true });
+    res.redirect("/productDetails/" + id);
+  } catch (error) {
+    throw error;
+  }
+})
+
+
 
 module.exports = {
   loadAddProduct,
@@ -187,5 +213,6 @@ module.exports = {
   deleteProduct,
   editProduct,
   loadEditProduct,
-  loadProduct
+  loadProduct,
+  rating,
 }

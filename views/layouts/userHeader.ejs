@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/css/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="/css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
@@ -54,7 +55,7 @@
             <a href="/signup">SignUP</a>
             <%}else{%>
                 <span><%= user.name %></span>
-                <button class="btn-light"><a href="/logout">LogOut</a></button>
+                <button class="btn-info"><a href="/logout">LogOut</a></button>
                 <%}%>
         </div>
     </div>
@@ -97,12 +98,12 @@
                                 <a href="/signup">SignUp</a>
                                 <%}else{%>
                                     <span><%=  user.name %></span>
-                                    <button class="btn-primary"><a href="/logout">LogOut</a></button>
+                                    <button class="btn-danger"><a href="/logout">LogOut</a></button>
                                     <%}%>
                         </div>
                         <ul class="header__right__widget">
                             <li><span class="icon_search search-switch"></span></li>
-                            <li><a href=""><span class="icon_heart_alt"></span>
+                            <li><a href="/wishlist"><span class="icon_heart_alt"></span>
                                 <!-- <div class="tip"></div> -->
                             </a></li>
                             <li><a href="/cart"><span class="icon_bag_alt"></span>

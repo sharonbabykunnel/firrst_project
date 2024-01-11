@@ -1,7 +1,7 @@
 <%- include("../layouts/header.ejs")%>
 
         <section class="content-main">
-            <div class="content-header">
+            <!-- <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Categories </h2>
                     <p>Add, edit or delete a category</p>
@@ -11,7 +11,7 @@
                         <input type="search" placeholder="Search Categories" class="form-control bg-white" name="search">
                     </form>
                 </div>
-            </div>
+            </div> -->
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -29,12 +29,13 @@
                                     <span id="slug_error"></span>
                                     <input type="hidden" name="id" id="id" value="<%= typeof Cate === 'undefined' ? '' : Cate?._id ; %>">
                                 </div>
-                                <!-- <div class="mb-4">
-                                    <label for="category_status0">Status</label>
-                                    <input type="radio" class="" id="category_status0" value="0" <%= typeof Cate==='undefined' ? '' : ( Cate?.status === 0 ? 'checked' : '')%>>
-                                    <label for="category_status1"></label>
-                                    <input type="radio" class="" id="category_status1" value="1" <%= typeof Cate === 'undefined' ? "" : (Cate?.status=== 1 ? 'checked' : '') %>>
-                                </div> -->
+                                <div class="mb-4">
+                                    <label for="product_slug" class="form-label">Status</label><br>
+                                    <label for="category_status0">Sub</label>
+                                    <input type="radio" class="" name="status" id="category_status0" value="sub" <%= typeof Cate==='undefined' ? '' : ( Cate?.status === 'sub' ? 'checked' : '')%>>
+                                    <label for="category_status1">Main</label>
+                                    <input type="radio" class="" name="status" id="category_status1" value="main" <%= typeof Cate === 'undefined' ? "" : (Cate?.status=== 'main' ? 'checked' : '') %>>
+                                </div> 
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
                                     <textarea placeholder="Type here" class="form-control" name="discription" id="product_dis" 
@@ -59,6 +60,7 @@
                                             <th>Name</th>
                                             <th>Description</th>
                                             <th>Slug</th>
+                                            <th>Status</th>
                                             <!-- <th>Status</th> -->
                                             
                                             <th class="text-end">Action</th>
@@ -70,6 +72,7 @@
                                             <td><b><%=category[i].name%></b></td>
                                             <td><%= category[i].discription%></td>
                                             <td>/<%=category[i].slug%></td>
+                                            <td><a href="/admin/unlistCategory?id=<%= category[i]._id %>&status=<%= category[i].is_unlisted %>"><%= category[i]?.is_unlisted == true ? 'unlisted' : 'Active' ;%></a></td>
                                             <!-- <td><%= category[i].status == 0 ? "No Product" : 'Product Available'; %></td> -->
                                             <td class="text-end">
                                                 <div class="dropdown">

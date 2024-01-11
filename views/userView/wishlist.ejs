@@ -1,0 +1,62 @@
+<%- include('../layouts/userHeader.ejs') %>
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Wishlist</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <% if(product){%>
+                <div class="col-lg-12 col-md-9">
+                    <div class="row">
+            <% product.product.forEach((item)=>{%>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="product__item">
+                                <div class="product__item__pic set-bg" data-setbg="images/<%= item.image[0] %>">
+                                    <!-- <div class="label new"></div> -->
+                                    <ul class="product__hover">
+                                        <li><a href="images/<%=item.image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                        <li><a href="/removeWishlist?id=<%= item._id %>"><span id='<%= item._id %>'  class="<%= wishlist?.product?.includes(item._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= item._id %>')"></span></a></li>
+                                        <li><a href="/addtoCart?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
+                                    </ul>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6><a href="/productDetails/<%= item._id %>"><%= item.title %></a></h6>
+                                    <div class="rating">
+                                        <% for(let j=1; j<=5; j++){ if(j<= item.totalrating){%>
+                                        <i class="fa fa-star"></i>
+                                        <%}else{%>
+                                            <i class="fa fa-star-o"></i>
+                                        <%}}%>
+                                    </div>
+                                    <div class="product__details__price">$<%= item.discount ? item.price - ( item.price * (item.discount/100 ))  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <%});%>
+                    </div>
+                </div>
+                <%}else{%>
+                    <P>no Item at Wishlist</P>
+                    <%}%>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Section End -->
+
+    
+
+<%- include('../layouts/userFooter.ejs') %>

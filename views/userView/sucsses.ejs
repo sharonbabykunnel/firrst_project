@@ -1,0 +1,16 @@
+<%- include("../layouts/userHeader.ejs") %>
+<div class="mx-auto col-3 text-center border p-5" style="margin-top: 10em;">
+    <div class="d-grid gap-3 mb-3">
+        <div class="order-placed">
+            <h1>Order Placed</h1>
+            <p class="message">Thank you for your order!</p>
+            <div class="buttons">
+                <a href="/" class="button">Continue Shopping</a>
+                <a href="/order" class="button">Go to Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <a href="/invoice/<%= id %>" class="btn btn-primary">View Order</a>
+</div>
+<%- include("../layouts/userFooter.ejs") %>

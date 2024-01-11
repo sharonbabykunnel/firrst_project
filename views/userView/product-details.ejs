@@ -49,7 +49,7 @@
                                 <% if(product.image[2]){%>
                                 <img data-hash="product-3" class="product__big__img" src="/images/<%= product?.image[2] %>" alt=""><%} %>
                                 <% if(product.image[3]){%> 
-                                <img data-hash="product-4" class="product__big__img" src="/images/<% product.image[3] %> "> <%} %>
+                                <img data-hash="product-4" class="product__big__img" src="/images/<%= product.image[3] %> "> <%} %>
                             </div>
                         </div>
                     </div>
@@ -58,30 +58,43 @@
                     <div class="product__details__text">
                         <h3><%= product.title %><span>Brand: <%= product.brand %></span></h3>
                         <div class="rating">
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <span>( 0 reviews )</span>
+                        <a href="">
+                            <% for(let s=0; s<product?.totalrating; s++){%><i class="fa fa-star"></i><span> </span><%}%>
+                            <% for(let s=0; s<5-product?.totalrating; s++){%><i class="fa fa-star-o"></i><span> </span><%}%>
+                            <span>( <%= product.rating.length %> review )</span>
+                        </a>
                         </div>
-                        <div class="product__details__price">$<%= product.discount ? product.discount : product.price  %> <span><%= product.discount ? product.price : '' %></span></div>
+                        <div class="product__details__price">$<%= product.discount ? product.price - ( product.price * (product.discount/100 ))  : product.price  %> <span><%= product.discount ? `$${product.price}` : '' %></span> <p><%= product.discount %>%Off</p></div>
                         <p></p>
                         <div class="product__details__button">
                             <form action="/addtoCart?id=<%= product?._id %>" method="post">
                                 <div class="quantity">
                                     <span>Quantity:</span>
                                     <div class="pro-qty">
-                                        <input type="text" value="<%= typeof cartData != 'undefined' ? cartData?.quantity : '0' %>" name="quantity">
+                                        <input type="text" id="q" value="<%= typeof cartData !== 'undefined' ? cartData?.quantity : '0' %>" name="quantity">
                                     </div>
+                                    <% if(typeof message !='undefined'){%>
+                                        <span><%= message %></span>
+                                        <%}%>
                                 </div>
+                                <ul>
+                                    <li><a href="/deleteCart?id=<%= product._id %>"><span class="<%= typeof cartData !== 'undefined' ? 'icon_heart' : 'icon_heart_alt' %>"></span></a></li>
+                                </ul>
                                 <button class="cart-btn">Add to Cart</button>
+                                
+                                <!-- Use inline onclick event to get the quantity -->
+                                <a class="cart-btn" style="background: orange;" onclick="buyNow()">BUY NOW</a>
+                                
+                                <script>
+                                    function buyNow() {
+                                        var quantity = document.getElementById('q').value;
+                                        var productId = '<%= product._id %>';
+                                        window.location.href = "/checkout?id=" + productId + "&quantity=" + quantity;
+                                    }
+                                </script>
+                                
                                 <!-- <a href="/addtoCart?id=<%= product._id %>"  class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</a> -->
                             </form>
-                            <ul>
-                                <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                <li><a href="#"><span class="icon_adjust-horiz"></span></a></li>
-                            </ul>
                         </div>
                         <div class="product__details__widget">
                             <ul>
@@ -116,6 +129,20 @@
                     </div>
                 </div>
                 <div class="col-lg-12">
+                    <div class="product__details__text">
+                        <div class="stock__checkbox">
+                            <form action="/addReview?id=<%= product._id %>" method="post">
+                                <div class="stock__checkbox">
+                                    <input type="hidden" name="star" id="instar">
+                                    <%for(let i=1;i<=5;i++){%>
+                                   <i class="fa fa-star-o" id="star-<%=i%>" onclick="changestar('<%=i%>')"></i> 
+                                    <%}%>
+                                    <textarea name="review" id="" class="form-control"  cols="30" rows="1"></textarea>
+                                </div>
+                                <button class="btn btn-info">ADD REVIEW</button>
+                            </form>
+                        </div>
+                    </div>
                     <div class="product__details__tab">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
@@ -125,7 +152,7 @@
                                 <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews </a>
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( <%= product.rating.length %> ) </a>
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -137,7 +164,10 @@
                                 <h6>Specification</h6>
                             </div>
                             <div class="tab-pane" id="tabs-3" role="tabpanel">
-                                <h6>Reviews </h6>
+                                <h6>Reviews(<%= product.rating.length %>) </h6>
+                                <% product.rating.forEach((item)=>{ %>
+                                <p><%= item.review %></p>
+                                <%})%>
                             </div>
                         </div>
                     </div>
@@ -157,20 +187,19 @@
                                 <div class="label new">New</div>
                                 <ul class="product__hover">
                                     <li><a href="/images/<%= products[i].image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                    <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                    <li><a href="/productDetails/<%=products[i].id %>"><span class="icon_bag_alt"></span></a></li>
+                                    <li><a href="/addtoWishlist?id=<%= products[i]._id %>"><span id='<%= products[i]._id %>'  class="<%= wishlist?.product?.includes(products[i]?._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= products[i]._id %>')"></span></a></li>
+                                    <li><a href="/addtoCart?id=<%= products[i]._id %>"><span class="icon_bag_alt"></span></a></li>
                                 </ul>
                             </div>
                                 <div class="product__item__text">
-                                    <h6><a href="/productDetails/<%=products[i].id %>"><%= products[i].title %></a></h6>
-                                    <div class="rating">
+                                    <h6><a href="/productDetails/<%=products[i].id %>"><%= products[i].title %></a></h6><div class="rating">
+                                        <% for(let j=1; j<=5; j++){ if(j<= products[i].totalrating){%>
                                         <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
+                                        <%}else{%>
+                                            <i class="fa fa-star-o"></i>
+                                        <%}}%>
                                     </div>
-                                    <div class="product__price">$ <%= products[i].price %></div>
+                                    <div class="product__details__price">$<%= products[i].discount ? products[i]?.price - ( products[i]?.price * (products[i]?.discount/100 ))  : products[i]?.price  %> <span><%= products[i]?.discount ? `$${products[i]?.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>

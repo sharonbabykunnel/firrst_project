@@ -41,21 +41,28 @@
                                             <div class="cart__product__item__title">
                                                 <h6><%= product[i].product_id?.title%></h6>
                                                 <div class="rating">
+                                                    <% for(let j=1; j<=5; j++){ if(j<= product[i].product_id?.totalrating){%>
                                                     <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
+                                                    <%}else{%>
+                                                        <i class="fa fa-star-o"></i>
+                                                    <%}}%>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="cart__price">$<%= product[i].product_id?.price %></td>
                                         <td class="cart__quantity">
-                                            <!-- <div class="pro-qty"> -->
-                                                <!-- <input type="text" value="<%= product[i].quantity %>" name="quantity"> -->
-                                                <span><%= product[i].quantity %></span>
-                                            <!-- </div> -->
+                                            <div class="pro-qty"> 
+                                                <input type="text" value="<%= product[i].quantity %>" name="quantity" id="quantityInput">
+                                                <span></span>
+                                            </div>
                                         </td>
+                                        <td class="cart__quantity">
+                                            
+                                        <a href="#" onclick="updateQuantity('<%= product[i]._id %>')">Update</a>
+                                        </td>
+                                        
+                                        
+                                        
                                         <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.price * product[i].quantity %></td>
                                         <td class="cart__close"><a href="/deleteCart?id=<%= product[i]._id %>"><span class="icon_close"></span></a></td>
                                     </tr>
@@ -81,8 +88,8 @@
                 <div class="col-lg-6">
                     <div class="discount__content">
                         <h6>Discount codes</h6>
-                        <form action="/cart/coupon">
-                            <input type="text" placeholder="Enter your coupon code">
+                        <form action="/cart/coupon" method="post">
+                            <input type="text" name="code" value='<%= typeof message == "undefined" ? "" : message %>' placeholder="Enter coupon code">
                             <button type="submit" class="site-btn">Apply</button>
                         </form>
                     </div>
@@ -92,9 +99,9 @@
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span>$ <%= calculatTotal(product) %></span></li>
-                            <li>Total <span id="total" >$ <%= calculatTotal(product) %></span></li>
+                            <% if(typeof discount !="undefined"){%><li>Total <span id="total" >$ <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></li><%}else{%><li>Total <span id="total" >$ <%= calculatTotal(product)  %></span></li><%}%>
                         </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout?discount=<%=discount%>" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>

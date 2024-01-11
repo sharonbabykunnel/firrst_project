@@ -63,3 +63,52 @@ const calculatTotal = (product) => {
 const display = () => {
   
 }
+
+const change = (id) => {
+  console.log("Function called");
+  let hid = document.getElementById(id);
+  console.log("Element:", hid);
+  hid.classList.toggle("icon_heart_alt");
+  hid.classList.toggle("icon_heart");
+};
+
+const changestar = (id) => {
+  console.log("Function called");
+  let instar = document.getElementById('instar');
+  instar.value = id;
+
+  for (let i = 1; i <= 5; i++) {
+    let star = document.getElementById(`star-${i}`);
+    if (star) {
+      if (i <= id) {
+        star.classList.remove("fa-star-o");
+        star.classList.add("fa-star");
+      } else {
+        star.classList.remove("fa-star");
+        star.classList.add("fa-star-o");
+      }
+      console.log("Element:", star);
+    }
+  }
+};
+
+const addcoupon = () => {
+  const coupon = document.getElementById('coupon').style.display = "block";
+   document.getElementById('question').style.display = "none";
+}
+
+const removecoupon = () => {
+  const coupon = document.getElementById("question").style.display = "block";
+    document.getElementById("coupon").style.display = "none";
+};
+
+const updateQuantity =  (productId)=> {
+    var quantity = document.getElementById('quantityInput').value;
+    window.location.href = `/addtoCart?id=${productId}&quantity=${quantity}`;
+}
+
+function getProductFromListItem(element) {
+  const itemName = element.getAttribute("data-item-name");
+  const catName = element.getAttribute("data-cat-name");
+  getProduct(itemName, catName);
+}

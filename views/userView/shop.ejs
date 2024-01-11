@@ -19,7 +19,7 @@
     <section class="shop spad">
         <div class="container">
             <div class="row">
-                <!-- <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-3">
                     <div class="shop__sidebar">
                         <div class="sidebar__categories">
                             <div class="section-title">
@@ -27,93 +27,31 @@
                             </div>
                             <div class="categories__accordion">
                                 <div class="accordion" id="accordionExample">
-                                    <div class="card">
-                                        <div class="card-heading active">
-                                            <a data-toggle="collapse" data-target="#collapseOne">Women</a>
-                                        </div>
-                                        <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
-                                            <div class="card-body">
-                                                <ul>
-                                                    <li><a href="#">Coats</a></li>
-                                                    <li><a href="#">Jackets</a></li>
-                                                    <li><a href="#">Dresses</a></li>
-                                                    <li><a href="#">Shirts</a></li>
-                                                    <li><a href="#">T-shirts</a></li>
-                                                    <li><a href="#">Jeans</a></li>
-                                                </ul>
+                                    <% category.forEach((item, index) => { %>
+                                        <% if (item.status == "main") { %>
+                                            <div class="card">
+                                                <div class="card-heading active">
+                                                    <a data-toggle="collapse" data-target="#collapse<%= index %>"><%= item.name %></a>
+                                                </div>
+                                                <div id="collapse<%= index %>" class="collapse " data-parent="#accordionExample">
+                                                    <div class="card-body">
+                                                        <ul>
+                                                            <% category.forEach((cat, subIndex) => { %>
+                                                                <% if (cat.status == "sub") { %>
+                                                                    <li data-item-name="<%= item.name %>" data-cat-name="<%= cat.name %>" onclick="getProductFromListItem(this)">
+                                                                        <a><%= cat.name %></a>
+                                                                    </li>
+                                                                <% } %>
+                                                            <% }) %>
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-heading">
-                                            <a data-toggle="collapse" data-target="#collapseTwo">Men</a>
-                                        </div>
-                                        <div id="collapseTwo" class="collapse" data-parent="#accordionExample">
-                                            <div class="card-body">
-                                                <ul>
-                                                    <li><a href="#">Coats</a></li>
-                                                    <li><a href="#">Jackets</a></li>
-                                                    <li><a href="#">Dresses</a></li>
-                                                    <li><a href="#">Shirts</a></li>
-                                                    <li><a href="#">T-shirts</a></li>
-                                                    <li><a href="#">Jeans</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-heading">
-                                            <a data-toggle="collapse" data-target="#collapseThree">Kids</a>
-                                        </div>
-                                        <div id="collapseThree" class="collapse" data-parent="#accordionExample">
-                                            <div class="card-body">
-                                                <ul>
-                                                    <li><a href="#">Coats</a></li>
-                                                    <li><a href="#">Jackets</a></li>
-                                                    <li><a href="#">Dresses</a></li>
-                                                    <li><a href="#">Shirts</a></li>
-                                                    <li><a href="#">T-shirts</a></li>
-                                                    <li><a href="#">Jeans</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-heading">
-                                            <a data-toggle="collapse" data-target="#collapseFour">Accessories</a>
-                                        </div>
-                                        <div id="collapseFour" class="collapse" data-parent="#accordionExample">
-                                            <div class="card-body">
-                                                <ul>
-                                                    <li><a href="#">Coats</a></li>
-                                                    <li><a href="#">Jackets</a></li>
-                                                    <li><a href="#">Dresses</a></li>
-                                                    <li><a href="#">Shirts</a></li>
-                                                    <li><a href="#">T-shirts</a></li>
-                                                    <li><a href="#">Jeans</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-heading">
-                                            <a data-toggle="collapse" data-target="#collapseFive">Cosmetic</a>
-                                        </div>
-                                        <div id="collapseFive" class="collapse" data-parent="#accordionExample">
-                                            <div class="card-body">
-                                                <ul>
-                                                    <li><a href="#">Coats</a></li>
-                                                    <li><a href="#">Jackets</a></li>
-                                                    <li><a href="#">Dresses</a></li>
-                                                    <li><a href="#">Shirts</a></li>
-                                                    <li><a href="#">T-shirts</a></li>
-                                                    <li><a href="#">Jeans</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        <% } %>
+                                    <% }) %>
                                 </div>
                             </div>
+                            
                         </div>
                         <div class="sidebar__filter">
                             <div class="section-title">
@@ -122,15 +60,15 @@
                             <div class="filter-range-wrap">
                                 <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
                                 data-min="33" data-max="99"></div>
-                                <div class="range-slider">
+                                <div class="range-slider ">
                                     <div class="price-input">
                                         <p>Price:</p>
-                                        <input type="text" id="minamount">
-                                        <input type="text" id="maxamount">
+                                        <input type="text"  id="minamount">
+                                        <input type="text" id="maxamount" >
                                     </div>
                                 </div>
-                            </div>
-                            <a href="#">Filter</a>
+                            </div><br>
+                            <a href="#" class="col-sm-12">Filter</a>
                         </div>
                         <div class="sidebar__sizes">
                             <div class="section-title">
@@ -227,30 +165,30 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
-                <div class="col-lg-12 col-md-9">
-                    <div class="row">
+                </div> 
+                <div class="col-lg-9 col-md-9 col-sm-9 produt-refresh">
+                    <div class="row property__gallery">
             <% product.forEach((item)=>{%>
                         <div class="col-lg-3 col-md-6">
                             <div class="product__item">
                                 <div class="product__item__pic set-bg" data-setbg="images/<%= item.image[0] %>">
-                                    <div class="label new">New</div>
+                                    <!-- <div class="label new">New</div> -->
                                     <ul class="product__hover">
                                         <li><a href="images/<%=item.image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
+                                        <li><a href="/addtoWishlist?id=<%= item._id %>"><span id='<%= item._id %>'  class="<%= wishlist?.product?.includes(item._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= item._id %>')"></span></a></li>
                                         <li><a href="/addtoCart?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
                                     <h6><a href="/productDetails/<%= item._id %>"><%= item.title %></a></h6>
-                                    <div class="rating">
+                                    <div class="rating"> 
+                                        <% for(let j=1; j<=5; j++){ if(j<= item.totalrating){%>
                                         <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
+                                        <%} else {%>
+                                            <i class="fa fa-star-o"></i>
+                                        <%}}%>
                                     </div>
-                                    <div class="product__price">$<%= item.price %></div>
+                                    <div class="product__details__price">$<%= item.discount ? item.price - ( item.price * (item.discount/100 ))  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>
@@ -317,6 +255,62 @@
             </div>
         </div>
     </div>
+    <script>
+        const getProduct = (main,sub)=>{
+            const category = [main,sub];
+        fetch('/home/'+category,{
+            method:'post',
+            headers:{
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({category})
+        }).then((res)=>{
+            console.log(res);
+            return res.json();
+        }).then((res)=>{
+            console.log(res,'res');
+            const products = res.product;
+            const wishlist = res.wishlist;
+            const propertyGallery = document.querySelector('.property__gallery');
+                propertyGallery.innerHTML = ''; // Clear the existing products
+            
+                // Create HTML elements for each product
+                // ...
+
+// Create HTML elements for each product
+for (let i = 0; i < products?.length; i++) {
+    const imagePath = `images/${products[i].image[0]}`;
+    const productItem = document.createElement('div');
+    productItem.classList.add("product__item");
+    
+    productItem.innerHTML = `
+                <div class="product__item__pic set-bg" style="background-image: url(${imagePath});">
+                    <div class="label new">${products[i].status}</div>
+                    <ul class="product__hover">
+                        <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                        <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
+                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
+                    </ul>
+                </div>
+                <div class="product__item__text">
+                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
+                    <div class="rating">
+                        ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
+                    </div>
+                    <div class="product__details__price">$${products[i].discount ? products[i].price - (products[i].price * (products[i].discount / 100)) : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
+                </div>
+    `;
+    
+
+    const mix = document.createElement('div');
+    mix.classList.add('col-lg-3', 'col-md-6', 'col-sm-24', 'mix', 'women');
+    mix.appendChild(productItem)
+    // Append the new product to the propertyGallery
+    propertyGallery.appendChild(mix);
+}
+        })
+        }
+    </script>
     <!-- Instagram End -->
 
 <%- include('../layouts/userFooter.ejs') %>

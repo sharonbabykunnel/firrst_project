@@ -44,6 +44,23 @@ const productSchema = new mongoose.Schema({
     category: {
         type: [String],
         require:true
+    },
+    rating: [
+        {
+            star: Number,
+            review:String,
+            postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+        }
+    ],
+    totalrating: {
+        type: Number,
+        default: 0
+    },
+    discount: {
+        type: Number,
+        min: 0,
+        max: 1,
+        default: 0
     }
 });
 

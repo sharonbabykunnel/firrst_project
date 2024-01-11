@@ -11,7 +11,7 @@
                         <h1>Women’s fFastcart</h1>
                         <p>Sitamet, consectetur adipiscing elit, sed do eiusmod tempor incidid-unt labore
                         edolore magna aliquapendisse ultrices gravida.</p>
-                        <a href="#">Shop now</a>
+                        <a href="">Shop now</a>
                     </div>
                 </div>
             </div>
@@ -22,7 +22,7 @@
                             <div class="categories__text">
                                 <h4>Men’s fashion</h4>
                                 <p>358 items</p>
-                                <a href="#">Shop now</a>
+                                <a href="">Shop now</a>
                             </div>
                         </div>
                     </div>
@@ -31,7 +31,7 @@
                             <div class="categories__text">
                                 <h4>Kid’s fashion</h4>
                                 <p>273 items</p>
-                                <a href="#">Shop now</a>
+                                <a href="" >Shop now</a>
                             </div>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                             <div class="categories__text">
                                 <h4>Cosmetics</h4>
                                 <p>159 items</p>
-                                <a href="#">Shop now</a>
+                                <a href="" >Shop now</a>
                             </div>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                             <div class="categories__text">
                                 <h4>Accessories</h4>
                                 <p>792 items</p>
-                                <a href="#">Shop now</a>
+                                <a href="" >Shop now</a>
                             </div>
                         </div>
                     </div>
@@ -69,14 +69,80 @@
                     <h4>products</h4>
                 </div>
             </div>
+            <script>
+                const getProducts = (category) => {
+                    console.log(category, "cat");
+                    fetch('/home/' + category, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    }).then((res) => {
+                        return res.json();
+                    }).then((response) => {
+                        console.log(response, 'rrrrrrrrrr');
+                        const products = response.product;
+                        const wishlist = response.wishlist;
+            
+                        // Update the HTML body with the fetched products
+                const propertyGallery = document.querySelector('.property__gallery');
+                propertyGallery.innerHTML = ''; // Clear the existing products
+            
+                // Create HTML elements for each product
+                // ...
+
+// Create HTML elements for each product
+for (let i = 0; i < products?.length; i++) {
+    const imagePath = `images/${products[i].image[0]}`;
+    const productItem = document.createElement('div');
+    productItem.classList.add("product__item");
+    
+    productItem.innerHTML = `
+                <div class="product__item__pic set-bg" style="background-image: url(${imagePath});">
+                    <div class="label new">${products[i].status}</div>
+                    <ul class="product__hover">
+                        <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                        <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
+                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
+                    </ul>
+                </div>
+                <div class="product__item__text">
+                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
+                    <div class="rating">
+                        ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
+                    </div>
+                    <div class="product__details__price">$${products[i].discount ? products[i].price - (products[i].price * (products[i].discount / 100)) : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
+                </div>
+    `;
+    
+
+    const mix = document.createElement('div');
+    mix.classList.add('col-lg-3', 'col-md-4', 'col-sm-6', 'mix', 'women');
+    mix.appendChild(productItem)
+    // Append the new product to the propertyGallery
+    propertyGallery.appendChild(mix);
+}
+
+// ...
+
+                    }).catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            
+            
+                
+            </script>
             <div class="col-lg-8 col-md-8">
                 <ul class="filter__controls">
-                    <li class="active" data-filter="*">All</li>
-                    <li data-filter=".women">Women’s</li>
-                    <li data-filter=".men">Men’s</li>
-                    <li data-filter=".kid">Kid’s</li>
-                    <li data-filter=".accessories">Accessories</li>
-                    <li data-filter=".cosmetic">Cosmetics</li>
+
+                    <li class="active"  onclick="getProducts('all')" id="all">All</li>
+                    <li onclick="getProducts('womens')" id="womens">Women’s</li>
+                    <li  onclick="getProducts('mens')" id="mens">Men’s</li>
+                    <li onclick="getProducts('kids')" id="kids">Kid’s</li>
+                    <li onclick="getProducts('accessories')" id="accessories">Accessories</li>
+                    <li onclick="getProducts('cosmetics')" id="cosmetics">Cosmetics</li>
                 </ul>
             </div>
         </div>
@@ -88,21 +154,22 @@
                     <div class="product__item__pic set-bg" data-setbg="images/<%= product[i].image[0] %>">
                         <div class="label new"><%= product[i].status %></div>
                         <ul class="product__hover">
+                            
                             <li><a href="images/<%= product[i].image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
-                            <li><a href="/productDetails/<%= product[i]._id %>"><span class="icon_heart_alt""></span></a></li>
+                            <li><a href="/addtoWishlist?id=<%= product[i]._id %>"><span id='<%= product[i]._id %>'  class="<%= wishlist?.product?.includes(product[i]._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= product[i]._id %>')"></span></a></li>
                             <li><a href="/addtoCart?id=<%= product[i]._id %>"><span class="icon_bag_alt"></span></a></li>
                         </ul>
                     </div>
                     <div class="product__item__text">
                         <h6><a href="/productDetails/<%= product[i]._id %>"><%= product[i].title %></a></h6>
                         <div class="rating">
+                            <% for(let j=1; j<=5; j++){ if(j<= product[i].totalrating){%>
                             <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
+                            <%}else{%>
+                                <i class="fa fa-star-o"></i>
+                            <%}}%>
                         </div>
-                        <div class="product__price">$ <%= product[i].price %></div>
+                        <div class="product__details__price">$<%= product[i].discount ? product[i].price - ( product[i].price * (product[i].discount/100 ))  : product[i].price  %> <span><%= product[i].discount ? `$${product[i].price}` : '' %></span></div>
                     </div>
                 </div>
             </div>
@@ -121,21 +188,21 @@
                         <div class="banner__text">
                             <span>The Chloe Collection</span>
                             <h1>The Project Jacket</h1>
-                            <a href="#">Shop now</a>
+                            <a href="/shop">Shop now</a>
                         </div>
                     </div>
                     <div class="banner__item">
                         <div class="banner__text">
                             <span>The Chloe Collection</span>
                             <h1>The Project Jacket</h1>
-                            <a href="#">Shop now</a>
+                            <a href="/shop">Shop now</a>
                         </div>
                     </div>
                     <div class="banner__item">
                         <div class="banner__text">
                             <span>The Chloe Collection</span>
                             <h1>The Project Jacket</h1>
-                            <a href="#">Shop now</a>
+                            <a href="/shop">Shop now</a>
                         </div>
                     </div>
                 </div>
@@ -146,7 +213,7 @@
 <!-- Banner Section End -->
 
 <!-- Trend Section Begin -->
-<!-- <section class="trend spad">
+<section class="trend spad">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-6">
@@ -316,7 +383,7 @@
             </div>
         </div>
     </div>
-</section> -->
+</section>
 <!-- Trend Section End -->
 
 <!-- Discount Section Begin -->
@@ -332,7 +399,7 @@
                 <div class="discount__text">
                     <div class="discount__text__title">
                         <span>Discount</span>
-                        <h2>Summer 2019</h2>
+                        <h2>Summer 2024</h2>
                         <h5><span>Sale</span> 50%</h5>
                     </div>
                     <div class="discount__countdown" id="countdown-time">
@@ -353,7 +420,7 @@
                             <p>Sec</p>
                         </div>
                     </div>
-                    <a href="#">Shop now</a>
+                    <a href="/shop">Shop now</a>
                 </div>
             </div>
         </div>
@@ -454,5 +521,7 @@
     </div>
 </div>
 <!-- Instagram End -->
+
+
 
 <%- include("../layouts/userFooter.ejs") %>
