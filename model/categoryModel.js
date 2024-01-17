@@ -16,7 +16,7 @@ const categorySchema = new mongoose.Schema({
     },
     is_unlisted: {
         type: Boolean,
-        default:1
+        default:0
     },
     slug: {
         type:String,

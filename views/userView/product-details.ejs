@@ -78,7 +78,7 @@
                                         <%}%>
                                 </div>
                                 <ul>
-                                    <li><a href="/deleteCart?id=<%= product._id %>"><span class="<%= typeof cartData !== 'undefined' ? 'icon_heart' : 'icon_heart_alt' %>"></span></a></li>
+                                    <li><a href="/addtoWishlist?id=<%= product._id %>"><span id='<%= product._id %>'  class="<%= wishlist?.product?.includes(product._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= product._id %>')"></span></a></li>
                                 </ul>
                                 <button class="cart-btn">Add to Cart</button>
                                 
@@ -131,15 +131,17 @@
                 <div class="col-lg-12">
                     <div class="product__details__text">
                         <div class="stock__checkbox">
-                            <form action="/addReview?id=<%= product._id %>" method="post">
+                            <form action="/addReview?id=<%= product._id %>"  onsubmit="return reviewsss()" method="post">
                                 <div class="stock__checkbox">
                                     <input type="hidden" name="star" id="instar">
                                     <%for(let i=1;i<=5;i++){%>
                                    <i class="fa fa-star-o" id="star-<%=i%>" onclick="changestar('<%=i%>')"></i> 
                                     <%}%>
-                                    <textarea name="review" id="" class="form-control"  cols="30" rows="1"></textarea>
+                                    <textarea  name="review" id="rating-review" onkeyup='validatString("rating-review", "review_error", "Review")'' class="form-control col-lg-6"  cols="30" rows="1"></textarea>
+                                    <span id="review_error"></span>
                                 </div>
                                 <button class="btn btn-info">ADD REVIEW</button>
+                                <span id="form_error"></span>
                             </form>
                         </div>
                     </div>
@@ -149,9 +151,6 @@
                                 <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Description</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Specification</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Reviews ( <%= product.rating.length %> ) </a>
                             </li>
                         </ul>
@@ -159,9 +158,6 @@
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                 <h6>Description</h6>
                                 <p><%= product.discription %></p>
-                            </div>
-                            <div class="tab-pane" id="tabs-2" role="tabpanel">
-                                <h6>Specification</h6>
                             </div>
                             <div class="tab-pane" id="tabs-3" role="tabpanel">
                                 <h6>Reviews(<%= product.rating.length %>) </h6>

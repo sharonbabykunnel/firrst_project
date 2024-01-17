@@ -9,44 +9,59 @@
                 </div>
             </div>
             <div class="card mb-4">
-                <header class="card-header">
+                <!-- <header class="card-header">
                     <div class="row align-items-center">
                         <div class="col-md-4 col-4">
                             <input type="date" value="02.05.2021" class="form-control">
                         </div>
-                    </div>
+                    </div> -->
                 </header> <!-- card-header end// -->
                 <div class="card-body">
-                    <% for(let i=0; i<coupon.length; i++){%>
                     <article class="itemlist">
-                        <div class="row align-items-center text-center">
-                            <div class="col-lg-3 col-sm-4 col-8  col-name p-0">
-                            <!-- <div class="info"> -->
-                                <h6 class="mb-0"><%= coupon[i].discription %></h6>
-                            <!-- </div> -->
-                            </div>
-                            <div class="col-lg-1 col-sm-2 p-0 col-4 col-price "> <span><%= coupon[i].discount %>%Off</span> </div>
-                            <div class="col-lg-1 col-sm-2 p-0 col-4 col-price"> <span><%= coupon[i].code %></span> </div>
-                            <div class="col-lg-1 col-sm-2 col-4 col-status">
-                                <a href="/admin/couponStatus?id=<%= coupon[i]._id %>&status=<%= coupon[i].status %>"><span class="badge rounded-pill alert-success"><%= coupon[i].status %></span></a>
-                            </div>
-                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-date">
-                                <span><%= coupon[i].createdDate %></span>
-                            </div>
-                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-date">
-                                <span><%= coupon[i].expiryDate %></span>
-                            </div>
-                            <div class="col-lg-2 p-0 col-sm-2 col-4 col-action text-end">
-                                <a href="/admin/addCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
-                                    <i class="material-icons md-edit"></i> Edit
-                                </a>
-                                <a href="/admin/deleteCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm btn-light rounded">
-                                    <i class="material-icons md-delete_forever"></i> Delete
-                                </a>
-                            </div>
+                        <div class="row align-items-center 
+                        text-center">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Discriptiion</th>
+                                    <th>Offer</th>
+                                    <th>Code</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(let i=0; i<coupon.length; i++){%>
+                                <tr>
+                                    <th>
+                                            <h6 class="mb-0"><%= coupon[i].discription %></h6>
+                                    <th> <span><%= coupon[i].discount %>%Off</span> 
+                                    <th> <span><%= coupon[i].code %></span></th>
+                                    <th>
+                                        <a href="/admin/couponStatus?id=<%= coupon[i]._id %>&status=<%= coupon[i].status %>"><span class="badge rounded-pill alert-success"><%= coupon[i].status %></span></a>
+                                    </th>
+                                    <th>
+                                        <span><%= coupon[i].createdDate?.toLocaleString() %></span>
+                                    </th>
+                                    <th>                            
+                                        <span><%= coupon[i].expiryDate?.toLocaleString() %></span>
+                                    </th>
+                                    <th>
+                                        <a href="/admin/addCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm rounded btn-brand">
+                                            <i class="material-icons md-edit"></i> Edit
+                                        </a>
+                                        <a href="/admin/deleteCoupon?id=<%= coupon[i]._id %>" class="btn btn-sm font-sm btn-light rounded">
+                                            <i class="material-icons md-delete_forever"></i> Delete
+                                        </a>
+                                    </th>
+                                </tr>
+                                <%}%> 
+                            </tbody>
+                        </table> 
                         </div> <!-- row .// -->
                     </article> <!-- itemlist  .// -->
-                    <%}%> 
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
         </section> <!-- content-main end// -->

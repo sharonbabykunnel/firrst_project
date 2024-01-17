@@ -49,7 +49,11 @@ const productSchema = new mongoose.Schema({
         {
             star: Number,
             review:String,
-            postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+            postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+            date: {
+                type: Date,
+                default:Date.now
+            }
         }
     ],
     totalrating: {
@@ -59,7 +63,7 @@ const productSchema = new mongoose.Schema({
     discount: {
         type: Number,
         min: 0,
-        max: 1,
+        max: 100,
         default: 0
     }
 });

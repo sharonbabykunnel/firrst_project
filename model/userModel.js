@@ -39,7 +39,8 @@ const userSchama = new mongoose.Schema({
         type: Number,
         require: true,
         default: 0
-    }
+    },
+    used_coupons:[String]
 })
 
 module.exports = mongoose.model("User", userSchama);

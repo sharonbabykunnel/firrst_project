@@ -186,15 +186,23 @@ const rating = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
     const { review, star } = req.body;
+    console.log(review,star,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     const id = req.query.id;
     const product = await Product.findById(id);
     const alreadyRated = product.rating.find((userId) => userId.postedby == user._id);
+    console.log(alreadyRated);
+
     if (alreadyRated) {
-      await Product.updateOne({ rating: { $elemMatch: alreadyRated } }, { $set: { "rating.$.star": star,"rating.$.review":review } });
+      console.log('enene');
+      const ss = await Product.updateOne({ rating: { $elemMatch: alreadyRated } }, { $set: { "rating.$.star": star, "rating.$.review": review } }, { new: true });
+      console.log(ss,'kkkk');
     } else {
       await Product.findByIdAndUpdate(id, { $push: { rating: { review,star, postedby: user._id } } }, { new: true });
     }
     const getallratings = await Product.findById(id)
+    console.log(getallratings,'ttt');
+    
+
     const ratingsum = getallratings.rating.map((item) => item.star).reduce((prev, curr) => prev + curr, 0);
     const ratingcount = getallratings.rating.length || 1;
     const totalrating = Math.round(ratingsum / ratingcount);

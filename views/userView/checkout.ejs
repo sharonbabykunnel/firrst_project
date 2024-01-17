@@ -22,7 +22,7 @@
                 <div class="col-lg-6"  style="display: none;" id="coupon">
                     <div class="discount__content">
                         <h6>Discount codes</h6>
-                        <form action="/cart/coupon">
+                        <form action="/cart/coupon" >
                             <input type="text" placeholder="Enter your coupon code">
                             <button type="submit" class="site-btn">Apply</button>
                         </form>
@@ -38,175 +38,140 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <h5>Billing detail</h5>
+                        <span id="form_error"></span>
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="checkout__form__input">
+                                    <p>Name <span>*</span></p>
+                                    <input type="text" name="name" id="name" value="<%= typeof address !== 'undefined' ? address.name : '' %>" onkeyup="validatString('name','name_error','Name')">
+                                    <span id="name_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
                                     <p>Hous Name/Buliding Number <span>*</span></p>
-                                    <input type="text" name="building" id="building">
-                                    <span id="_error"></span>
+                                    <input type="text" name="building" id="building" value="<%= typeof address !== 'undefined' ? address.building : '' %>" onkeyup="validatString('building','building_error','Hous Name/Building Number')">
+                                    <span id="building_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>Land Mark <span>*</span></p>
-                                    <input type="text" name="landmark" id="landmark">
-                                    <span id="_error"></span>
+                                    <input type="text" name="landmark" id="landmark" value="<%= typeof address != 'undefined' ? address.landmark : '' %>" onkeyup="validatString('landmark','landmark_error','Land Mark')">
+                                    <span id="landmark_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>Streat <span>*</span></p>
-                                    <input type="text" name="streat" id="streat">
-                                    <span id="_error"></span>
+                                    <input type="text" name="streat" id="streat" value="<%= typeof address == 'undefined' ? '' : address?.streat %>" onkeyup="validatString('streat','streat_error','Streat')">
+                                    <span id="streat_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>Country <span>*</span></p>
-                                    <input type="text" name="country" id="country">
-                                    <span id="_error"></span>
+                                    <input type="text" name="country" id="country" value="<%= typeof address == 'undefined' ? '' : address?.country %>" onkeyup="validatString('country','country_error','Country')">
+                                    <span id="country_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>State <span>*</span></p>
-                                    <input type="text" name="state" id="state">
-                                    <span id="_error"></span>
+                                    <input type="text" name="state" id="state" value="<%= typeof address == 'undefined' ? '' : address?.state %>" onkeyup="validatString('state','state_error','State')">
+                                    <span id="state_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>District <span>*</span></p>
-                                    <input type="text" name="district" id="district">
-                                    <span id="_error"></span>
+                                    <input type="text" name="district" id="district" value="<%= typeof address == 'undefined' ? '' : address?.district %>" onkeyup="validatString('district','district_error','District')">
+                                    <span id="district_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Mobile No. <span>*</span></p>
+                                    <input type="text" name="mobile" id="mobile" value="<%= typeof address == 'undefined' ? '' : address?.mobile %>" onkeyup="validatNum2('mobile','phone_error','Mobile')">
+                                    <span id="phone_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
                                     <p>Postcode <span>*</span></p>
-                                    <input type="text" name="pincode" id="pincode">
-                                    <input type="hidden" id="status" name="status" value="Pending">
-                                    <span id="_error"></span>
+                                    <input type="text" name="pincode" id="pincode" value="<%=typeof address == 'undefined' ? '' : address?.pincode%>" onkeyup="validatNum2('pincode','pincode_error','Pincode')">
+                                    <input type="hidden" id="id" name="id"  >
+                                    <input type="hidden" id="status" name="status" value="Pending" >
+                                    <input type="hidden" id="couponId" name="" value=<%=couponId%> >
+                                    <span id="pincode_error"></span>
+                                </div>
+                                <div class="checkout__form__input">
+                                    <p>Oder notes <span>*</span></p>
+                                    <input type="text"
+                                    placeholder="Note about your order, e.g, special noe for delivery" name="notes" id="notes" >
+                                <span id="_error"></span>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
-                                    <div class="checkout__form__input">
-                                        <p>Oder notes <span>*</span></p>
-                                        <input type="text"
-                                        placeholder="Note about your order, e.g, special noe for delivery" name="notes" id="notes" >
-                                    <span id="_error"></span>
-                                    </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="checkout__order__widget" >
+                                    <% address.address.forEach((address,index)=>{%>
+                                    <label for="<%= index %>">
+                                        <%= address.name %>,<%= address.state %>,<%= address.district %>,<%= address.streat %>, <%= address.landmark %>, <%= address.pincode %>
+                                        <input type="radio" id="<%= index %>" name="payment" value="1">
+                                        <span class="checkmark" onclick="changeAddress('<%= JSON.stringify(address) %>')" id="<%= index %>" ></span>
+                                    </label>
+                                    <%})%>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="checkout__order">
-                                <h5>Your order</h5>
-                                <div class="checkout__order__product">
-                                    <ul>
-                                        <li>
-                                            <span class="top__text">Product</span>
-                                            <span class="top__text__right">Total</span>
-                                        </li>
-                                        <% if (Array.isArray(product)){ %> 
-                                        <%for(let i=0; i<product.length; i++){%>
-                                            <li><%= i+1 %>.   <%= product[i].product_id.title %> <span>$ <%= product[i].product_id.price %></span></li><%}%>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="checkout__order">
+                            <h5>Your order</h5>
+                            <div class="checkout__order__product">
+                                <ul>
+                                    <li>
+                                        <span class="top__text">Product</span>
+                                        <span class="top__text__right">Total</span>
+                                    </li>
+                                    <% if (Array.isArray(product)){ %> 
+                                    <%for(let i=0; i<product.length; i++){%>
+                                        <li><%= i+1 %>.   <%= product[i].product_id.title %> <span>$ <%= product[i].product_id.price %></span></li><%}%>
+                                    <%}else{%>
+                                        <li><%= 1 %>.   <%= product.title %> <span>$ <%= product.price %></span></li>
+                                        <%}%>
+                                </ul>
+                            </div>
+                            <div class="checkout__order__total">
+                                <ul>
+                                    <li>Subtotal <span>$<span id="stotal"> <%= calculatTotal %></span></span></li>
+                                    <% if(typeof discount !="undefined"){%>
+                                        <li>Total <span>$<span id="total" > <%= calculatTotal -(calculatTotal * discount /100) %></span></span></li>  
                                         <%}else{%>
-                                            <li><%= 1 %>.   <%= product.title %> <span>$ <%= product.price %></span></li>
-                                            <%}%>
-                                    </ul>
-                                </div>
-                                <div class="checkout__order__total">
-                                    <ul>
-                                        <li>Subtotal <span>$<span id="stotal"> <%= calculatTotal %></span></span></li>
-                                        <% if(typeof discount !="undefined"){%>
-                                            <li>Total <span>$<span id="total" > <%= calculatTotal -(calculatTotal * discount /100) %></span></span></li>  
-                                            <%}else{%>
-                                            <li>Total <span>$<span id="total" > <%= calculatTotal  %></span></span></li><%}%>
-                                    </ul>
-                                </div>
-                                <div class="checkout__order__widget">
-                                    <!-- <label for="o-acc">
-                                        Create an acount?
-                                        <input type="checkbox" id="o-acc">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <p>Create am acount by entering the information below. If you are a returing customer
-                                    login at the top of the page.</p> -->
-                                    <label for="check-payment">
-                                        COD
-                                        <input type="radio" id="check-payment" name="payment" value="COD">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <label for="paypal">
-                                        paypal
-                                        <input type="radio" id="paypal" name="payment" value="paypal">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <input type="hidden" name="discount"  value="<%= discount %>">
-                                    <label for="razorpay">
-                                        razorpay
-                                        <input type="radio" id="razorpay" name="payment" value="razorpay">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <!-- <label for="paypal">
-                                        razorpay
-                                        <input type="radio" id="paypal" name="payment">
-                                        <span class="checkmark"></span>
-                                    </label> -->
-                                </div>
-                                <button type="submit" class="site-btn" onclick="checkout()">Place oder</button>
+                                        <li>Total <span>$<span id="total" > <%= calculatTotal  %></span></span></li><%}%>
+                                </ul>
                             </div>
-                        </div>
-                    </div>
-                
-            </div>
-        </section>
-        <!-- Checkout Section End -->
-
-        <!-- Instagram Begin -->
-        <div class="instagram">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-1.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
+                            <div class="checkout__order__widget">
+                                <!-- <label for="o-acc">
+                                    Create an acount?
+                                    <input type="checkbox" id="o-acc">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <p>Create am acount by entering the information below. If you are a returing customer
+                                login at the top of the page.</p> -->
+                                <label for="check-payment">
+                                    COD
+                                    <input type="radio" id="check-payment" name="payment" value="COD">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <!-- <label for="paypal">
+                                    paypal
+                                    <input type="radio" id="paypal" name="payment" value="paypal">
+                                    <span class="checkmark"></span>
+                                </label> -->
+                                <input type="hidden" name="discount"  value="<%= discount %>">
+                                <label for="razorpay">
+                                    razorpay
+                                    <input type="radio" id="razorpay" name="payment" value="razorpay">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <!-- <label for="paypal">
+                                    razorpay
+                                    <input type="radio" id="paypal" name="payment">
+                                    <span class="checkmark"></span>
+                                </label> -->
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-2.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-3.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-4.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-5.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 p-0">
-                        <div class="instagram__item set-bg" data-setbg="img/instagram/insta-6.jpg">
-                            <div class="instagram__text">
-                                <i class="fa fa-instagram"></i>
-                                <a href="#">@ ashion_shop</a>
-                            </div>
+                            <button type="submit" class="site-btn" onclick="return validatAddressForm()">Place oder</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+        <!-- Checkout Section End -->
         <script>
            function checkout() {
             console.log("dd");
@@ -218,7 +183,7 @@
         }
         let stotal = Number(document.getElementById('stotal').innerHTML)
         let total = Number(document.getElementById('total').innerHTML)
-        // let discount = document.getElementById('discount').value
+        let couponId = document.getElementById('couponId').value
         let building = document.getElementById('building').value
         let landmark = document.getElementById('landmark').value
         let streat = document.getElementById('streat').value
@@ -228,8 +193,11 @@
         let state = document.getElementById('state').value
         let notes = document.getElementById('notes').value
         let status = document.getElementById('status').value
+        let name = document.getElementById('name').value
+        let mobile = document.getElementById('mobile').value
+        let id = document.getElementById('id').value
         let obj = {
-            stotal,total,district,building,landmark,streat,country,pincode,state,notes,status,payment
+            stotal,total,district,building,landmark,streat,country,pincode,state,notes,status,payment,couponId,name,mobile,id
         }
 
         fetch('/cart/placeOrder?id=<%= product._id %>&quantity=<%=quantity %>', {
@@ -243,12 +211,12 @@
         }).then((data) => {
             console.log(data);
             if (data.payment == 'COD') {
-                location.href = '/order-success'
+                location.href = '/order-success/'+data.orderData._id
             }
             else if (data.payment == 'razorpay') {
                 razorpayPayment(data.responce, data.user)
             } else if (data.payment == 'paypal') {
-                console.log(data.link,"jj");
+                console.log(data.link,"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj");
                 location.href = data.link
             }
         })
@@ -285,7 +253,7 @@
         var rzp1 = new Razorpay(options)
         
         rzp1.on('payment.failed', function (response) {
-            alert(response.error.code);
+            alert(response.error.code,"Payment failed");
         })
         rzp1.open()
     }
@@ -307,83 +275,58 @@
             
             return res.json()
         }).then((response) => {
-            console.log(response,'rrrrrrrrrrrrrrrrrrrrr');
             if (response.status) {
                 console.log(response.status,"kl");
                 location.href = `/order-success/${response.order}`
             } else {
-                alert('payment failed')
+                location.href = `/cart`
             }
         }).catch((error) => {
-        // Handle any errors that occur during the fetch or parsing of JSON
         console.error('Error:', error);
         alert('An error occurred. Please try again.');
     });
-
     }
 
 
-    function applyCoupon() {
-        let code = document.getElementById('coupon_code').value
-        let total = document.getElementById('original_amount').value
-        fetch('/coupon-check', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                code, total
-            })
-        }).then((res) => {
-            return res.json()
-        }).then((data) => {
-            let { result } = data
-            console.log(result)
-            if (result) {
-                if (result == 'coupon used') {
-                    document.getElementById('discount').innerHTML = 0
-                    document.getElementById('offer_amount').innerHTML = total
-                    document.getElementById('coupon_applied').value = ''
-                    document.getElementById('coupon_error').innerHTML = 'coupon used'
-                    document.getElementById('coupon_error').style.visibility = 'visible'
-                } else {
-                    console.log(data.result)
-                    document.getElementById('discount').innerHTML = result.discount
-                    document.getElementById('offer_amount').innerHTML = result.answer
-                    document.getElementById('coupon_applied').value = code
-                    document.getElementById('coupon_error').style.visibility = 'hidden'
-                }
-            }
-            else {
-                document.getElementById('discount').innerHTML = 0
-                document.getElementById('offer_amount').innerHTML = total
-                document.getElementById('coupon_applied').value = ''
-                document.getElementById('coupon_error').innerHTML = 'Invalid coupon'
-                document.getElementById('coupon_error').style.visibility = 'visible'
-            }
-        })
-    }
-
-    function getAddress(address_no) {
-        fetch('/getaddress', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify({
-                address_no
-            })
-        }).then((res) => {
-            return res.json()
-        }).then((data) => {
-            document.getElementById('housename').value = data.address.housename
-            document.getElementById('locality').value = data.address.locality
-            document.getElementById('landmark').value = data.address.landmark
-            document.getElementById('city').value = data.address.city
-            document.getElementById('district').value = data.address.district
-            document.getElementById('pincode').value = data.address.pincode
-        })
-    }
-        </script>
-        <!-- Instagram End -->
+    // function applyCoupon() {
+    //     let code = document.getElementById('coupon_code').value
+    //     let total = document.getElementById('original_amount').value
+    //     fetch('/coupon-check', {
+    //         method: 'post',
+    //         headers: {
+    //             'Content-Type': 'application/json;charset=utf-8'
+    //         },
+    //         body: JSON.stringify({
+    //             code, total
+    //         })
+    //     }).then((res) => {
+    //         return res.json()
+    //     }).then((data) => {
+    //         let { result } = data
+    //         console.log(result)
+    //         if (result) {
+    //             if (result == 'coupon used') {
+    //                 document.getElementById('discount').innerHTML = 0
+    //                 document.getElementById('offer_amount').innerHTML = total
+    //                 document.getElementById('coupon_applied').value = ''
+    //                 document.getElementById('coupon_error').innerHTML = 'coupon used'
+    //                 document.getElementById('coupon_error').style.visibility = 'visible'
+    //             } else {
+    //                 console.log(data.result)
+    //                 document.getElementById('discount').innerHTML = result.discount
+    //                 document.getElementById('offer_amount').innerHTML = result.answer
+    //                 document.getElementById('coupon_applied').value = code
+    //                 document.getElementById('coupon_error').style.visibility = 'hidden'
+    //             }
+    //         }
+    //         else {
+    //             document.getElementById('discount').innerHTML = 0
+    //             document.getElementById('offer_amount').innerHTML = total
+    //             document.getElementById('coupon_applied').value = ''
+    //             document.getElementById('coupon_error').innerHTML = 'Invalid coupon'
+    //             document.getElementById('coupon_error').style.visibility = 'visible'
+    //         }
+    //     })
+    // }
+</script>
 <%- include('../layouts/userFooter.ejs') %>

@@ -11,6 +11,7 @@
                                     <span id="form_error"></span>
                                 </div>
                             </div>
+                            <%= typeof message != 'undefined' ? message : '' %>
                             <div class="mb-4">
                                 <label for="product_title" class="form-label">Coupon Code</label>
                                 <input type="hidden" name="id" value="<%= typeof coupon == 'undefined' ? '' : coupon?._id %>">

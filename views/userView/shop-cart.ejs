@@ -89,7 +89,7 @@
                     <div class="discount__content">
                         <h6>Discount codes</h6>
                         <form action="/cart/coupon" method="post">
-                            <input type="text" name="code" value='<%= typeof message == "undefined" ? "" : message %>' placeholder="Enter coupon code">
+                            <input type="text" name="code" value='' placeholder='<%= typeof message == "undefined" ? "Enter coupon code" : message %>'>
                             <button type="submit" class="site-btn">Apply</button>
                         </form>
                     </div>
@@ -101,7 +101,7 @@
                             <li>Subtotal <span>$ <%= calculatTotal(product) %></span></li>
                             <% if(typeof discount !="undefined"){%><li>Total <span id="total" >$ <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></li><%}else{%><li>Total <span id="total" >$ <%= calculatTotal(product)  %></span></li><%}%>
                         </ul>
-                        <a href="/checkout?discount=<%=discount%>" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout?discount=<%=discount%>&couponId=<%=couponId%>" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>

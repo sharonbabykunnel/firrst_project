@@ -4,6 +4,7 @@ const Product = require('../model/productModel');
 const Cart = require('../model/cartModel');
 const Wishlist = require('../model/wishlistModel');
 const Category = require("../model/categoryModel");
+const Address = require("../model/addressModel");
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const otpGenerator = require('otp-generator');
@@ -135,7 +136,7 @@ const loadHome = asyncHandler(async (req, res) => {
         const user = req.session.user;
         const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-        const product = await Product.find();
+        const product = await Product.find().limit(8);
         res.render('userView/index', { product, user, cartNum, wishlist });
     } catch (error) {
         throw error;
@@ -155,7 +156,7 @@ const getProducts = asyncHandler(async (req, res) => {
     let product = [];
     const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
       ?.length;
-    if (category == 'all') {
+    if (category == 'all' || category[0] == 'all') {
        product = await Product.find();
     } else {
        product = await Product.find({
@@ -250,7 +251,7 @@ const loadProductDetails = asyncHandler(async (req, res) => {
         const message = req.query.message;
         console.log(message);
         const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
-        const cart = await Cart.findOne({ user_id: user._id })
+        const cart = await Cart.findOne({ user_id: user?._id })
         const cartData = cart?.product.find((product) => product.product_id == id);
         console.log(cartData,'cartttt');
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
@@ -270,7 +271,7 @@ const loadProductDetails = asyncHandler(async (req, res) => {
 
 const loadCart = asyncHandler(async (req, res) => {
     try {
-        const { discount, message } = req.query;
+        const { discount, message ,couponId} = req.query;
         console.log(discount,"discount");
         const user = req.session.user;
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
@@ -282,7 +283,7 @@ const loadCart = asyncHandler(async (req, res) => {
                 return total + productTotal;
             }, 0);
         };
-        res.render('userView/shop-cart', {cart, product,user, calculatTotal,cartNum, discount, message });
+        res.render('userView/shop-cart', {cart, product,user, calculatTotal,cartNum, discount, message,couponId });
     } catch (error) {
         throw error;
     }
@@ -292,7 +293,8 @@ const addToCart = asyncHandler(async (req, res) => {
     try {
         const product_id = req.query.id;
         console.log(product_id,"poooooo");
-        const quantity = req.body.quantity || req.query.quantity;
+      let quantity = req.body.quantity || req.query.quantity;
+      if (quantity == 0) quantity = 1;
         console.log(req.body.quantity ,req.query.quantity);
         console.log(quantity,'qqqqqqqqqqqqqqqq');
         const user_id = req.session.user._id;
@@ -395,14 +397,14 @@ const changePassword = asyncHandler(async (req, res) => {
 
 const loadwislist = asyncHandler(async (req, res) => {
   try {
-      const user = req.session.user;
+      const user = req.session?.user;
         const wishlist = await Wishlist.findOne(
           { user_id: user?._id },
           { product: 1 }
         );
       const product = await Wishlist.findOne({ user_id: user?._id }).populate("product");
       console.log(product);
-      res.render('userView/wishlist',{product, wishlist});
+      res.render('userView/wishlist',{product, wishlist,user});
   } catch (error) {
     throw error;
   }
@@ -471,37 +473,19 @@ const addReview = asyncHandler(async (req, res) => {
     }
 });
 
-const loadCheckout = asyncHandler(async (req, res) => {
-    try {
-        const user = req.session.user;
-        const { discount, message, id, quantity } = req.query;
-        if (id) {
-            if (quantity < 1) {
-                res.redirect(`/productDetails/${id}?message='quantity cant be lessthan 1'`)
-            } else {
-                
-                var product = await Product.findOne({ _id: id });
-                var calculatTotal = product.price * quantity
-            }
-        } else {
-            var cart = await Cart.findOne({ user_id: user._id }).populate(
-              "product.product_id"
-            );
-            var product = cart?.product;
-            var calculatTotal = cart.product.reduce((total, product) => {
-              const productTotal = product.product_id?.price * product.quantity;
-              return total + productTotal;
-            }, 0);
-        }
-        console.log(discount, "discount");
-        
-        
-      const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-      res.render("userView/checkout",{product,cartNum,user,cart,calculatTotal,discount,quantity});
+const loadBlog = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session?.user;
+    const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
+    const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+
+    res.render('userView/blog', { user, wishlist, cartNum })
   } catch (error) {
     throw error;
   }
 });
+
+
 
   module.exports = {
     loadHome,
@@ -525,6 +509,6 @@ const loadCheckout = asyncHandler(async (req, res) => {
     addtoWishlist,
     removeWishlist,
     addReview,
-    loadCheckout,
-    getProducts
+    getProducts,
+    loadBlog,
 };

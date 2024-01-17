@@ -1,0 +1,187 @@
+<%- include('../layouts/header.ejs') %>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List </h2>
+        </div>
+        <!-- <div>
+            <input type="text" id="orderId" placeholder="Search order ID" class="form-control bg-white">
+        </div>
+    </div> -->
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row gx-3">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <input onkeyup="filter()" id="search" type="search" placeholder="Search..." value="<%= typeof search == 'undefined' ? '' : search %>" class="form-control">
+                </div>
+                <div class="col-lg-2 col-6 col-md-3">
+                    <select class="form-select" id="status" onchange="filter()">
+                        <option>Status</option>
+                        <option>Show All</option>
+                        <option>Delivered</option>
+                        <option>Returned</option>
+                        <option>Pending</option>
+                        <option>Canceled</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-6 col-md-3">
+                    <select class="form-select" id="count" onchange="filter()">
+                        <option value="10">Show 10</option>
+                        <option value="20">Show 20</option>
+                        <option value="30">Show 30</option>
+                    </select>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Payment</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Date</th>
+                            <th scope="col" class="text-end"> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody id="body">
+                        <% order.forEach((order,index)=>{%>
+                            <tr>
+                                <td><%= index+1 %></td>
+                                <td><b><%= order.user.name %></b></td>
+                                <td><b><%= order.payment %></b></td>
+                                <td>$<%= order.total %></td>
+                                <td><span class="badge rounded-pill alert-warning" id=<%= index %>><%= order.status %></span></td>
+                                <td><%= order.createdAt %></td>
+                                <td class="text-end">
+                                    <a href="/admin/order/details/<%=order._id%>" class="btn btn-md rounded font-sm">Detail</a>
+                                    <div class="dropdown">
+                                        <a href="" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> cahnge status </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" onclick="changeStatus('<%= index %>','<%=order._id%>','Delivered')">Delivered</a>
+                                            <a class="dropdown-item"  onclick="changeStatus('<%=index%>','<%=order._id%>','Shipped')">Shipped</a>
+                                        </div>
+                                    </div> <!-- dropdown //end -->
+                                </td>
+                            </tr>
+                        <%})%>
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <% for(let i=1; i<=totalPage; i++){%>
+                    <li class="page-item"><a id="page<%=i%>" onclick="getPage('page<%=i%>')"  class="page-link active"><%= i %></a></li>
+                <%}%>
+                <!-- <li class="page-item active"><a class="page-link" href="<%= page %>"><%= page %></a></li>
+                <li class="page-item"><a class="page-link" href="<%= page %>"><%= page %></a></li>
+                <li class="page-item"><a class="page-link" href="<%= page %>"><%= page %></a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="<%= totalPage %>"><%= totalPage %></a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li> -->
+            </ul>
+        </nav>
+    </div>
+</section> <!-- content-main end// -->
+<script>
+    const changeStatus = (index,id,status)=>{
+        console.log(index,id,status);
+        fetch('/admin/changeOrderStatus',{
+             method:'post',
+             headers:{
+                'Content-Type' : "application/json"
+             },
+             body:JSON.stringify({status,id})
+        }).then((res)=>{
+            console.log(res);
+            return res.json();
+        }).then((res)=>{
+       document.getElementById(index).innerHTML = status
+        })
+    }
+
+
+    let choosedpage 
+    console.log(choosedpage);
+     function filter(){
+        console.log('j');
+        console.log(choosedpage);
+        const count = document.getElementById('count').value
+        console.log(count,'j');
+
+        const search = document.getElementById('search').value;
+        console.log(search,'j');
+
+        const status = document.getElementById('status').value;
+        console.log(status,'j');
+
+        console.log('oo');
+        const page =  document.getElementById(choosedpage)?.innerHTML || 1;
+        console.log(count,search,status,page);
+        fetch('/admin/order',{
+            method:'post',
+            headers:{
+                'Content-Type' : 'application/json'
+            },
+            body:JSON.stringify({count,search,status,page})
+        }).then((res)=>{
+            return res.json();
+        }).then((res)=>{
+            console.log(res);
+            const count = res.count;
+            const order = res.order;
+            const page = res.page;
+            const totalPage = res.totalPage;
+            console.log(totalPage,'tt');
+            console.log(count,'c');
+            console.log(order,'cdsdfasdf');
+            const body = document.getElementById('body');
+            body.innerHTML = '';
+           order.forEach((order,index) => {
+            const tr = document.createElement('tr');
+tr.innerHTML = `<td>${index + 1}</td><td><b>${order?.user?.name}</b></td><td><b>${order.payment}</b></td><td>$${order.total}</td><td><span class="badge rounded-pill alert-warning" id=${index} >${order.status} </span></td><td>${order.createdAt} </td> <td class='text-end'><a href='/admin/order/details/${order._id}' class='btn btn-md rounded font-sm'>Detail</a><div class='dropdown'><a data-bs-toggle='dropdown' class='btn btn-light rounded btn-sm font-sm'> cahnge status </a><div class='dropdown-menu'><a class='dropdown-item' onclick="changeStatus('${index}'','${order._id}','Delivered')">Delivered</a><a class='dropdown-item'  onclick="changeStatus('${index}','${order._id}','Shipped')">Shipped</a></div></div></td>`;
+body.appendChild(tr);
+           })   
+//         const pagination = document.querySelector('pagination');
+//         pagination.innerHTML = '';
+//         for(let i=1; i<=totalPage; i++){
+//             const a = document.createElement('a');
+//             a.enterKeyHint.onclick = 'filter()'
+//             a.classList.add('page-link','active')
+//             a.innerHTML = `${i}`
+//             // <a id="page1" onclick="filter()" class="page-link active">${i}</a></li>
+//             const li = document.createElement('li');
+//              li.appendChild(a)
+//              li.classList.add('.page-item');
+//              pagination.appendChild(li);
+//         }
+//     })
+// }
+console.log("ki");
+// document.addEventListener('DOMContentLoaded', function () {
+    console.log('lk');
+  const pagination = document.querySelector('.pagination');
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPage; i++) {
+    console.log(totalPage);
+  const a = document.createElement('a');
+  a.href = `javascript:void(0)`;
+  a.addEventListener("click", () => getPage(`page${i}`));
+  a.innerHTML = `${i}`;
+  a.id = `page${i}`
+  const li = document.createElement('li');
+  li.classList.add('page-item');
+  li.appendChild(a);
+  pagination.appendChild(li);
+}
+    }
+        )}
+</script>
+       <%- include('../layouts/footer.ejs') %>
+        

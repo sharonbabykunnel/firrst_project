@@ -112,3 +112,26 @@ function getProductFromListItem(element) {
   const catName = element.getAttribute("data-cat-name");
   getProduct(itemName, catName);
 }
+
+function getPage  (page) {
+console.log(page);
+  choosedpage = page;
+  console.log(choosedpage);
+  filter();
+};
+
+const changeAddress = (addres) => {
+  const address = JSON.parse(addres);
+  console.log(address);
+  console.log("sdfsf");
+  document.getElementById("name").value = address.name;
+  document.getElementById("building").value = address.building;
+  document.getElementById("streat").value = address.streat;
+  document.getElementById("landmark").value = address.landmark;
+  document.getElementById("district").value = address.district;
+  document.getElementById("state").value = address.state;
+  document.getElementById("country").value = address.country;
+  document.getElementById("mobile").value = address.mobile;
+  document.getElementById("pincode").value = address.pincode;
+  document.getElementById("id").value = address._id;
+}; 
