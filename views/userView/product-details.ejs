@@ -64,7 +64,7 @@
                             <span>( <%= product.rating.length %> review )</span>
                         </a>
                         </div>
-                        <div class="product__details__price">$<%= product.discount ? product.price - ( product.price * (product.discount/100 ))  : product.price  %> <span><%= product.discount ? `$${product.price}` : '' %></span> <p><%= product.discount %>%Off</p></div>
+                        <div class="product__details__price">$<%= product.discount ? product.discountPrice  : product.price  %> <span><%= product.discount ? `$${product.price}` : '' %></span> <p><%= product.discount %>%Off</p></div>
                         <p></p>
                         <div class="product__details__button">
                             <form action="/addtoCart?id=<%= product?._id %>" method="post">
@@ -89,7 +89,7 @@
                                     function buyNow() {
                                         var quantity = document.getElementById('q').value;
                                         var productId = '<%= product._id %>';
-                                        window.location.href = "/checkout?id=" + productId + "&quantity=" + quantity;
+                                        window.location.href = "/checkout?_id=" + productId + "&quantity=" + quantity;
                                     }
                                 </script>
                                 
@@ -195,7 +195,7 @@
                                             <i class="fa fa-star-o"></i>
                                         <%}}%>
                                     </div>
-                                    <div class="product__details__price">$<%= products[i].discount ? products[i]?.price - ( products[i]?.price * (products[i]?.discount/100 ))  : products[i]?.price  %> <span><%= products[i]?.discount ? `$${products[i]?.price}` : '' %></span></div>
+                                    <div class="product__details__price">$<%= products[i].discount ? products[i]?.discountPrice  : products[i]?.price  %> <span><%= products[i]?.discount ? `$${products[i]?.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>

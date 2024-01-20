@@ -72,17 +72,16 @@
             <script>
                 const getProducts = (category) => {
                     console.log(category, "cat");
-                    fetch('/home/' , {
-                        method: 'POST',
+                    fetch('/home/getProduct?main='+category , {
+                        method: 'get',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({category})
                     }).then((res) => {
                         return res.json();
                     }).then((response) => {
                         console.log(response, 'rrrrrrrrrr');
-                        const products = response.product;
+                        const products = response.products;
                         const wishlist = response.wishlist;
             
                         // Update the HTML body with the fetched products
@@ -94,6 +93,7 @@
 
 // Create HTML elements for each product
 for (let i = 0; i < products?.length; i++) {
+    console.log('');
     const imagePath = `images/${products[i].image[0]}`;
     const productItem = document.createElement('div');
     productItem.classList.add("product__item");
@@ -112,7 +112,7 @@ for (let i = 0; i < products?.length; i++) {
                     <div class="rating">
                         ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
                     </div>
-                    <div class="product__details__price">$${products[i].discount ? products[i].price - (products[i].price * (products[i].discount / 100)) : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
+                    <div class="product__details__price">$${products[i].discount ? products[i].discountPrice : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
                 </div>
     `;
     
@@ -123,9 +123,6 @@ for (let i = 0; i < products?.length; i++) {
     // Append the new product to the propertyGallery
     propertyGallery.appendChild(mix);
 }
-
-// ...
-
                     }).catch((error) => {
                         console.error('Error:', error);
                     });
@@ -169,7 +166,7 @@ for (let i = 0; i < products?.length; i++) {
                                 <i class="fa fa-star-o"></i>
                             <%}}%>
                         </div>
-                        <div class="product__details__price">$<%= product[i].discount ? product[i].price - ( product[i].price * (product[i].discount/100 ))  : product[i].price  %> <span><%= product[i].discount ? `$${product[i].price}` : '' %></span></div>
+                        <div class="product__details__price">$<%= product[i].discount ? product[i].discountPrice  : product[i].price  %> <span><%= product[i].discount ? `$${product[i].price}` : '' %></span></div>
                     </div>
                 </div>
             </div>

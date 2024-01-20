@@ -26,13 +26,13 @@ Paypal.configure({
 const loadCheckout = asyncHandler(async (req, res) => {
     try {
         const user = req.session.user;
-        const { discount, message, id, quantity,couponId } = req.query;
-        if (id) {
+        const { discount, message, _id, quantity,couponId } = req.query;
+        if (_id) {
             if (quantity < 1) {
-                res.redirect(`/productDetails/${id}?message='quantity cant be lessthan 1'`)
+                res.redirect(`/productDetails/${_id}?message='quantity cant be lessthan 1'`)
             } else {
                 
-                var product = await Product.findOne({ _id: id });
+                var product = await Product.findOne({ _id: _id });
                 var calculatTotal = product.price * quantity
             }
         } else {
@@ -61,25 +61,44 @@ const placeOrder = asyncHandler(async (req, res) => {
     const { _id, quantity } = req.query;
     const { building, landmark, streat, country, district, state, pincode, notes, payment, discount, status, stotal, total, couponId, id, name, mobile } = req.body;
     if (_id) {
-      const product = await Product.findById(_id);
+      const product = await Product.findByIdAndUpdate(_id, { $inc: { quantity: -quantity } });
+      console.log(product, 'kkkkkkkkkkkkk', _id);
       var item = { product: product._id, price: product.price, quantity };
     } else {
-      const cart = await Cart.findOne({ user_id: user }).populate("product.product_id");
-      var item = cart?.product.map((item) => { return { product: item.product_id, quantity: item.quantity, price: item.product_id.price } });
+      const cart = await Cart.findOne({ user_id: user }).populate('product.product_id')
+      var item = await cart?.product.map((item) => {
+        console.log(item.product_id, "l");
+        return { product: item.product_id._id, quantity: item.quantity, price: item.product_id.price }
+      });
+      console.log(cart, 'kk', item);
+      await cart.product.map(async (item) => {
+        await Product.findByIdAndUpdate(item.product_id, { $inc: { quantity: -item.quantity } })
+      })
     }
     if (!id) {
       await Address.findOneAndUpdate({ user }, { $push: { address: { country, streat, pincode, building, landmark, district, state, user, name, mobile } } }, { new: true });
     }
     const address = { country, streat, pincode, building, landmark, district, state, user,name,mobile };
     const order = new Order({ user, stotal, total, status, payment, address, notes, item })
-    const orderData = await order.save();
-    if (couponId) await User.findByIdAndUpdate(user, { $push: { used_coupons: couponId } }, { new: true });
     if (payment == "COD") {
-      confirmOrder(user, orderData._id)
+    const orderData = await order.save();
+      confirmOrder(user, orderData._id,couponId)
       res.json({ orderData, payment: 'COD' });
     } else if (payment == 'razorpay') {
-      const responce = await generateRazorpay(orderData._id, total);
+    const orderData = await order.save();
+      const responce = await generateRazorpay(orderData._id, total,couponId);
       res.json({ responce, user, payment: "razorpay" });
+    } else if (payment == 'wallet') {
+      const wallet = await Wallet.findOne({user:user});
+      console.log(wallet,'llll');
+      if (total > wallet.balance) {
+        res.json({ message:'Insufficient Balance', payment: "wallet" });
+      } else {
+        await Wallet.updateOne({user}, { $inc: { balance: -total } });
+        const orderData = await order.save();
+        confirmOrder(user, orderData._id, couponId);
+        res.json({ orderData, payment: "wallet" });
+      }
     } else if (payment == 'paypal') {
       let a = await generatePaypal(orderData._id);
       console.log(a, 'a');
@@ -90,7 +109,13 @@ const placeOrder = asyncHandler(async (req, res) => {
   }
 });
 
-const confirmOrder = async (userId, orderId) => {
+const confirmOrder = async (userId, orderId,couponId) => {
+    if (couponId)
+      await User.findByIdAndUpdate(
+        userId,
+        { $push: { used_coupons: couponId } },
+        { new: true }
+      );
   await Order.updateOne({ _id: orderId }, { $set: { status: "ordered" } }).then(
     async () => {
       await Cart.deleteOne({ user_id: userId });
@@ -134,7 +159,7 @@ const verifyRazorpay = async (payment, order, userId) => {
         hmac = hmac.digest('hex')
         console.log(hmac);
             if (hmac == payment.razorpay_signature) {
-                confirmOrder(userId, order.receipt)
+                confirmOrder(userId, order.receipt,couponId)
                 console.log('lll');
                 resolve()
             } else {
@@ -250,14 +275,10 @@ const loadSucsses = asyncHandler(async (req, res) => {
 
 const loadOrder = asyncHandler(async (req, res) => {
     try {
-      const user = req.session.user
-       const wishlist = await Wishlist.findOne(
-         { user_id: user?._id },
-         { product: 1 }
-       );
+      const user = req.session.user;
        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
          ?.length;
-      const orderData = await Order.find({user:user._id }).populate("item.product")
+      const orderData = await Order.find({ user: user._id, status: { $ne: "Pending" } }).populate("item.product")
     res.render("userView/order",{orderData,user,cartNum});
   } catch (error) {
     throw error;
@@ -362,9 +383,9 @@ const loadWallet = asyncHandler(async (req, res) => {
     const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
       ?.length;
     const wallet = await Wallet.findOne({ user: user._id }).populate('orderId');
-    const order = await Order.find({ user: user._id, status: "Returned" }).populate('item.product');
-    console.log(wallet,'wallet',order,'order',user,'user');
-    res.render("userView/wallet", { wallet,user,order,cartNum ,wishlist});
+    const orders = await Order.find({ user: user._id, $or: [{ status: 'Returned' }, { $and: [{ status: "Cancelled" }, { payment: 'razorpay' }] }] }).populate('item.product');
+    console.log(wallet,'wallet');
+    res.render("userView/wallet", { wallet,user,cartNum ,orders,wishlist});
   } catch (error) {
     throw error;
   }

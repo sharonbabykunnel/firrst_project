@@ -49,26 +49,70 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="cart__price">$<%= product[i].product_id?.price %></td>
+                                        <td class="cart__price">
+                                            <div class="product__details__price">
+                                              $<%= product[i].product_id.discount ? 
+                                                 product[i].product_id.discountPrice :
+                                                 product[i].product_id.price
+                                              %>
+                                              <span>
+                                                <%= product[i].product_id.discount ? `$${product[i].product_id.price}` : '' %>
+                                              </span>
+                                            </div>
+                                          </td>
+                                          
                                         <td class="cart__quantity">
                                             <div class="pro-qty"> 
-                                                <input type="text" value="<%= product[i].quantity %>" name="quantity" id="quantityInput">
+                                        <!-- <span class="dec qtybtn">-</span> -->
+
+                                                <input type="text"  value="<%= product[i].quantity %>" name="quantity" id="quantityInput<%= i %>">
+                                        <!-- <span class="inc qtybtn" id="<%= i %>" onclick="dec('<%= i %>')">+</span> -->
+
                                                 <span></span>
                                             </div>
+                                            <!-- <script>
+                                                const dec = (index)=>{
+                                                let value =   document.getElementById(index).value;
+                                                console.log(value,'d');
+                                                value = value+1;
+                                                console.log(value);
+                                                }
+
+
+                                            </script> -->
                                         </td>
                                         <td class="cart__quantity">
                                             
-                                        <a href="#" onclick="updateQuantity('<%= product[i]._id %>')">Update</a>
+                                        <a href="#" onclick="updateQuantity('<%= product[i].product_id._id %>','<%= i%>')">Update</a>
                                         </td>
                                         
-                                        
-                                        
-                                        <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.price * product[i].quantity %></td>
+                                        <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.discount ? product[i].product_id.discountPrice *product[i].quantity : product[i].product_id.price * product[i].quantity %></td>
                                         <td class="cart__close"><a href="/deleteCart?id=<%= product[i]._id %>"><span class="icon_close"></span></a></td>
                                     </tr>
                                 <%}%>
                             </tbody>
                         </table>
+                        <% if(typeof message!= 'undefined' ){%>
+                            <div class="modal" id="quantityErrorModal">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Quantity Error</h5>
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+                                        <!-- Modal Body -->
+                                        <div class="modal-body">
+                                            <p>The updated quantity is greater than the available stock.</p>
+                                        </div>
+                                        <!-- Modal Footer -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <%}%>
                     </div>
                 </div>
             </div>
@@ -78,19 +122,14 @@
                         <a href="/">Continue Shopping</a>
                     </div>
                 </div>
-                <!-- <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="cart__btn update__btn">
-                        <a href="/updateCart?quantity=quantity"><span class="icon_loading"></span> Update cart</a>
-                    </div>
-                </div> -->
             </div>
             <div class="row">
                 <div class="col-lg-6">
                     <div class="discount__content">
                         <h6>Discount codes</h6>
-                        <form action="/cart/coupon" method="post">
-                            <input type="text" name="code" value='' placeholder='<%= typeof message == "undefined" ? "Enter coupon code" : message %>'>
-                            <button type="submit" class="site-btn">Apply</button>
+                        <form onsubmit="" action="" method="get" >
+                            <input type="text" name="code" value='' placeholder='<%= typeof message == "undefined" ? "Enter coupon code" : message %>' id="code">
+                            <a onclick="applyCoupon()"><button type="button" class="site-btn"  >Apply</button></a>
                         </form>
                     </div>
                 </div>
@@ -98,10 +137,10 @@
                     <div class="cart__total__procced">
                         <h6>Cart total</h6>
                         <ul>
-                            <li>Subtotal <span>$ <%= calculatTotal(product) %></span></li>
-                            <% if(typeof discount !="undefined"){%><li>Total <span id="total" >$ <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></li><%}else{%><li>Total <span id="total" >$ <%= calculatTotal(product)  %></span></li><%}%>
+                            <li>Subtotal <span>$ <span id="stotal"> <%= calculatTotal(product) %></span></span></li>
+                            <% if(typeof discount !="undefined"){%><li>Total <span  >$ <span id="total"> <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></span></li><%}else{%><li>Total <span>$ <span id="total" > <%= calculatTotal(product)  %></span></span></li><%}%>
                         </ul>
-                        <a href="/checkout?discount=<%=discount%>&couponId=<%=couponId%>" class="primary-btn">Proceed to checkout</a>
+                        <a id="href" href="/checkout" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
@@ -167,6 +206,80 @@
             </div>
         </div>
     </div>
-    <!-- Instagram End -->
+    <script>
+        function applyCoupon() {
+        let code = document.getElementById('code').value
+        let total = document.getElementById('stotal').innerHTML
+        console.log(code,total);
+        fetch(`/cart/coupon?code=${code}&total=${total}`, {
+            method: 'get',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            let { Total, discount, couponId,message } = data
+            console.log(Total)
+                if (Total ) {
+                    document.getElementById('total').innerHTML = Total
+
+                    const a = document.getElementById('href')
+                    a.setAttribute('href', `/checkout?discount=${discount}&couponId=${couponId}`);
+                    // document.getElementById('coupon_applied').value = ''
+                    // document.getElementById('coupon_error').innerHTML = 'coupon used'
+                    // document.getElementById('coupon_error').style.visibility = 'visible'
+                } else {
+                    const messageDiv = document.createElement('div');
+
+messageDiv.innerHTML = message;
+messageDiv.style.position = 'fixed';
+messageDiv.style.top = '50%';
+messageDiv.style.left = '50%';
+messageDiv.style.transform = 'translate(-50%, -50%)';
+messageDiv.style.backgroundColor = '#fff';
+messageDiv.style.padding = '20px';
+messageDiv.style.color = '#333';
+messageDiv.style.borderRadius = '10px';
+messageDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+messageDiv.style.maxWidth = '400px';
+messageDiv.style.width = '80%';
+messageDiv.style.textAlign = 'center';
+messageDiv.style.fontSize = '18px';
+messageDiv.style.fontWeight = 'bold';
+messageDiv.style.animation = 'fadeInOut 5s ease-in-out';
+
+document.body.appendChild(messageDiv);
+
+setTimeout(() => {
+    messageDiv.style.opacity = '0';
+    setTimeout(() => {
+        document.body.removeChild(messageDiv);
+    }, 1000); // Assuming the fadeOut animation takes 1 second
+}, 5000); // Display for 5 seconds
+
+// Add a keyframe animation for fadeInOut
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+`;
+
+document.head.appendChild(style);
+
+                    // console.log(data.result)
+                    // document.getElementById('discount').innerHTML = result.discount
+                    // document.getElementById('offer_amount').innerHTML = result.answer
+                    // document.getElementById('coupon_applied').value = code
+                    // document.getElementById('coupon_error').style.visibility = 'hidden'
+                }
+            }
+        )
+    }
+    </script>
 
 <%- include("../layouts/userFooter.ejs") %>

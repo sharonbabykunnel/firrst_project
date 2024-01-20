@@ -4,10 +4,19 @@
         <div>
             <h2 class="content-title card-title">Order List </h2>
         </div>
-        <!-- <div>
-            <input type="text" id="orderId" placeholder="Search order ID" class="form-control bg-white">
+            
+        <div>
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    
+                </form>
+            </div>
         </div>
-    </div> -->
+    </div> 
     <div class="card mb-4">
         <header class="card-header">
             <div class="row gx-3">
@@ -21,7 +30,7 @@
                         <option>Delivered</option>
                         <option>Returned</option>
                         <option>Pending</option>
-                        <option>Canceled</option>
+                        <option>Cancelled</option>
                     </select>
                 </div>
                 <div class="col-lg-2 col-6 col-md-3">
@@ -55,7 +64,7 @@
                                 <td><b><%= order.payment %></b></td>
                                 <td>$<%= order.total %></td>
                                 <td><span class="badge rounded-pill alert-warning" id=<%= index %>><%= order.status %></span></td>
-                                <td><%= order.createdAt %></td>
+                                <td><%= order.createdAt.toLocaleString() %></td>
                                 <td class="text-end">
                                     <a href="/admin/order/details/<%=order._id%>" class="btn btn-md rounded font-sm">Detail</a>
                                     <div class="dropdown">

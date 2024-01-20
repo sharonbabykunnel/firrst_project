@@ -61,18 +61,20 @@ const validatNum2 = (valueId, messageId, input) => {
 const validatcForm = () => {
     var message = document.getElementById('form_error');
     if (
-        !validatString("product_dis", "dis_error", "Discription") ||
-        !validatString("product_slug", "slug_error", "Slug") ||
-        !validatString("product_name", "name_error", "Name") || !chekStatus("")
+      !validatString("product_dis", "dis_error", "Discription") ||
+      !validatString("product_slug", "slug_error", "Slug") ||
+      !validatString("product_name", "name_error", "Name") ||
+      !chekStatus("") ||
+      validatNum("product_discount", "discount_error", "Discount")
     ) {
-        message.style.display = "block";
-        message.style.color = "red";
-        message.innerHTML = "Please Enter Correct Details";
-        setTimeout(() => {
-            message.style.display = "none";
-        }, 4000);
-        return false;
-  }
+      message.style.display = "block";
+      message.style.color = "red";
+      message.innerHTML = "Please Enter Correct Details";
+      setTimeout(() => {
+        message.style.display = "none";
+      }, 4000);
+      return false;
+    }
     return true;
 };
 

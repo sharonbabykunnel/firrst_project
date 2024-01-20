@@ -102,8 +102,9 @@ const removecoupon = () => {
     document.getElementById("coupon").style.display = "none";
 };
 
-const updateQuantity =  (productId)=> {
-    var quantity = document.getElementById('quantityInput').value;
+const updateQuantity =  (productId,i)=> {
+  var quantity = document.getElementById('quantityInput' + i).value;
+  console.log(quantity,'q');
     window.location.href = `/addtoCart?id=${productId}&quantity=${quantity}`;
 }
 
@@ -135,3 +136,4 @@ const changeAddress = (addres) => {
   document.getElementById("pincode").value = address.pincode;
   document.getElementById("id").value = address._id;
 }; 
+

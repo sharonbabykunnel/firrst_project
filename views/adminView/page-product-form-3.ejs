@@ -11,6 +11,12 @@
                             <button class="btn btn-md rounded font-sm hover-up" type="submit">Publich</button>
                         </div> -->
                     </div>
+                    <% if (typeof message !== 'undefined'){ %>
+                        <div id="popup">
+                            <p><%= message %></p>
+                        </div>
+        
+                    <% } %>
                 </div>
                 <div class="col-lg-6">
                     <div class="card mb-4">
@@ -82,11 +88,13 @@
                                     <option>Draft</option>
                                 </select>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label">Categories</label>
-                                <input type="text" placeholder="Type here" class="form-control" name="category" id="product_categories" onkeyup="validatString('product_categories','categorie_error','Categorie')">
-                                <span id="categorie_error"></span>
-                            </div>
+                            <h5 class="mb-3">Categories</h5>
+                            <% for (let i=0; i<category.length; i++){%>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"  id="product-cat<%=i%>" name="category" value="<%= category[i].name %>" >
+                                    <label class="form-check-label" for="product-cat<%=i%>"> <%= category[i].name %> </label>
+                                </div>
+                            <%}%>
                             <!-- <div class="mb-4">
                                 <label class="form-label">Tags</label>
                                 <input type="text" placeholder="Type here" class="form-control" name="tags">
@@ -131,12 +139,7 @@
                 <span id="form_error"></span>
             </form>
             </div>
-            <% if (typeof message !== 'undefined'){ %>
-                <div id="popup">
-                    <p><%= message %></p>
-                </div>
-
-            <% } %>
+           
             
    
 

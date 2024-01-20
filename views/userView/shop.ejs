@@ -4,19 +4,36 @@
     <div class="breadcrumb-option">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-3">
                     <div class="breadcrumb__links">
                         <a href="/"><i class="fa fa-home"></i> Home</a>
                         <span>Shop</span>
                     </div>
-
                 </div>
-                <div class="col-lg-12"> <!-- <li><span class="icon_search search-switch"></span></li> -->
-                    <!-- <input list="search_terms" type="text" class="form-control col-lg-9" placeholder="Search term">
-                    <button class="btn btn-light bg col-lg-2" type="button"> <i class="material-icons md-search icon_search "></i></button></div> -->
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input list="search_terms" id="search" type="text" class="form-control" placeholder="Search term">
+                        <div class="input-group-append">
+                            <button class="btn btn-light" type="button" onclick="filter()">
+                                <i class="material-icons md-search icon_search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="btn-group ml-3">
+                        <select onchange="filter()"  class="btn btn-secondary btn-sm dropdown-toggle" id="dropdownMenuReference">
+                            <option value="default" selected disabled>Sort By</option>
+                            <option  value="low-to-high" class="dropdown-item">Price, low to high</option>
+                            <option  value="high-to-low" class="dropdown-item">Price, high to low</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <option  href="/product?sortBy=low-to-high">Price, low to high</option> -->
             </div>
         </div>
     </div>
+    
     <!-- Breadcrumb End -->
 
     <!-- Shop Section Begin -->
@@ -74,100 +91,87 @@
                             </div><br>
                             <!-- <a href="#" class="col-sm-12"></a> -->
                         </div>
+                        <div class="sidebar__filter">
+                            <div class="section-title">
+                                <h4>Shop by price</h4>
+                            </div>
+                            <div class="filter-range-wrap">
+                                <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                data-min="9" data-max="999"></div>
+                                <div class="range-slider">
+                                    <div class="price-input">
+                                        <p>Price:</p>
+                                        <input type="text" id="minamount">
+                                        <input type="text" id="maxamount">
+                                    </div>
+                                </div>
+                            </div>
+                            <button></button>
+                            <a onclick="filter()">Filter</a>
+                        </div>
                         <div class="sidebar__sizes">
                             <div class="section-title">
-                                <h4></h4>
+                                <h4>Shop by size</h4>
                             </div>
                             <div class="size__list">
                                 <label for="xxs">
-                                    
-                                    <input type="checkbox" id="xxs">
-                                    <!-- <span class="checkmark"></span> -->
+                                    xxs
+                                    <input type="checkbox" name="size" onclick="filter()" id="xxs" value="xxs">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="xs">
-                                    
-                                    <input type="checkbox" id="xs">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="xss">
-                                   
-                                    <input type="checkbox" id="xss">
-                                    <!-- <span class="checkmark"></span> -->
+                                    xs
+                                    <input type="checkbox" name="size" onclick="filter()" id="xs" value="xs">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="s">
-                                    
-                                    <input type="checkbox" id="s">
-                                    <!-- <span class="checkmark"></span> -->
+                                    s
+                                    <input type="checkbox" name="size" onclick="filter()" id="s" value="s">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="m">
-                                    
-                                    <input type="checkbox" id="m">
-                                    <!-- <span class="checkmark"></span> -->
+                                    m
+                                    <input type="checkbox" name="size" onclick="filter()" id="m" value="m">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="ml">
-                                    
-                                    <input type="checkbox" id="ml">
-                                    <!-- <span class="checkmark"></span> -->
+                                    m-l
+                                    <input type="checkbox" name="size" onclick="filter()" id="ml" value="ml">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="l">
-                                    
-                                    <input type="checkbox" id="l">
-                                    <!-- <span class="checkmark"></span> -->
+                                    l
+                                    <input type="checkbox" name="size" onclick="filter()" id="l" value="l">
+                                    <span class="checkmark"></span>
                                 </label>
                                 <label for="xl">
-                                    
-                                    <input type="checkbox" id="xl">
-                                    <!-- <span class="checkmark"></span> -->
+                                    xl
+                                    <input type="checkbox" name="size" onclick="filter()" id="xl" value="xl">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="7">
+                                    7
+                                    <input type="checkbox" name="size" onclick="filter()" id="7" value="7">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="8">
+                                    8
+                                    <input type="checkbox" name="size" onclick="filter()" id="8" value="8">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="9">
+                                    9
+                                    <input type="checkbox" name="size" onclick="filter()" id="9" value="9">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label for="10">
+                                    10
+                                    <input type="checkbox" name="size" onclick="filter()" id="10" value="10">
+                                    <span class="checkmark"></span>
                                 </label>
                             </div>
                         </div>
-                        <div class="sidebar__color">
-                            <div class="section-title">
-                                <h4></h4>
-                            </div>
-                            <div class="size__list color__list">
-                                <label for="black">
-                                    
-                                    <input type="checkbox" id="black">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="whites">
-                                    
-                                    <input type="checkbox" id="whites">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="reds">
-                                    
-                                    <input type="checkbox" id="reds">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="greys">
-                                    
-                                    <input type="checkbox" id="greys">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="blues">
-                                    
-                                    <input type="checkbox" id="blues">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="beige">
-                                    
-                                    <input type="checkbox" id="beige">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="greens">
-                                    
-                                    <input type="checkbox" id="greens">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                                <label for="yellows">
-                                    
-                                    <input type="checkbox" id="yellows">
-                                    <!-- <span class="checkmark"></span> -->
-                                </label>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div> 
                 <div class="col-lg-9 col-md-9 col-sm-9 produt-refresh">
@@ -192,7 +196,7 @@
                                             <i class="fa fa-star-o"></i>
                                         <%}}%>
                                     </div>
-                                    <div class="product__details__price">$<%= item.discount ? item.price - ( item.price * (item.discount/100 ))  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
+                                    <div class="product__details__price">$<%= item.discount ? item.discountPrice  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>
@@ -258,30 +262,102 @@
                 </div>
             </div>
         </div>
+        <input type="hidden" id="main" value="all">
+        <input type="hidden" id="sub" value="all">
+        <input type="hidden" id="max">
+        <input type="hidden" id="min">
     </div>
     <script>
-        const getProduct = (main,sub)=>{
+        const getProduct = (main,sub,max,min)=>{
             const category = [main,sub];
-        fetch('/home/',{
-            method:'post',
+            console.log(category);
+        fetch('/getProduct?main='+main+'&sub='+sub,{
+            method:'get',
             headers:{
                 'Content-Type' : 'application/json'
             },
-            body: JSON.stringify({category})
         }).then((res)=>{
             console.log(res);
             return res.json();
         }).then((res)=>{
             console.log(res,'res');
-            const products = res.product;
+            document.getElementById('main').value = res.main
+            document.getElementById('sub').value = res.sub
+            // document.getElementById('max')
+            // document.getElementById('min')
+            const products = res.products;
             const wishlist = res.wishlist;
             const propertyGallery = document.querySelector('.property__gallery');
-                propertyGallery.innerHTML = ''; // Clear the existing products
-            
-                // Create HTML elements for each product
-                // ...
+                propertyGallery.innerHTML = ''; 
+if(products.length<1){
+    const noProduct = document.createElement('h1');
+    noProduct.classList.add('product__item')
+    noProduct.innerHTML = `No Products Available`
+    propertyGallery.appendChild(noProduct);
+}else{
+for (let i = 0; i < products?.length; i++) {
+    const imagePath = `images/${products[i].image[0]}`;
+    const productItem = document.createElement('div');
+    productItem.classList.add("product__item");
+    
+    productItem.innerHTML = `
+                <div class="product__item__pic set-bg" style="background-image: url(${imagePath});">
+                    <div class="label new">${products[i].status}</div>
+                    <ul class="product__hover">
+                        <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                        <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
+                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
+                    </ul>
+                </div>
+                <div class="product__item__text">
+                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
+                    <div class="rating">
+                        ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
+                    </div>
+                    <div class="product__details__price">$${products[i].discount ? products[i].discountPrice : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
+                </div>
+    `;
+    
 
-// Create HTML elements for each product
+    const mix = document.createElement('div');
+    mix.classList.add('col-lg-3', 'col-md-6', 'col-sm-24', 'mix', 'women');
+    mix.appendChild(productItem)
+    // Append the new product to the propertyGallery
+    propertyGallery.appendChild(mix);
+}
+}
+        })
+        }    
+
+const filter = ()=>{
+    const search = document.getElementById('search').value;
+    const main = document.getElementById('main').value;
+    const sub = document.getElementById('sub').value;
+    const max = document.getElementById('maxamount').value;
+    const min = document.getElementById('minamount').value;
+    const sort = document.getElementById('dropdownMenuReference').value;
+    const size = document.querySelectorAll("input[name='size']:checked");
+    const sizeValues = Array.from(size).map(checkbox => checkbox.value);
+    const sizeQueryString = sizeValues.length > 0 ? `&size=${sizeValues.join(',')}` : '';
+    console.log(sizeValues,'ddd');
+    fetch(`/filter?main=${main}&sub=${sub}&max=${max}&min=${min}${sizeQueryString}&sort=${sort}&search=${search}`,{
+        method:'get',
+        headers:{
+            'Content-Type' : 'application/json'
+        },
+    }).then((res)=>{
+        console.log(res,'res')
+        return res.json();
+    }).then((res)=>{
+            console.log(res,'res');
+            document.getElementById('main').value = res.main
+            document.getElementById('sub').value = res.sub
+            // document.getElementById('max')
+            // document.getElementById('min')
+            const products = res.products;
+            const wishlist = res.wishlist;
+            const propertyGallery = document.querySelector('.property__gallery');
+                propertyGallery.innerHTML = ''; 
 if(products.length<1){
     const noProduct = document.createElement('h1');
     noProduct.classList.add('product__item')
@@ -315,13 +391,11 @@ for (let i = 0; i < products?.length; i++) {
     const mix = document.createElement('div');
     mix.classList.add('col-lg-3', 'col-md-6', 'col-sm-24', 'mix', 'women');
     mix.appendChild(productItem)
-    // Append the new product to the propertyGallery
     propertyGallery.appendChild(mix);
 }
 }
-        })
-        }
-    
+    })
+}
     </script>
     <!-- Instagram End -->
 

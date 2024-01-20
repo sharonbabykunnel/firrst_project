@@ -34,9 +34,12 @@ rout.get("/wallet", auth.isLogged, order.loadWallet);
 rout.get("/blog", user.loadBlog);
 rout.get("/profile", address.loadProfile);
 rout.get("/deleteAddress/:id",address.deleteAddress)
+rout.get("/cart/coupon", auth.isLogged, coupon.applyCoupon);
+rout.get("/home/getProduct",user.getProducts);
+rout.get("/getProduct", user.getProducts);
+rout.get("/filter", user.filterProducts);
 
 rout.post("/razorpay-success", auth.isLogged, order.razorpaySuccess);
-rout.post("/cart/coupon", auth.isLogged, coupon.applyCoupon);
 rout.post("/addReview", auth.isLogged, auth.isLogged, product.rating);
 rout.post("/signup", user.verifySignup);
 rout.post("/signin", user.verifySignin);
@@ -46,7 +49,6 @@ rout.post("/addtoCart", auth.isLogged, auth.isLogged, user.addToCart);
 rout.post("/cancelOrder/:id", auth.isLogged, order.cancelOrder);
 rout.post("/returnOrder/:id", auth.isLogged, order.returnOrder);
 rout.post("/cart/placeOrder", auth.isLogged, order.placeOrder);
-rout.post("/home", user.getProducts);
 rout.post("/addAddress", address.addAddress);
 rout.post("/editAddress/:id", address.editAddress);
 module.exports = rout;

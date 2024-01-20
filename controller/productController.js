@@ -5,11 +5,15 @@ const Category = require('../model/categoryModel');
 const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 
+function calculateDiscountPrice() {
+  return this.price - (this.price * this.discount) / 100;
+}
+      
 const loadAddProduct = asyncHandler(async (req, res) => {
   try {
-    console.log('p')
+    const category = await Category.find();
     const message = req.query.message;
-    res.render("adminView/page-product-form-3", { message });
+    res.render("adminView/page-product-form-3", { message , category});
   } catch (error) {
     throw  error;
   }
@@ -28,19 +32,21 @@ const addProduct = asyncHandler(async (req, res) => {
       status,
       category,
       quantity,
-      discount
+      discount,
     } = await req.body;
     let Title = await Product.findOne({ title: title });
     if (Title) {
-      res.redirect('/admin/addProduct?message=Product is Already Exist.');
-    } else if (Number(quantity)<1 || isNaN(Number(quantity))) {
-      res.redirect("/admin/addProduct?message= INvalid Quantity Value."); 
+      res.redirect("/admin/addProduct?message=Product is Already Exist.");
+    } else if (Number(quantity) < 1 || isNaN(Number(quantity))) {
+      res.redirect("/admin/addProduct?message= INvalid Quantity Value.");
+    } else if (Number(discount) < 1 || isNaN(Number(discount))) {
+      res.redirect("/admin/addProduct?message= INvalid discount Value.");
     } else if (Number(price) < 1 || isNaN(Number(price))) {
       res.redirect("/admin/addProduct?message=Invalid Price Value.");
-    } else if (!isNaN(Number(size)) && Number(size) < 1 ) {
+    } else if (!isNaN(Number(size)) && Number(size) < 1) {
       res.redirect("/admin/addProduct?message=Size is not correct.");
     } else {
-      const product = new Product({
+      const productObj = {
         title: title,
         color: color,
         size: size,
@@ -51,12 +57,12 @@ const addProduct = asyncHandler(async (req, res) => {
         price: price,
         status: status,
         category: category,
-        discount
-      });
+        discount,
+        discountPrice: calculateDiscountPrice.call({price,discount})
+      };
+      const product = new Product(productObj);
       product.save();
-      res.render("adminView/page-product-form-3", {
-        message: "Prodect added Successfully!.",
-      });
+      res.redirect("/admin/addproduct?message=Product Added Successfuly!!");
     }
   } catch (error) {
     throw error;
@@ -155,24 +161,23 @@ const editProduct = asyncHandler(async (req, res) => {
       if (req.files && req.files.length > 0) {
         image = req.files.map((image) => image.filename);
       }
-      await Product.findByIdAndUpdate(
-        { _id: id },
-        {
-          $set: {
-            title: title,
-            price: price,
-            color: color,
-            brand: brand,
-            category: category,
-            discription: discription,
-            quantity: quantity,
-            size: size,
-            status: status,
-            image: image,
-            discount,
-          },
-        }
-      );
+          const updateObj = {
+            $set: {
+              title: title,
+              price: price,
+              color: color,
+              brand: brand,
+              category: category,
+              discription: discription,
+              quantity: quantity,
+              size: size,
+              status: status,
+              image: image,
+              discount: discount,
+              discountPrice: calculateDiscountPrice.call({ price, discount }),
+            },
+          };
+    await Product.findByIdAndUpdate({ _id: id },updateObj );
       res.redirect(
         `/admin/editProduct?id=${id}&message='prouduct updated Succseefully'`
       );

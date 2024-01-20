@@ -24,7 +24,6 @@
                           <tr>
                             <th>No.</th>
                             <th>Date</th>
-                            <th>Order Id</th>
                             <th>Product</th>
                             <th>Quantity</th>
                             <th>Payment Method</th>
@@ -32,12 +31,12 @@
                           </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                          <% if (order.length === 0) { %>
+                          <% if (orders.length === 0) { %>
                             <tr>
                               <td colspan="7" class="text-center">No refunded orders available</td>
                             </tr>
                           <% } else { %>
-                            <% order.reverse().forEach((order, index) => { %>
+                            <% orders.reverse().forEach((order, index) => { %>
                               <tr>
                                 <td><%= index + 1 %></td>
                                 <td>
@@ -47,7 +46,6 @@
                                     N/A
                                   <% } %>
                                 </td>
-                                <td><%= order._id %></td>
                                 <td><strong>
                                   <% order.item.forEach((item) => { %>
                                     <%= item.product.title %> <br>

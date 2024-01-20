@@ -78,24 +78,33 @@ const status = asyncHandler(async (req, res) => {
 const applyCoupon = asyncHandler(async (req, res) => {
   try {
     const id = req.session.user._id;
-    const code = req.body.code;
-    console.log(code, "coder");
-      const coupon = await Coupon.findOne({ code });
-    const discount = Number(coupon?.discount);
-    const couponId = coupon?._id;
-    console.log(discount,"discount");
+    const { code, total } = req.query;
+    const coupon = await Coupon.findOne({ code });
+    if (coupon.expiryDate >= Date.now()) {
+      const couponId = coupon?._id;
       if (coupon) {
-        const used = await User.findOne({ _id: id, used_coupons: { $in: couponId } });
+        const used = await User.findOne({
+          _id: id,
+          used_coupons: { $in: couponId },
+        });
         if (!used) {
-          res.redirect(`/cart?discount=${discount}&couponId=${couponId}`);
+          const discount = Number(coupon?.discount);
+          console.log(discount, "discount");
+          const Total = total - (total * discount) / 100;
+          res.json({ discount, couponId, Total });
         } else {
-          console.log(used,"d");
-      res.redirect(`/cart?message=${"Used Coupons"}`);
+          console.log(used, "d");
+          res.json({ message: "Used Coupons" });
         }
+      } else {
+        console.log('ll');
+        res.json({ message: "Coupon Not Valid" });
+      }
     } else {
-      res.redirect(`/cart?message=${"Coupon Not Valid"}`);
-      
+      console.log('lll');
+      res.json({ message: "Coupon Expired" });
     }
+
   } catch (error) {
     throw error;
   }

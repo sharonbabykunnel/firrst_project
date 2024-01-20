@@ -40,7 +40,12 @@ const userSchama = new mongoose.Schema({
         require: true,
         default: 0
     },
-    used_coupons:[String]
+    used_coupons: [String],
+    referral: String,
+    referrer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    }
 })
 
 module.exports = mongoose.model("User", userSchama);

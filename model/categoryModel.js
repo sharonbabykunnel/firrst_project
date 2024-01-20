@@ -27,7 +27,8 @@ const categorySchema = new mongoose.Schema({
     order: {
         type: Number,
         require:false
-    }
+    },
+    discount:Number
 });
 
 module.exports = mongoose.model('Category', categorySchema);

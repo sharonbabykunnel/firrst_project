@@ -24,10 +24,17 @@
                                     <span id="name_error"></span>
                                 </div>
                                 <div class="mb-4">
+                                    <div class="col-lg-6">
                                     <label for="product_slug" class="form-label">Slug</label>
                                     <input type="text" placeholder="Type here" class="form-control" id="product_slug" name="slug" onkeyup="validatString('product_slug','slug_error','Slug')" value="<%= typeof Cate === 'undefined' ? '' : Cate?.slug ; %>">
                                     <span id="slug_error"></span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                    <label for="product_slug" class="form-label">discount</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_discount" name="discount" onkeyup="validatNum('product_discount','discount_error','Discount')" value="<%= typeof Cate === 'undefined' ? '' : Cate?.discount ; %>">
+                                    <span id="discount_error"></span>
                                     <input type="hidden" name="id" id="id" value="<%= typeof Cate === 'undefined' ? '' : Cate?._id ; %>">
+                                    </div>
                                 </div>
                                 <div class="mb-4">
                                     <label for="product_slug" class="form-label">Status</label><br>

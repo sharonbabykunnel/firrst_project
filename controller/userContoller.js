@@ -3,6 +3,7 @@ const User = require('../model/userModel');
 const Product = require('../model/productModel');
 const Cart = require('../model/cartModel');
 const Wishlist = require('../model/wishlistModel');
+const Wallet = require('../model/walletModel');
 const Category = require("../model/categoryModel");
 const Address = require("../model/addressModel");
 const bcrypt = require('bcrypt');
@@ -84,51 +85,32 @@ const loadSignup = asyncHandler(async (req, res) => {
 })
 
 const verifySignup = asyncHandler(async(req, res)=> {
-    try {
-        const { email, name, mobile, password } = req.body;
-        console.log(password);
-        req.session.user = { email, name, mobile, password };
-        const userName = await User.findOne({ name: name });
-        const userMobile = await User.findOne({ mobile: mobile });
-        const userEmail = await User.findOne({ email: email });
-        if (email === userEmail?.email) {
-            res.render('auth/page-account-register', {
-              massage: "The Email is Already Exist."
-            });
-        }
-        else if (name === userName?.name) {
-            res.render("auth/page-account-register", {
-              massage: "The Name is Already Exist.",
-            });
-            
-        }
-        else if (mobile === userMobile?.mobile) {
-            res.render("auth/page-account-register", {
-              massage: "The Mobile No. is Already Exist.",
-            });
-            
-        }
-        else {
-
-
-            if (req.session.user) {
-                const otp = await generateOtp();
-                req.session.user.OTP = otp;
-                console.log(req.session.user.OTP);
-                console.log(otp,generateOtp)
-                    sentOtp(req.body.email,otp );
-                    res.redirect('/verify');
-                    //   res.render("userView/signup", { massage: "Succsesful." });
-                    } else {
-                      res.render("auth/page-account-register", {
-                        massage: "Faild!.",
-                      });
-                    }
-        }
-
-    } catch (error) {
-        throw  error;
+  try {
+    const { email, name, mobile, password, referral } = req.body;
+    req.session.user = { email, name, mobile, password, referral };
+    const [userName, userMobile, userEmail] = await Promise.all([User.findOne({ name }),User.findOne({ mobile }),User.findOne({ email })])
+    if (email === userEmail?.email) {
+      res.render('auth/page-account-register', {massage: "The Email is Already Exist."});
     }
+    else if (name === userName?.name) {
+      res.render("auth/page-account-register", {massage: "The Name is Already Exist.",}); 
+    }
+    else if (mobile === userMobile?.mobile) {
+      res.render("auth/page-account-register", {massage: "The Mobile No. is Already Exist.",});
+    }
+    else {
+      if (req.session.user) {
+        const otp = await generateOtp();
+        req.session.user.OTP = otp;
+        sentOtp(req.body.email,otp );
+        res.redirect('/verify');
+      } else {
+        res.render("auth/page-account-register", { massage: "Faild!.",});
+      }
+    }
+  } catch (error) {
+    throw  error;
+  }
 })
 
 const loadHome = asyncHandler(async (req, res) => {
@@ -146,25 +128,75 @@ const loadHome = asyncHandler(async (req, res) => {
 const getProducts = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
-    console.log(req.params.category,"ii", req.body.category,"kk");
-      const category = req.body.category ;
-      console.log(category,"cat");
+    const { main, sub } = req.query;
+    console.log(sub);
     const wishlist = await Wishlist.findOne(
       { user_id: user?._id },
       { product: 1 }
     );
-    let product = [];
     const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
       ?.length;
-    if (category == 'all' || category[0] == 'all') {
-       product = await Product.find();
-    } else {
-       product = await Product.find({
-        category: { $all: req.body.category },
-      });
-      
-    }      console.log(product,"pro");
-    res.json( { product, user, cartNum, wishlist });
+
+    let query = {};
+    if (sub == undefined && main != undefined) {
+      query.category = { $all: [main] };
+    } else if (main !== "all" && sub !== "all") {
+      query.category = {$all:[main, sub]}
+    }
+    const products = await (Object.keys(query).length
+      ? Product.find(query)
+      : Product.find());
+
+    console.log(products, "pro");
+    res.json({ products, user, cartNum, wishlist, main, sub });
+  } catch (error) {
+    throw error;
+  }
+});
+
+
+const filterProducts = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session.user;
+    console.log(req.query.category, "ii");
+    const { main, sub, max, min, size ,sort, search} = req.query;
+    console.log(size, 'lll', req.query.size);
+    const newsize =  size?.split(',') 
+    console.log(newsize);
+    const wishlist = await Wishlist.findOne({ user_id: user?._id },{ product: 1 });
+    const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+    let filterCriteria = {};
+
+    if (main !== "all" && sub !== "all") {
+      filterCriteria.category = { $all: [main, sub] };
+    }
+
+    if (search !== undefined) {
+      filterCriteria.title = { $regex: '.*' + search + '.*', $options: 'i' };
+    }
+
+    if (size !== undefined) {
+      filterCriteria.size = { $in: newsize };
+    }
+
+    if (min !== undefined) {
+      filterCriteria.price = { $gte: parseFloat(min) };
+    }
+
+    if (max !== undefined) {
+      filterCriteria.price = { ...filterCriteria.price, $lte: parseFloat(max) };
+    }
+    
+    let by = {};
+    if (sort == 'low-to-high') {
+      by = {price : 1} 
+    } else if(sort == 'high-to-low'){
+      by = {price: -1}
+    }
+    console.log(filterCriteria);
+    const products = await Product.find(filterCriteria).sort(by);
+    console.log(products?.length, "pro");
+    res.json({ products, user, cartNum, wishlist, main, sub });
   } catch (error) {
     throw error;
   }
@@ -179,33 +211,45 @@ const loadOtp = asyncHandler(async (req, res) => {
 })
 
 const verifyotp = asyncHandler(async (req, res) => {
-    try {
-        console.log('1');
-       const otp = req.body.otp;
-        const OTP = req.session.user.OTP;
-        console.log(OTP);
-        console.log(req.session.user.password);
-        if (otp === OTP) {
-            const spassword = await securePassword(req.session.user.password);
-            const user = new User({
-                name: req.session.user.name,
-                email: req.session.user.email,
-                password: spassword,
-                mobile: req.session.user.mobile,
-            });
-            user.save();
-            res.redirect('/signin');
-        } else {
-            res.render('auth/otp', { message: 'incorrect otp' });
-        }
+  try {
+    const otp = req.body.otp;
+    const OTP = req.session.user.OTP;
+    if (otp === OTP) {
+      const referral = req.session.user.name + otp;
+      if (req.session.user.referral) {
+        var referrer = await User.findOne({ referral: req.session.user.referral }, { _id: 1 });
+        console.log(referrer,'referrer');
+        await Wallet.updateOne({ user: referrer },{$inc:{balance:50}});
+      }
+      console.log(referral,'referral');
+      const spassword = await securePassword(req.session.user.password);
+      const user = new User({
+        name: req.session.user.name,
+        email: req.session.user.email,
+        password: spassword,
+        mobile: req.session.user.mobile,
+        referral,
+        referrer
+      }); 
+      await user.save();
+      console.log(user, 'user');
+      await Wallet.create
+      if (referrer) {
+        await Wallet.create({ balance: 20, user: user._id });
+      } else {
+        await Wallet.create({ user: user._id ,balance: 0});
+      }
+      res.redirect('/signin');
+    } else {
+      res.render('auth/otp', { message: 'incorrect otp' });
+    }
   } catch (error) {
-    throw  error;
+  throw  error;
   }
 });
 
 const sentOtp = asyncHandler(async (email, otp) => {
     try {
-        console.log(email);
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 465,
@@ -215,7 +259,6 @@ const sentOtp = asyncHandler(async (email, otp) => {
                 pass: 'mqrt vpym ersh yhug',
             },
         });
-        console.log(process.env.USER);
         const mailOptios = {
             form: process.env.USER,
             to: email,
@@ -226,8 +269,7 @@ const sentOtp = asyncHandler(async (email, otp) => {
             if (error) {
                 console.log(error);
             } else {
-                req.session.user.OTP = otp;
-                console.log("email send successfully!");
+              req.session.user.OTP = otp;
             }
         });
     } catch (error) {
@@ -296,35 +338,42 @@ const addToCart = asyncHandler(async (req, res) => {
       let quantity = req.body.quantity || req.query.quantity;
       if (quantity == 0) quantity = 1;
         console.log(req.body.quantity ,req.query.quantity);
-        console.log(quantity,'qqqqqqqqqqqqqqqq');
+      console.log(quantity, 'qqqqqqqqqqqqqqqq');
+      const productQuantity = await Product.findById(product_id);
+      console.log(productQuantity.quantity,"llllllllllllll");
+      if (quantity > productQuantity.quantity) {
+        console.log('entered');
+        res.redirect('/cart?message=out of stock')
+      } else {
         const user_id = req.session.user._id;
         const objectId = mongoose.Types.ObjectId.isValid(product_id);
         if (objectId) {
-            let cart = await Cart.findOne({ user_id: user_id });
+          let cart = await Cart.findOne({ user_id: user_id });
           if (!cart) {
-              const cartData = new Cart({ user_id: user_id, product: [] });
-              await cartData.save();
-              cart = cartData;
+            const cartData = new Cart({ user_id: user_id, product: [] });
+            await cartData.save();
+            cart = cartData;
           }
-          const productIndex =  cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);
-            if (productIndex == -1) {
-                cart.product.push({ quantity ,product_id});
-                console.log(productIndex,cart.product)
+          const productIndex = cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);
+          if (productIndex == -1) {
+            cart.product.push({ quantity, product_id });
+            console.log(productIndex, cart.product)
+          } else {
+            if (quantity) {
+              console.log('enterd');
+              cart.product[productIndex].quantity = quantity;
             } else {
-                if (quantity) {
-                    console.log('enterd');
-                    cart.product[productIndex].quantity = quantity;
-                } else {
-                    cart.product[productIndex].quantity += 1;
-                }
+              cart.product[productIndex].quantity += 1;
+            }
                   
-                console.log(cart.product,product_id)
+            console.log(cart.product, product_id)
           }
           await cart.save();
-          res.redirect('/cart')  
+          res.redirect('/cart')
         } else {
-            res.redirect('/*');
+          res.redirect('/*');
         }
+      }
   } catch (error) {
     throw error;
   }
@@ -510,5 +559,6 @@ const loadBlog = asyncHandler(async (req, res) => {
     removeWishlist,
     addReview,
     getProducts,
+    filterProducts,
     loadBlog,
 };
