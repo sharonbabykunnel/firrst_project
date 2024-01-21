@@ -104,11 +104,11 @@ for (let i = 0; i < products?.length; i++) {
                     <ul class="product__hover">
                         <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
                         <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
-                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
+                        <li><a href="/addtoCartProduct?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
                     </ul>
                 </div>
                 <div class="product__item__text">
-                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
+                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}<br><span style="color: red;">${products[i].quantity < 1 ? 'Out of Stock' : products[i].quantity < 10 ? `Only ${products[i].quantity} items left` : ''}<span></a></h6>
                     <div class="rating">
                         ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
                     </div>
@@ -154,11 +154,11 @@ for (let i = 0; i < products?.length; i++) {
                             
                             <li><a href="images/<%= product[i].image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
                             <li><a href="/addtoWishlist?id=<%= product[i]._id %>"><span id='<%= product[i]._id %>'  class="<%= wishlist?.product?.includes(product[i]._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= product[i]._id %>')"></span></a></li>
-                            <li><a href="/addtoCart?id=<%= product[i]._id %>"><span class="icon_bag_alt"></span></a></li>
+                            <li><a href="/addtoCartProduct?id=<%= product[i]._id %>"><span class="icon_bag_alt"></span></a></li>
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="/productDetails/<%= product[i]._id %>"><%= product[i].title %></a></h6>
+                        <h6><a href="/productDetails/<%= product[i]._id %>"><%= product[i].title %><br><span style="color: red;"><%if (product[i].quantity < 1 ){%>Out of Stoke <%} else if (product[i].quantity < 10){%> only <%=item.quantity%> items left <%}%></span></a></h6>
                         <div class="rating">
                             <% for(let j=1; j<=5; j++){ if(j<= product[i].totalrating){%>
                             <i class="fa fa-star"></i>
@@ -166,7 +166,7 @@ for (let i = 0; i < products?.length; i++) {
                                 <i class="fa fa-star-o"></i>
                             <%}}%>
                         </div>
-                        <div class="product__details__price">$<%= product[i].discount ? product[i].discountPrice  : product[i].price  %> <span><%= product[i].discount ? `$${product[i].price}` : '' %></span></div>
+                        <div class="product__details__price">$<%= product[i].discount || product[i].catDiscount ? product[i].discountPrice  : product[i].price  %> <span><%= product[i].discount || product[i].catDiscount ? `$${product[i].price}` : '' %></span></div>
                     </div>
                 </div>
             </div>

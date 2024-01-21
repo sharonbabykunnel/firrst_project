@@ -184,11 +184,11 @@
                                     <ul class="product__hover">
                                         <li><a href="images/<%=item.image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
                                         <li><a href="/addtoWishlist?id=<%= item._id %>"><span id='<%= item._id %>'  class="<%= wishlist?.product?.includes(item._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= item._id %>')"></span></a></li>
-                                        <li><a href="/addtoCart?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
+                                        <li><a href="/addtoCartProduct?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><a href="/productDetails/<%= item._id %>"><%= item.title %></a></h6>
+                                    <h6><a href="/productDetails/<%= item._id %>"><%= item.title %><br><span style="color: red;"><%if (item.quantity < 1 ){%>Out of Stoke <%} else if (item.quantity < 10){%> only <%=item.quantity%> items left <%}%></span></a></h6>
                                     <div class="rating"> 
                                         <% for(let j=1; j<=5; j++){ if(j<= item.totalrating){%>
                                         <i class="fa fa-star"></i>
@@ -196,7 +196,10 @@
                                             <i class="fa fa-star-o"></i>
                                         <%}}%>
                                     </div>
-                                    <div class="product__details__price">$<%= item.discount ? item.discountPrice  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
+                                    <div class="product__details__price">$<%= item.discount || item.catDiscount ? item.discountPrice  : item.price  %> <span><%= item.discount || item.catDiscount ? `$${item.price}` : '' %></span></div>
+                                    
+                                        
+                                    
                                 </div>
                             </div>
                         </div>
@@ -269,64 +272,9 @@
     </div>
     <script>
         const getProduct = (main,sub,max,min)=>{
-            const category = [main,sub];
-            console.log(category);
-        fetch('/getProduct?main='+main+'&sub='+sub,{
-            method:'get',
-            headers:{
-                'Content-Type' : 'application/json'
-            },
-        }).then((res)=>{
-            console.log(res);
-            return res.json();
-        }).then((res)=>{
-            console.log(res,'res');
-            document.getElementById('main').value = res.main
-            document.getElementById('sub').value = res.sub
-            // document.getElementById('max')
-            // document.getElementById('min')
-            const products = res.products;
-            const wishlist = res.wishlist;
-            const propertyGallery = document.querySelector('.property__gallery');
-                propertyGallery.innerHTML = ''; 
-if(products.length<1){
-    const noProduct = document.createElement('h1');
-    noProduct.classList.add('product__item')
-    noProduct.innerHTML = `No Products Available`
-    propertyGallery.appendChild(noProduct);
-}else{
-for (let i = 0; i < products?.length; i++) {
-    const imagePath = `images/${products[i].image[0]}`;
-    const productItem = document.createElement('div');
-    productItem.classList.add("product__item");
-    
-    productItem.innerHTML = `
-                <div class="product__item__pic set-bg" style="background-image: url(${imagePath});">
-                    <div class="label new">${products[i].status}</div>
-                    <ul class="product__hover">
-                        <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                        <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
-                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
-                    </ul>
-                </div>
-                <div class="product__item__text">
-                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
-                    <div class="rating">
-                        ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
-                    </div>
-                    <div class="product__details__price">$${products[i].discount ? products[i].discountPrice : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
-                </div>
-    `;
-    
-
-    const mix = document.createElement('div');
-    mix.classList.add('col-lg-3', 'col-md-6', 'col-sm-24', 'mix', 'women');
-    mix.appendChild(productItem)
-    // Append the new product to the propertyGallery
-    propertyGallery.appendChild(mix);
-}
-}
-        })
+            document.getElementById('main').value = main;
+            document.getElementById('sub').value = sub;
+            filter();
         }    
 
 const filter = ()=>{
@@ -375,11 +323,11 @@ for (let i = 0; i < products?.length; i++) {
                     <ul class="product__hover">
                         <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
                         <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
-                        <li><a href="/addtoCart?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
+                        <li><a href="/addtoCartProduct?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
                     </ul>
                 </div>
                 <div class="product__item__text">
-                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}</a></h6>
+                    <h6><a href="/productDetails/${products[i]._id}">${products[i].title}<br><span style="color: red;">${products[i].quantity < 1 ? 'Out of Stock' : products[i].quantity < 10 ? `Only ${products[i].quantity} items left` : ''}<span></a></h6>
                     <div class="rating">
                         ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
                     </div>
@@ -397,6 +345,5 @@ for (let i = 0; i < products?.length; i++) {
     })
 }
     </script>
-    <!-- Instagram End -->
 
 <%- include('../layouts/userFooter.ejs') %>

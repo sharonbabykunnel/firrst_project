@@ -39,13 +39,26 @@ const addProduct = asyncHandler(async (req, res) => {
       res.redirect("/admin/addProduct?message=Product is Already Exist.");
     } else if (Number(quantity) < 1 || isNaN(Number(quantity))) {
       res.redirect("/admin/addProduct?message= INvalid Quantity Value.");
-    } else if (Number(discount) < 1 || isNaN(Number(discount))) {
+    } else if (Number(discount) < 0 || isNaN(Number(discount))) {
       res.redirect("/admin/addProduct?message= INvalid discount Value.");
     } else if (Number(price) < 1 || isNaN(Number(price))) {
       res.redirect("/admin/addProduct?message=Invalid Price Value.");
     } else if (!isNaN(Number(size)) && Number(size) < 1) {
       res.redirect("/admin/addProduct?message=Size is not correct.");
     } else {
+      if (Array.isArray(category)) {
+        const catPromise = category.map(async (name) => {
+          const cat = await Category.findOne({ name, discount: { $gt: 0 } });
+          console.log(cat?.discount, "s");
+          return cat?.discount || 0;
+        });
+        const catResult = await Promise.all(catPromise);
+        var catDiscount = catResult.reduce((acc, cat) => acc + cat, 0);
+      } else {
+        const cat = await Category.findOne({ name: category });
+        var catDiscount = cat?.discount;
+      }
+      const totalDiscount = Number(catDiscount) + Number(discount);
       const productObj = {
         title: title,
         color: color,
@@ -58,7 +71,8 @@ const addProduct = asyncHandler(async (req, res) => {
         status: status,
         category: category,
         discount,
-        discountPrice: calculateDiscountPrice.call({price,discount})
+        catDiscount,
+        discountPrice: calculateDiscountPrice.call({price,discount:totalDiscount})
       };
       const product = new Product(productObj);
       product.save();
@@ -133,7 +147,7 @@ const editProduct = asyncHandler(async (req, res) => {
         category: categoryData,
         message: "prise can't be under 1$",
       });
-    } else if (Number(quantity) < 1 || isNaN(Number(quantity))) {
+    } else if (Number(quantity) < 0 || isNaN(Number(quantity))) {
       res.render("adminView/page-product-edit", {
         product: data,
         category: categoryData,
@@ -161,6 +175,19 @@ const editProduct = asyncHandler(async (req, res) => {
       if (req.files && req.files.length > 0) {
         image = req.files.map((image) => image.filename);
       }
+      if (Array.isArray(category)) {
+        const catPromise = category.map(async (name) => {
+          const cat = await Category.findOne({ name, discount: { $gt: 0 } })
+          console.log(cat?.discount, 's');
+          return cat?.discount || 0;
+        })
+        const catResult = await Promise.all(catPromise)
+        var catDiscount = catResult.reduce((acc, cat) => acc + cat, 0);
+      } else {
+        const cat = await Category.findOne({ name: category })
+        var catDiscount = cat?.discount;
+      }
+      const totalDiscount = Number(catDiscount)+Number(discount)
           const updateObj = {
             $set: {
               title: title,
@@ -174,7 +201,8 @@ const editProduct = asyncHandler(async (req, res) => {
               status: status,
               image: image,
               discount: discount,
-              discountPrice: calculateDiscountPrice.call({ price, discount }),
+              catDiscount,
+              discountPrice: calculateDiscountPrice.call({ price, discount:totalDiscount }),
             },
           };
     await Product.findByIdAndUpdate({ _id: id },updateObj );

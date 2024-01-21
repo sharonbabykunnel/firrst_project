@@ -17,6 +17,25 @@ const validatString = (valueId, messageId, input) => {
 
     return true;
 };
+const validatName = (valueId, messageId, input) => {
+  console.log(valueId);
+  var value = document.getElementById(valueId).value;
+  console.log(value);
+  console.log(input);
+  var message = document.getElementById(messageId);
+  console.log(message);
+    if (value.length === 0) {
+        message.innerHTML = input + " Required";
+        return false;
+    }
+    if (!value.match(/[A-Za-z]/)) {
+        message.innerHTML = input + " is Not Correct";
+        return false;
+    }
+        message.innerHTML = '';
+
+    return true;
+};
 
 const validatNum = (valueId, messageId, input) => {
     var value = document.getElementById(valueId).value;
@@ -63,9 +82,9 @@ const validatcForm = () => {
     if (
       !validatString("product_dis", "dis_error", "Discription") ||
       !validatString("product_slug", "slug_error", "Slug") ||
-      !validatString("product_name", "name_error", "Name") ||
-      !chekStatus("") ||
-      validatNum("product_discount", "discount_error", "Discount")
+      !validatName("product_name", "name_error", "Name") ||
+      !validatNum("product_discount", "discount_error", "Discount") ||
+      !checkStatus("status",'radio') 
     ) {
       message.style.display = "block";
       message.style.color = "red";
@@ -78,6 +97,16 @@ const validatcForm = () => {
     return true;
 };
 
+const checkStatus = (name,inputType) => {
+  const inputss = document.getElementsByName(name);
+  for (const input of inputss) {
+    if (input.checked && input.type == inputType) {
+      return true;
+    }
+  }
+  return false;
+}
+
 var validatFromEditPage = () => {
     console.log('d')
   var message = document.getElementById("form_error");
@@ -89,7 +118,8 @@ var validatFromEditPage = () => {
     !validatString("product_discription", "discription_error", "Discription") ||
     !validatString("product_price", "price_error", "Price") ||
     !validatString("product_quantity", "quantity_error", "Quantity") ||
-    !validatNum("product_discount", "discount_error", "Discount")
+    !validatNum("product_discount", "discount_error", "Discount") ||
+    !checkStatus('category','checkbox')
   ) {
     console.log("ddfgggdhdygdryhgbdfghftdjhdygdfghhhhhhhhhhhhhf");
     message.style.display = "block";

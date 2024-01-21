@@ -1,4 +1,51 @@
 <%- include('../layouts/userHeader.ejs') %>
+<% if (message) { %>
+    <script>
+      function showMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.innerHTML = message;
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.top = '50%';
+        messageDiv.style.zIndex = '100'
+        messageDiv.style.left = '50%';
+        messageDiv.style.transform = 'translate(-50%, -50%)';
+        messageDiv.style.backgroundColor = '#fff';
+        messageDiv.style.padding = '20px';
+        messageDiv.style.color = '#333';
+        messageDiv.style.borderRadius = '10px';
+        messageDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+        messageDiv.style.maxWidth = '400px';
+        messageDiv.style.width = '80%';
+        messageDiv.style.textAlign = 'center';
+        messageDiv.style.fontSize = '18px';
+        messageDiv.style.fontWeight = 'bold';
+        messageDiv.style.animation = 'fadeInOut 5s ease-in-out';
+  
+        document.body.appendChild(messageDiv);
+  
+        setTimeout(() => {
+          messageDiv.style.opacity = '0';
+          setTimeout(() => {
+            document.body.removeChild(messageDiv);
+          }, 1000); 
+        }, 3000);
+      }
+    </script>
+    <script>
+      // Add a keyframe animation for fadeInOut
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeInOut {
+          0% { opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+      showMessage('<%= message %>');
+    </script>
+  <% } %>
 
     <!-- Breadcrumb Begin -->
     <div class="breadcrumb-option">
@@ -51,7 +98,7 @@
                                         </td>
                                         <td class="cart__price">
                                             <div class="product__details__price">
-                                              $<%= product[i].product_id.discount ? 
+                                              $<%= product[i].product_id.discount || product[i].product_id.catDiscount ? 
                                                  product[i].product_id.discountPrice :
                                                  product[i].product_id.price
                                               %>
@@ -86,7 +133,7 @@
                                         <a href="#" onclick="updateQuantity('<%= product[i].product_id._id %>','<%= i%>')">Update</a>
                                         </td>
                                         
-                                        <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.discount ? product[i].product_id.discountPrice *product[i].quantity : product[i].product_id.price * product[i].quantity %></td>
+                                        <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.discount || product[i].product_id.catDiscount ? product[i].product_id.discountPrice *product[i].quantity : product[i].product_id.price * product[i].quantity %></td>
                                         <td class="cart__close"><a href="/deleteCart?id=<%= product[i]._id %>"><span class="icon_close"></span></a></td>
                                     </tr>
                                 <%}%>

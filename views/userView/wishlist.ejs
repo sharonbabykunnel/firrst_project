@@ -30,11 +30,11 @@
                                     <ul class="product__hover">
                                         <li><a href="images/<%=item.image[0] %>" class="image-popup"><span class="arrow_expand"></span></a></li>
                                         <li><a href="/removeWishlist?id=<%= item._id %>"><span id='<%= item._id %>'  class="<%= wishlist?.product?.includes(item._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= item._id %>')"></span></a></li>
-                                        <li><a href="/addtoCart?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
+                                        <li><a href="/addtoCartProduct?id=<%= item._id %>"><span class="icon_bag_alt"></span></a></li>
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
-                                    <h6><a href="/productDetails/<%= item._id %>"><%= item.title %></a></h6>
+                                    <h6><a href="/productDetails/<%= item._id %>"><%= item.title %><br><span style="color: red;"><%if (item.quantity < 1 ){%>Out of Stoke <%} else if (item.quantity < 10){%> only <%=item.quantity%> items left <%}%></span></a></h6>
                                     <div class="rating">
                                         <% for(let j=1; j<=5; j++){ if(j<= item.totalrating){%>
                                         <i class="fa fa-star"></i>
@@ -42,7 +42,7 @@
                                             <i class="fa fa-star-o"></i>
                                         <%}}%>
                                     </div>
-                                    <div class="product__details__price">$<%= item.discount ? item.price - ( item.price * (item.discount/100 ))  : item.price  %> <span><%= item.discount ? `$${item.price}` : '' %></span></div>
+                                    <div class="product__details__price">$<%= item.discount || item.catDiscount ? item.price - ( item.price * (item.discount/100 ))  : item.price  %> <span><%= item.discount || item.catDiscount ? `$${item.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>

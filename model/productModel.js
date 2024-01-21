@@ -67,9 +67,13 @@ const productSchema = new mongoose.Schema({
     max: 100,
     default: 0,
   },
-  discountPrice: {
-    type: Number,
+  catDiscount: {
+    type:Number,
+    min: 0,
+    max: 100,
+    default:0
   },
+  discountPrice:Number
 });
 
 module.exports = mongoose.model("Product", productSchema);

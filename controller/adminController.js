@@ -142,12 +142,32 @@ const addCategory = asyncHandler(async (req, res) => {
             res.redirect(`/admin/category?id=${id}&message='The Slug is already exist'`);
         }
         else if (id) {
-            await Category.findByIdAndUpdate( id , { $set: {name,slug,discription ,status,discount} });
+          await Category.findByIdAndUpdate(id, { $set: { name, slug, discription, status, discount } });
+          if (discount) {
+                        const product = await Product.find({ category: { $in: name } })
+            const Uproduct = Promise.all(product.map(async product => {
+              const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
+              await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
+            }))
+            console.log(Uproduct,"l;");
+            // const prodcut = await Product.updateMany({ category: { $in: name } }, {  $set: { discountPrice: { $toDouble: { $multiply: ["$price" , 0.9] } } } } );
+            console.log(product,"miss") 
+          }
             res.redirect(`/admin/category?&message='Category Updatd successfully'`);
         } else {
-        const category = new Category({name,slug,discription,status,discount});
-        category.save();
-        res.redirect(`/admin/category?${id}&message='Category Added Successfully'`); 
+          const category = new Category({ name, slug, discription, status, discount });
+          category.save();
+          if (discount) {
+            console.log(discount, "isds");
+            const product = await Product.find({ category: { $in: name } })
+            const Uproduct = Promise.all(product.map(async product => {
+              const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
+              await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
+            }))
+            console.log(Uproduct, "l;");
+            // await Product.updateMany({ category: { $in: name } }, [{ $inc: { discount } }, { $set: { discountPrice: { $subtract: ['$price', { $multiply: ['$price', { $divide: ['$discount', 100] }] }] } }  }]);
+          }
+        res.redirect(`/admin/category?${id}&message=Category Added Successfully`); 
         }
   } catch (error) {
     throw  error;

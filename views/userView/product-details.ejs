@@ -64,7 +64,7 @@
                             <span>( <%= product.rating.length %> review )</span>
                         </a>
                         </div>
-                        <div class="product__details__price">$<%= product.discount ? product.discountPrice  : product.price  %> <span><%= product.discount ? `$${product.price}` : '' %></span> <p><%= product.discount %>%Off</p></div>
+                        <div class="product__details__price">$<%= product.discount || product.catDiscount ? product.discountPrice  : product.price  %> <span><%= product.discount || product.catDiscount ? `$${product.price}` : '' %></span> <p><%= product.discount %>%Off</p></div>
                         <p></p>
                         <div class="product__details__button">
                             <form action="/addtoCart?id=<%= product?._id %>" method="post">
@@ -73,9 +73,53 @@
                                     <div class="pro-qty">
                                         <input type="text" id="q" value="<%= typeof cartData !== 'undefined' ? cartData?.quantity : '0' %>" name="quantity">
                                     </div>
-                                    <% if(typeof message !='undefined'){%>
-                                        <span><%= message %></span>
-                                        <%}%>
+                                    <% if (message) { %>
+                                        <script>
+                                          function showMessage(message) {
+                                            const messageDiv = document.createElement('div');
+                                            messageDiv.innerHTML = message;
+                                            messageDiv.style.position = 'fixed';
+                                            messageDiv.style.top = '50%';
+                                            messageDiv.style.zIndex = '100'
+                                            messageDiv.style.left = '50%';
+                                            messageDiv.style.transform = 'translate(-50%, -50%)';
+                                            messageDiv.style.backgroundColor = '#fff';
+                                            messageDiv.style.padding = '20px';
+                                            messageDiv.style.color = '#333';
+                                            messageDiv.style.borderRadius = '10px';
+                                            messageDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+                                            messageDiv.style.maxWidth = '400px';
+                                            messageDiv.style.width = '80%';
+                                            messageDiv.style.textAlign = 'center';
+                                            messageDiv.style.fontSize = '18px';
+                                            messageDiv.style.fontWeight = 'bold';
+                                            messageDiv.style.animation = 'fadeInOut 5s ease-in-out';
+                                      
+                                            document.body.appendChild(messageDiv);
+                                      
+                                            setTimeout(() => {
+                                              messageDiv.style.opacity = '0';
+                                              setTimeout(() => {
+                                                document.body.removeChild(messageDiv);
+                                              }, 1000); 
+                                            }, 3000);
+                                          }
+                                        </script>
+                                        <script>
+                                          // Add a keyframe animation for fadeInOut
+                                          const style = document.createElement('style');
+                                          style.textContent = `
+                                            @keyframes fadeInOut {
+                                              0% { opacity: 0; }
+                                              10% { opacity: 1; }
+                                              90% { opacity: 1; }
+                                              100% { opacity: 0; }
+                                            }
+                                          `;
+                                          document.head.appendChild(style);
+                                          showMessage('<%= message %>');
+                                        </script>
+                                      <% } %>
                                 </div>
                                 <ul>
                                     <li><a href="/addtoWishlist?id=<%= product._id %>"><span id='<%= product._id %>'  class="<%= wishlist?.product?.includes(product._id) ? 'icon_heart' : 'icon_heart_alt red' %>" onclick="change('<%= product._id %>')"></span></a></li>
@@ -188,14 +232,14 @@
                                 </ul>
                             </div>
                                 <div class="product__item__text">
-                                    <h6><a href="/productDetails/<%=products[i].id %>"><%= products[i].title %></a></h6><div class="rating">
+                                    <h6><a href="/productDetails/<%=products[i].id %>"><%= products[i].title %><br><span style="color: red;"><%if (products[i].quantity < 1 ){%>Out of Stoke <%} else if (products[i].quantity < 10){%> only <%=products[i].quantity%> items left <%}%></span></a></h6><div class="rating">
                                         <% for(let j=1; j<=5; j++){ if(j<= products[i].totalrating){%>
                                         <i class="fa fa-star"></i>
                                         <%}else{%>
                                             <i class="fa fa-star-o"></i>
                                         <%}}%>
                                     </div>
-                                    <div class="product__details__price">$<%= products[i].discount ? products[i]?.discountPrice  : products[i]?.price  %> <span><%= products[i]?.discount ? `$${products[i]?.price}` : '' %></span></div>
+                                    <div class="product__details__price">$<%= products[i].discount || products[i].catDiscount ? products[i]?.discountPrice  : products[i]?.price  %> <span><%= products[i]?.discount || products[i].catDiscount ? `$${products[i]?.price}` : '' %></span></div>
                                 </div>
                             </div>
                         </div>

@@ -120,9 +120,9 @@
                                     </li>
                                     <% if (Array.isArray(product)){ %> 
                                     <%for(let i=0; i<product.length; i++){%>
-                                        <li><%= i+1 %>.   <%= product[i].product_id.title %> <span>$ <%= product[i].product_id.price %></span></li><%}%>
+                                        <li><%= i+1 %>.   <%= product[i].product_id.title %>  <span>$ <%= product[i].product_id.discountPrice * product[i].quantity %></span></li><%}%>
                                     <%}else{%>
-                                        <li><%= 1 %>.   <%= product.title %> <span>$ <%= product.price %></span></li>
+                                        <li><%= 1 %>.   <%= product.title %> <span>$ <%= product.discountPrice %></span></li>
                                         <%}%>
                                 </ul>
                             </div>

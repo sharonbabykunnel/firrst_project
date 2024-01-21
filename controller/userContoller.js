@@ -114,15 +114,15 @@ const verifySignup = asyncHandler(async(req, res)=> {
 })
 
 const loadHome = asyncHandler(async (req, res) => {
-    try {
-        const user = req.session.user;
-        const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
-        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-        const product = await Product.find().limit(8);
-        res.render('userView/index', { product, user, cartNum, wishlist });
-    } catch (error) {
-        throw error;
-    }
+  try {
+    const user = req.session.user;
+    const message = req.query.message;
+    const [wishlist,cart,product] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id }),Product.find().sort({ _id: -1 }).limit(8)])
+    const cartNum = cart?.product?.length;
+    res.render('userView/index', { product, user, cartNum, wishlist,message });
+  } catch (error) {
+      throw error;
+  }
 });
 
 const getProducts = asyncHandler(async (req, res) => {
@@ -180,18 +180,18 @@ const filterProducts = asyncHandler(async (req, res) => {
     }
 
     if (min !== undefined) {
-      filterCriteria.price = { $gte: parseFloat(min) };
+      filterCriteria.discountPrice = { $gte: parseFloat(min) };
     }
 
     if (max !== undefined) {
-      filterCriteria.price = { ...filterCriteria.price, $lte: parseFloat(max) };
+      filterCriteria.discountPrice = { ...filterCriteria.price, $lte: parseFloat(max) };
     }
     
     let by = {};
     if (sort == 'low-to-high') {
-      by = {price : 1} 
+      by = {discountPrice : 1} 
     } else if(sort == 'high-to-low'){
-      by = {price: -1}
+      by = {discountPrice: -1}
     }
     console.log(filterCriteria);
     const products = await Product.find(filterCriteria).sort(by);
@@ -321,7 +321,7 @@ const loadCart = asyncHandler(async (req, res) => {
         const product = cart?.product;
         const calculatTotal = (product) => {
             return product.reduce((total, product) => {
-                const productTotal = product.product_id?.price * product.quantity;
+                const productTotal = product.product_id?.discountPrice* product.quantity;
                 return total + productTotal;
             }, 0);
         };
@@ -343,11 +343,10 @@ const addToCart = asyncHandler(async (req, res) => {
       console.log(productQuantity.quantity,"llllllllllllll");
       if (quantity > productQuantity.quantity) {
         console.log('entered');
-        res.redirect('/cart?message=out of stock')
+        res.json({message: 'out of stock',quantity:productQuantity.quantity})
       } else {
         const user_id = req.session.user._id;
-        const objectId = mongoose.Types.ObjectId.isValid(product_id);
-        if (objectId) {
+        console.log( "kk", product_id,'ll');
           let cart = await Cart.findOne({ user_id: user_id });
           if (!cart) {
             const cartData = new Cart({ user_id: user_id, product: [] });
@@ -369,11 +368,43 @@ const addToCart = asyncHandler(async (req, res) => {
             console.log(cart.product, product_id)
           }
           await cart.save();
-          res.redirect('/cart')
+          res.json({ message:'Cart Updated',quantity })
+      }
+  } catch (error) {
+    throw error;
+  }
+});
+
+const addToCartProduct = asyncHandler(async (req, res) => {
+  try {
+    const product_id = req.query.id;
+    const user_id = req.session.user._id;
+    let quantity = req.body.quantity || req.query.quantity;
+    if (quantity == 0) quantity = 1;
+    const [cartcheck, productQuantity] = await Promise.all([Cart.findOne({ user_id: user_id, "product.product_id": product_id },{ "product.$": 1 }), Product.findById(product_id)])
+    if (quantity > productQuantity.quantity || !productQuantity.quantity || cartcheck?.product[0]?.quantity >= productQuantity.quantity
+    ) {
+      res.redirect("/cart?message=Out Of Stock");
+    } else {
+      let cart = await Cart.findOne({ user_id: user_id });
+      if (!cart) {
+        const cartData = new Cart({ user_id: user_id, product: [] });
+        await cartData.save();
+        cart = cartData;
+      }
+      const productIndex = cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id );
+      if (productIndex == -1) {
+        cart.product.push({ quantity, product_id });
+      } else {
+        if (quantity) {
+          cart.product[productIndex].quantity = quantity;
         } else {
-          res.redirect('/*');
+          cart.product[productIndex].quantity += 1;
         }
       }
+      await cart.save();
+      res.redirect("/cart?message=Product Added To Cart");
+    }
   } catch (error) {
     throw error;
   }
@@ -406,13 +437,11 @@ const loadError = asyncHandler(async (req, res) => {
 });
 
 const loadShop = asyncHandler(async (req, res) => {
-    try {
-        const user = req.session.user;
-        const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
-        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-      const product = await Product.find();
-      const category = await Category.find();
-        res.render("userView/shop",{user,product,cartNum,wishlist, category});
+  try {
+    const user = req.session.user;
+    const [wishlist,cart,product,category] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id }),Product.find(),Category.find()])
+    const cartNum = cart?.product?.length;
+    res.render("userView/shop",{user,product,cartNum,wishlist, category});
   } catch (error) {
     throw error;
   }
@@ -446,42 +475,39 @@ const changePassword = asyncHandler(async (req, res) => {
 
 const loadwislist = asyncHandler(async (req, res) => {
   try {
-      const user = req.session?.user;
-        const wishlist = await Wishlist.findOne(
-          { user_id: user?._id },
-          { product: 1 }
-        );
-      const product = await Wishlist.findOne({ user_id: user?._id }).populate("product");
-      console.log(product);
-      res.render('userView/wishlist',{product, wishlist,user});
+    const user = req.session?.user;
+    const [wishlist,product] = await Promise.all([Wishlist.findOne({ user_id: user?._id },{ product: 1 }),Wishlist.findOne({ user_id: user?._id }).populate("product")])
+    res.render('userView/wishlist',{product, wishlist,user});
   } catch (error) {
     throw error;
   }
 });
 
 const addtoWishlist = asyncHandler(async (req, res) => {
-    try {
-        const user = req.session.user;
-        const  product_id  = req.query.id;
-        let wishlist = await Wishlist.findOne({ user_id: user?._id });
-        if (!wishlist) {
-            const wish = new Wishlist({ user_id: user._id, product: [] });
-            await wish.save();
-            wishlist = wish;
-        }
-        console.log(wishlist);
-        const productIndex = wishlist.product.findIndex((item) => item == product_id);
-        console.log(productIndex);
-        if (productIndex == -1) {
-            wishlist.product.push( product_id );
-        } else {
-            wishlist.product.splice(productIndex, 1);
-        }
-        await wishlist.save()
-    } catch (error) {
-        throw error;
+  try {
+    const user = req.session.user;
+    const product_id = req.query.id;
+    let wishlist = await Wishlist.findOne({ user_id: user?._id });
+    if (!wishlist) {
+      const wish = new Wishlist({ user_id: user._id, product: [] });
+      await wish.save();
+      wishlist = wish;
     }
-})
+    console.log(wishlist);
+    const productIndex = wishlist.product.findIndex(
+      (item) => item == product_id
+    );
+    console.log(productIndex);
+    if (productIndex == -1) {
+      wishlist.product.push(product_id);
+    } else {
+      wishlist.product.splice(productIndex, 1);
+    }
+    await wishlist.save();
+  } catch (error) {
+    throw error;
+  }
+});
 
 const removeWishlist = asyncHandler(async (req, res) => {
   try {
@@ -525,9 +551,8 @@ const addReview = asyncHandler(async (req, res) => {
 const loadBlog = asyncHandler(async (req, res) => {
   try {
     const user = req.session?.user;
-    const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
-    const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-
+    const [wishlist,cart] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id })])
+    const cartNum = cart?.product?.length;
     res.render('userView/blog', { user, wishlist, cartNum })
   } catch (error) {
     throw error;
@@ -549,6 +574,7 @@ const loadBlog = asyncHandler(async (req, res) => {
     loadProductDetails,
     loadCart,
     addToCart,
+    addToCartProduct,
     deleteCart,
     loadError,
     loadShop,

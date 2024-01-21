@@ -103,9 +103,59 @@ const removecoupon = () => {
 };
 
 const updateQuantity =  (productId,i)=> {
-  var quantity = document.getElementById('quantityInput' + i).value;
-  console.log(quantity,'q');
-    window.location.href = `/addtoCart?id=${productId}&quantity=${quantity}`;
+  var quantity = document.getElementById('quantityInput' + i);
+  console.log(quantity, 'q');
+  fetch(`/addtoCart?id=${productId}&quantity=${quantity.value}`, {
+    method: 'get',
+    headers:{'Content-Type':"application/json;charset=utf-8"}
+  }).then((res) => {
+    return res.json();
+  }).then((res) => {
+    const message = res.message;
+    if (message) {
+      quantity.innerHTML = res.quantity;
+      quantity.value = res.quantity;
+      const messageDiv = document.createElement("div");
+      messageDiv.innerHTML = message;
+      messageDiv.style.position = "fixed";
+      messageDiv.style.top = "50%";
+      messageDiv.style.left = "50%";
+      messageDiv.style.transform = "translate(-50%, -50%)";
+      messageDiv.style.backgroundColor = "#fff";
+      messageDiv.style.padding = "20px";
+      messageDiv.style.color = "#333";
+      messageDiv.style.borderRadius = "10px";
+      messageDiv.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
+      messageDiv.style.maxWidth = "400px";
+      messageDiv.style.width = "80%";
+      messageDiv.style.textAlign = "center";
+      messageDiv.style.fontSize = "18px";
+      messageDiv.style.fontWeight = "bold";
+      messageDiv.style.animation = "fadeInOut 5s ease-in-out";
+
+      document.body.appendChild(messageDiv);
+
+      setTimeout(() => {
+        messageDiv.style.opacity = "0";
+        setTimeout(() => {
+          document.body.removeChild(messageDiv);
+        }, 1000); // Assuming the fadeOut animation takes 1 second
+      }, 5000); // Display for 5 seconds
+
+      // Add a keyframe animation for fadeInOut
+      const style = document.createElement("style");
+      style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+`;
+
+      document.head.appendChild(style);
+    }
+  })
 }
 
 function getProductFromListItem(element) {
@@ -137,3 +187,57 @@ const changeAddress = (addres) => {
   document.getElementById("id").value = address._id;
 }; 
 
+const addtocart = (id) => {
+  fetch('/addToCart?id=' + id, {
+    method: 'get',
+    headers:{'Content-Type':'application/json'},
+  }).then((res) => {
+    return res.json();
+  }).then((res) => {
+    if (res) {
+      var message = res.message
+    } else {
+      var message = "sign In First"
+    }
+    console.log(res, 'res')
+      const messageDiv = document.createElement("div");
+      messageDiv.innerHTML = message;
+      messageDiv.style.position = "fixed";
+      messageDiv.style.top = "50%";
+      messageDiv.style.left = "50%";
+      messageDiv.style.transform = "translate(-50%, -50%)";
+      messageDiv.style.backgroundColor = "#fff";
+      messageDiv.style.padding = "20px";
+      messageDiv.style.color = "#333";
+      messageDiv.style.borderRadius = "10px";
+      messageDiv.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.2)";
+      messageDiv.style.maxWidth = "400px";
+      messageDiv.style.width = "80%";
+      messageDiv.style.textAlign = "center";
+      messageDiv.style.fontSize = "18px";
+      messageDiv.style.fontWeight = "bold";
+      messageDiv.style.animation = "fadeInOut 5s ease-in-out";
+
+      document.body.appendChild(messageDiv);
+
+      setTimeout(() => {
+        messageDiv.style.opacity = "0";
+        setTimeout(() => {
+          document.body.removeChild(messageDiv);
+        }, 1000); // Assuming the fadeOut animation takes 1 second
+      }, 5000); // Display for 5 seconds
+
+      // Add a keyframe animation for fadeInOut
+      const style = document.createElement("style");
+      style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+`;
+
+      document.head.appendChild(style);
+  })
+}
