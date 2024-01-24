@@ -342,7 +342,7 @@ const addToCart = asyncHandler(async (req, res) => {
       const productQuantity = await Product.findById(product_id);
       console.log(productQuantity.quantity,"llllllllllllll");
       if (quantity > productQuantity.quantity) {
-        console.log('entered');
+        await Cart.updateOne()
         res.json({message: 'out of stock',quantity:productQuantity.quantity})
       } else {
         const user_id = req.session.user._id;

@@ -16,11 +16,11 @@
                                 <label for="product_title" class="form-label">Coupon Code</label>
                                 <input type="hidden" name="id" value="<%= typeof coupon == 'undefined' ? '' : coupon?._id %>">
                                 <input type="text" name="code" placeholder="Type here" class="form-control" id="product_code" onkeyup="validatString('product_code','code_error','Code')" value="<%= typeof coupon == 'undefined' ? '' : coupon?.code %>">
-                                <span id="code_error"><%= typeof message == 'undefined' ? '' : message %></span>
+                                <span id="code_error"></span>
                             </div>
                             <div class="row gx-3">
                                 <div class="col-md-4  mb-3">
-                                    <label for="product_sku" class="form-label">Created Date</label>
+                                    <label for="product_sku" class="form-label">Activate Date</label>
                                     <input type="date" name="createdDate" placeholder="Type here" class="form-control" id="product_sku" value="<%= typeof coupon == 'undefined' ? '' : coupon?.createdDate %>">
                                 </div>
                                 <div class="col-md-4  mb-3">

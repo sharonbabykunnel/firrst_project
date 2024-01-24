@@ -9,12 +9,16 @@
                 </div>
             </div>
             <div class="card mb-4">
-                <!-- <header class="card-header">
-                    <div class="row align-items-center">
+                 <header class="card-header">
+                    <!-- <div class="row align-items-center">
                         <div class="col-md-4 col-4">
                             <input type="date" value="02.05.2021" class="form-control">
                         </div>
-                    </div> -->
+                    </div>  -->
+                    <div class="input-group">
+                        <input id="sreachterms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" onclick="filter()"> <i class="material-icons md-search"></i></button>
+                    </div>
                 </header> <!-- card-header end// -->
                 <div class="card-body">
                     <article class="itemlist">
@@ -32,7 +36,7 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tbody">
                                 <% for(let i=0; i<coupon.length; i++){%>
                                 <tr>
                                     <th>
@@ -64,5 +68,76 @@
                     </article> <!-- itemlist  .// -->
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <% for(let i=1; i<=totalPage; i++){%>
+                            <li class="page-item"><a id="page<%=i%>" onclick="getPages('page<%=i%>')"  class="page-link active"><%= i %></a></li>
+                        <%}%>
+                    </ul>
+                </nav>
+            </div>
         </section> <!-- content-main end// -->
+
+<script>
+    let page
+    const getPages = (id)=>{
+        console.log('dd');
+        page = document.getElementById(id).innerHTML
+        filter();
+    }
+    const filter = ()=>{
+        const search = document.getElementById('sreachterms').value;
+        fetch('/admin/getCoupons?search='+search+'&page='+page,{method:'get'}).then(res=>{return res.json()}).then(res=>{
+            const coupon = res.coupon;
+            const totalPage = res.totalPage;
+         const tbody = document.getElementById('tbody');
+         tbody.innerHTML="";
+         coupon.forEach((coupon,i)=>{
+            const tr = document.createElement('tr');
+            tr.innerHTML=`
+        <th>
+            <h6 class="mb-0">${coupon.discription}</h6>
+        </th>
+        <th> <span>${coupon.discount}% Off</span> </th>
+        <th> <span>${coupon.code}</span></th>
+        <th>
+            <a href="/admin/couponStatus?id=${coupon._id}&status=${coupon.status}">
+                <span class="badge rounded-pill alert-success">${coupon.status}</span>
+            </a>
+        </th>
+        <th>
+            <span>${coupon.createdDate?.toLocaleString()}</span>
+        </th>
+        <th>                            
+            <span>${coupon.expiryDate?.toLocaleString()}</span>
+        </th>
+        <th>
+            <a href="/admin/addCoupon?id=${coupon._id}" class="btn btn-sm font-sm rounded btn-brand">
+                <i class="material-icons md-edit"></i> Edit
+            </a>
+            <a href="/admin/deleteCoupon?id=${coupon._id}" class="btn btn-sm font-sm btn-light rounded">
+                <i class="material-icons md-delete_forever"></i> Delete
+            </a>
+        </th>
+`;
+tbody.appendChild(tr);
+         })
+         const pagination = document.querySelector('.pagination');
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPage; i++) {
+    console.log(totalPage);
+  const a = document.createElement('a');
+  a.href = `javascript:void(0)`;
+  a.addEventListener("click", () => getPages(`page${i}`));
+  a.innerHTML = `${i}`;
+  a.id = `page${i}`
+  const li = document.createElement('li');
+  li.classList.add('page-item');
+  li.appendChild(a);
+  pagination.appendChild(li);
+}
+        })
+    }
+</script>
 <%- include('../layouts/footer.ejs') %>

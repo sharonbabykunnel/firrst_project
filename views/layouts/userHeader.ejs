@@ -54,6 +54,7 @@
             <a href="/signin">SignIN</a>
             <a href="/signup">SignUP</a>
             <%}else{%>
+                <a href="/profile"><span  class="icon_profile"></span></a>
                 <span><%= user.name %></span>
                 <button class="btn-info"><a href="/logout">LogOut</a></button>
                 <%}%>
@@ -89,6 +90,7 @@
                                 <a href="/signin">SignIN</a>
                                 <a href="/signup">SignUp</a>
                                 <%}else{%>
+                                    <a href="/profile"><span  class="icon_profile"></span></a>
                                     <span><%=  user.name %></span>
                                     <button class="btn-danger"><a href="/logout">LogOut</a></button>
                                     <%}%>

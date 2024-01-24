@@ -39,9 +39,9 @@
                     </div>
                     <div class="modal-body">
                       <div class="p-3 p-lg-5 border">
-                        <form action="/addAddress" onsubmit="va"  method="post">
+                        <form action="/addAddress" onsubmit="return validatAddressForm2()"  method="post">
           
-          
+                        <span id="form_error"></span>
                           <%
                               if(typeof message !== 'undefined'){
                                 %>
@@ -56,59 +56,59 @@
                         <div class="form-group row">
                           <div class="col-md-12">
                             <label for="c_fname" class="text-black"> Name <span class="text-danger">*</span></label>
-                            <input name="name"   type="text" class="form-control" id="c_fname" required/>
+                            <input name="name"   type="text" class="form-control" id="name" onkeyup="validatString('name','name_error','Name')" required/><span id="name_error"></span>
                           </div>
                         </div>
                         <div class="form-group">
                           <label for="country" class="text-black">Country <span class="text-danger">*</span></label>
-                          <input name="country"  type="text" id="country" class="form-control" value="India">
+                          <input name="country"  type="text" id="country" class="form-control" value="India" onkeyup="validatString('country','country_error','Country')"><span id="country_error"></span>
                         </div>
                         <div class="form-group">
-                          <label for="streat" class="text-black">State <span class="text-danger">*</span></label>
-                          <input name="state"  type="text" id="c_streat" class="form-control" required>
+                          <label for="state" class="text-black">State <span class="text-danger">*</span></label>
+                          <input name="state"  type="text" id="state" class="form-control" onkeyup="validatString('state','state_error','State')" required><span id="state_error"></span>
                         </div>
           
                         <div class="form-group">
-                          <label for="c_country" class="text-black">District<span class="text-danger">*</span></label>
-                          <input name="district"  type="text" id="c_country" class="form-control" required>
+                          <label for="district" class="text-black">District<span class="text-danger">*</span></label>
+                          <input name="district"  type="text" id="district" class="form-control" onkeyup="validatString('district','district_error','District')" required><span id="district_error"></span>
           
                         </div>
                         <div class="form-group">
-                            <label for="c_streat" class="text-black">Streat <span class="text-danger">*</span></label>
-                            <input name="streat"  type="text" id="c_streat" class="form-control" required>
+                            <label for="streat" class="text-black">Street <span class="text-danger">*</span></label>
+                            <input name="streat"  type="text" id="streat" class="form-control" onkeyup="validatString('streat','streat_error','Streat')" required><span id="streat_error"></span>
                           </div>
                         <div class="form-group row">
                           <div class="col-md-12 mb-3">
-                            <label for="c_building" class="text-black">Building <span class="text-danger">*</span></label>
-                            <input name="building"  type="text" class="form-control  py-5" id="c_building" required>
+                            <label for="building" class="text-black">Building <span class="text-danger">*</span></label>
+                            <input name="building"  type="text" class="form-control  py-5" id="building" onkeyup="validatString('building','building_error','Building')" required><span id="building_error"></span>
                           </div>
                         </div>
                         <div class="form-group">
-                            <label for="c_landmarlk" class="text-black">Land Mark<span class="text-danger">*</span></label>
-                            <input name="landmark"  type="text" id="c_landmark" class="form-control" required>
+                            <label for="landmark" class="text-black">Land Mark<span class="text-danger">*</span></label>
+                            <input name="landmark"  type="text" id="landmark" class="form-control" onkeyup="validatString('landmark','landmark_error','Land Mark')" required><span id="landmark_error"></span>
             
                           </div>
                         <div class="form-group row">
                           <div class="col-md-12">
-                            <label for="c_postal_zip" class="text-black">Pincode<span class="text-danger">*</span></label>
-                            <input name="pincode" type="text" class="form-control" id="c_postal_zip" required>
+                            <label for="pincode" class="text-black">Pincode<span class="text-danger">*</span></label>
+                            <input name="pincode" type="number" class="form-control" id="pincode" onkeyup="validatNum2('pincode','pincode_error','Pincode')" required><span id="pincode_error"></span>
                           </div>
                         </div>
           
                         <div class="form-group row mb-5">
                           <div class="col-md-12">
-                            <label for="c_phone" class="text-black">Phone <span class="text-danger">*</span></label>
-                            <input name="mobile" type="text" class="form-control" id="c_phone" required>
+                            <label for="mobile" class="text-black">Mobile No. <span class="text-danger">*</span></label>
+                            <input name="mobile" type="number" class="form-control" id="mobile" onkeyup="validatNum2('mobile','phone_error','Mobile')" required><span id="phone_error"></span>
                           </div>
                         </div>
-                      </div>
+                        <div class="modal-footer form-group">
+                          <button type="submit" class="btn btn-primary" onclick="return validatAddressForm2()">Save</button>
+                        </div>
+                      </form>
                     </div>
-                    <div class="modal-footer form-group">
-                      <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                  </form>
                   </div>
                 </div>
+              </div>
               </div>
                <!-- /Add address modal -->
 
@@ -220,11 +220,11 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                   <span aria-hidden="true">&times;</span>
                                 </button>
+                                <form action="/edit_address/<%= address._id %>" onsubmit="return validatAddressForm2()" class="edit-address-form" address-id="<%= address._id %>" method="post">
                               </div>
                               <div class="modal-body">
                                 <div class="p-3 p-lg-5 border">
-                                  <form action="/editAddress/<%= address._id %>" class="edit-address-form" address-id="<%= address._id %>" method="post">
-                    
+                                    <span id="form_error"></span>
                     
                                     <%
                                         if(typeof message !== 'undefined'){
@@ -239,56 +239,55 @@
                     
                                       <div class="form-group row">
                                         <div class="col-md-12">
-                                          <label for="c_fname" class="text-black"> Name <span class="text-danger">*</span></label>
-                                          <input name="name"   type="text" class="form-control" id="c_fname" value="<%= address.name %>" required/>
+                                          <label for="name" class="text-black"> Name <span class="text-danger">*</span></label>
+                                          <input name="name"   type="text" class="form-control" id="name" value="<%= address.name %>" onkeyup="validatString('name','name_error','Name')" required/><span id="name_error"></span>
                                         </div>
                                       </div>
                                       <div class="form-group">
                                         <label for="country" class="text-black">Country <span class="text-danger">*</span></label>
-                                        <input name="country"  type="text" id="country" class="form-control" value="<%= address.country %>">
+                                        <input name="country"  type="text" id="country" class="form-control" value="<%= address.country %>" onkeyup="validatString('country','country_error','Country')"><span id="country_error"></span>
                                       </div>
                                       <div class="form-group">
-                                        <label for="streat" class="text-black">State <span class="text-danger">*</span></label>
-                                        <input name="state"  type="text" id="c_streat" class="form-control" value="<%= address.state %>" required>
+                                        <label for="state" class="text-black">State <span class="text-danger">*</span></label>
+                                        <input name="state"  type="text" id="state" class="form-control" value="<%= address.state %>" onkeyup="validatString('state','state_error','State')" required><span id="state_error"></span>
                                       </div>
                         
                                       <div class="form-group">
-                                        <label for="c_country" class="text-black">District<span class="text-danger">*</span></label>
-                                        <input name="district"  type="text" id="c_country" class="form-control" value="<%= address.district %>" required>
+                                        <label for="district" class="text-black">District<span class="text-danger">*</span></label>
+                                        <input name="district"  type="text" id="district" class="form-control" value="<%= address.district %>" onkeyup="validatString('district','district_error','District')" required><span id="district_error"></span>
                         
                                       </div>
                                       <div class="form-group">
-                                          <label for="c_streat" class="text-black">Streat <span class="text-danger">*</span></label>
-                                          <input name="streat"  type="text" id="c_streat" class="form-control" value="<%= address.streat %>" required>
+                                          <label for="streat" class="text-black">Streat <span class="text-danger">*</span></label>
+                                          <input name="streat"  type="text" id="streat" class="form-control" value="<%= address.streat %>" onkeyup="validatString('streat','streat_error','Streat')"  required><span id="streat_error"></span>
                                         </div>
                                       <div class="form-group row">
                                         <div class="col-md-12 mb-3">
-                                          <label for="c_building" class="text-black">Building <span class="text-danger">*</span></label>
-                                          <input name="building"  type="text" class="form-control  py-5" id="c_building" value="<%= address.building %>" required>
-                                        </div>
+                                          <label for="building" class="text-black">Building <span class="text-danger">*</span></label>
+                                          <input name="building"  type="text" class="form-control  py-5" id="building" value="<%= address.building %>" onkeyup="validatString('building','building_error','Building')" required>
+                                        </div><span id="building_error"></span>
                                       </div>
                                       <div class="form-group">
-                                          <label for="c_landmarlk" class="text-black">Land Mark<span class="text-danger">*</span></label>
-                                          <input name="landmark"  type="text" id="c_landmark" class="form-control" value="<%= address.landmark %>" required>
-                          
+                                          <label for="landmark" class="text-black">Land Mark<span class="text-danger">*</span></label>
+                                          <input name="landmark"  type="text" id="landmark" class="form-control" value="<%= address.landmark %>" onkeyup="validatString('landmark','landmark_error','Land Mark')" required><span id="landmark_error"></span>
                                         </div>
                                       <div class="form-group row">
                                         <div class="col-md-12">
-                                          <label for="c_postal_zip" class="text-black">Pincode<span class="text-danger">*</span></label>
-                                          <input name="pincode" type="text" class="form-control" id="c_postal_zip" value="<%= address.pincode %>" required>
+                                          <label for="pincode" class="text-black">Pincode<span class="text-danger">*</span></label>
+                                          <input name="pincode" type="text" class="form-control" id="pincode" value="<%= address.pincode %>" onkeyup="validatNm2('pincode','pincode_error','Pincode')" required><span id="pincode_error"></span>
                                         </div>
                                       </div>
                         
                                       <div class="form-group row mb-5">
                                         <div class="col-md-12">
-                                          <label for="c_phone" class="text-black">Phone <span class="text-danger">*</span></label>
-                                          <input name="mobile" type="text" class="form-control" id="c_phone" value="<%= address.mobile %>" required>
+                                          <label for="mobile" class="text-black">Mobile No. <span class="text-danger">*</span></label>
+                                          <input name="mobile" type="text" class="form-control" id="mobile" value="<%= address.mobile %>" onkeyup="validatNum2('mobile','phone_error','Mobile')" required><span id="phone_error"></span>
                                         </div>
                                       </div>
                                 </div>
                               </div>
                               <div class="modal-footer form-group">
-                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                <button type="submit" class="btn btn-primary" onclick="return validatAddressForm2()">Save changes</button>
                               </div>
                             </form>
                             </div>
@@ -307,6 +306,7 @@
 
   
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <!-- <script>
   //edit address ajax
@@ -324,7 +324,7 @@
         Toastify({
           Text: "response.data.message",
           duration: 4000,
-          backgroundColor: 'Green',
+          style:{backgroundColor: 'Green'},
           destination: '/user/profile',
           close: true,
         }).showToast();
@@ -344,7 +344,7 @@
 
 
   //delete address ajax
-  $('.delete-address-btn'),on('click', function(e){
+  $('.delete-address-btn').on('click', function(e){
     var addressId = $(this).data('address-id');
 
     $.ajax({

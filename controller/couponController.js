@@ -4,8 +4,26 @@ const User = require("../model/userModel");
 
 const loadCoupon = asyncHandler(async (req, res) => {
   try {
-    const coupon = await Coupon.find();
-    res.render("adminView/page-coupon-list", { coupon });
+    const limit = 5;
+    const [coupon, count] = await Promise.all([Coupon.find().sort({ _id: -1 }).limit(limit), Coupon.find().countDocuments()]);
+    const totalPage = Math.ceil(count / limit);
+    res.render("adminView/page-coupon-list", { coupon ,totalPage});
+  } catch (error) {
+    throw error;
+  }
+});
+const getCoupons = asyncHandler(async (req, res) => {
+  try {
+    const limit = 5
+    const { search, page } = req.query;
+    console.log(req.query);
+    const [coupon, count] = await Promise.all([
+      Coupon.find({ code: { $regex: ".*" + search.trim() + ".*", $options: "i" } }).sort({ _id: -1 }).skip((page - 1) * limit).limit(limit),
+      Coupon.find({ code: { $regex: ".*" + search.trim() + ".*", $options: "i" } }).countDocuments()
+    ]);
+    const totalPage = Math.ceil(count / limit);
+    console.log(coupon, totalPage,'dd');
+    res.json( { coupon,totalPage });
   } catch (error) {
     throw error;
   }
@@ -15,6 +33,7 @@ const loadAddCoupon = asyncHandler(async (req, res) => {
   try {
     const id = req.query?.id;
     const message = req.query?.message;
+    console.log(message);
     const coupon = await Coupon.findOne({_id:id});
     res.render("adminView/page-coupon-form",{coupon,message})
   } catch (error) {
@@ -24,25 +43,26 @@ const loadAddCoupon = asyncHandler(async (req, res) => {
 
 const addCoupon = asyncHandler(async (req, res) => {
   try {
-    const { code, createdDate, expiryDate, discount, discription, status, id } =
-      req.body;
+    const { code, createdDate, expiryDate, discount, discription, status, id } = req.body;
     if (id) {
-      await Coupon.findByIdAndUpdate(id, {
-        $set: {
-          code,
-          createdDate,
-          expiryDate,
-          discount,
-          discription,
-          status,
-        },
-      });
+      let update = {code,discount,discription,status};
+      if (createdDate) {
+        update.createdDate = createdDate;
+      }
+      if (expiryDate) {
+        update.expiryDate = expiryDate;
+      }
+      await Coupon.findByIdAndUpdate(id, { $set:update});
     } else {
       const duplicate = await Coupon.findOne({ code });
       if (duplicate) {
         res.render("adminView/page-coupon-form", {
           message: "code already exist",
         });
+      } else if (expiryDate<createdDate) {
+        res.render("adminView/page-coupon-form", {
+          message: "Expiry Date should be greater than Active Date",
+        });  
       } else {
         const coupon = new Coupon({
           code,
@@ -53,9 +73,9 @@ const addCoupon = asyncHandler(async (req, res) => {
           status,
         });
         await coupon.save();
-        res.redirect("/admin/addcoupon?message=coupon added successfuly");
       }
     }
+    res.redirect("/admin/addcoupon?message=coupon added successfuly");
   } catch (error) {
     throw error;
   }
@@ -81,7 +101,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     const id = req.session.user._id;
     const { code, total } = req.query;
     const coupon = await Coupon.findOne({ code });
-    if (coupon.expiryDate >= Date.now()) {
+    if (coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate" ) {
       const couponId = coupon?._id;
       if (coupon) {
         const used = await User.findOne({
@@ -101,8 +121,11 @@ const applyCoupon = asyncHandler(async (req, res) => {
         console.log('ll');
         res.json({ message: "Coupon Not Valid" });
       }
-    } else {
+    } else if(coupon.createdDate >=Date.now() && coupon.expiryDate >= Date.now() && coupon.status != "Activate") {
       console.log('lll');
+      res.json({ message: "Coupon Not Active" });
+    } else {
+      console.log("ll");
       res.json({ message: "Coupon Expired" });
     }
 
@@ -128,4 +151,5 @@ module.exports = {
   status,
   applyCoupon,
   deleteCoupon,
+  getCoupons,
 };

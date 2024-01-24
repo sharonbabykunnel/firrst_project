@@ -95,8 +95,33 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const loadProduct = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.find();
-    res.render("adminView/page-products-list", { product: product });
+    const page = 1
+    const limit = 10
+    const product = await Product.find().sort({ _id: -1 }).limit(limit).skip((page-1)*limit)
+    const totalPage = 2
+    res.render("adminView/page-products-list", { product: product ,totalPage});
+  } catch (error) {
+    throw error;
+  }
+});
+
+const getProduct = asyncHandler(async (req, res) => {
+  try {
+    const { page, status, search, count } = req.query;
+    console.log(req.query);
+    const limit = count || 10
+    let filter = {}
+    if (status) {
+      filter.status = status
+    }
+    if (search) {
+      filter.title = { $regex: ".*" + search.trim() + ".*", $options: "i" };
+    }
+    console.log(filter);
+    const [product, productCount] = await Promise.all([ Product.find(filter).sort({ _id: -1 }).limit(limit).skip((page-1)*limit),Product.find(filter).countDocuments()])
+    const totalPage = Math.ceil(productCount / limit)
+    console.log(productCount,limit,totalPage);
+    res.json({ product: product ,totalPage});
   } catch (error) {
     throw error;
   }
@@ -256,4 +281,5 @@ module.exports = {
   loadEditProduct,
   loadProduct,
   rating,
+  getProduct
 }

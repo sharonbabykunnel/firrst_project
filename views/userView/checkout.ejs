@@ -57,7 +57,7 @@
                                     <span id="landmark_error"></span>
                                 </div>
                                 <div class="checkout__form__input">
-                                    <p>Streat <span>*</span></p>
+                                    <p>Street <span>*</span></p>
                                     <input type="text" name="streat" id="streat" value="<%= typeof address == 'undefined' ? '' : address?.streat %>" onkeyup="validatString('streat','streat_error','Streat')">
                                     <span id="streat_error"></span>
                                 </div>
@@ -207,7 +207,7 @@
                 location.href = '/order-success/'+data.orderData._id
             }
             else if (data.payment == 'razorpay') {
-                razorpayPayment(data.responce, data.user,data.couponId)
+                razorpayPayment(data.responce, data.user,data.couponId,data._id)
             } else if(data.payment == 'wallet'){
                 if (data.message) {
                     if (data.message) {
@@ -269,7 +269,7 @@ document.head.appendChild(style);
 
 
 
-    function razorpayPayment(order, user,couponId) {
+    function razorpayPayment(order, user,couponId,_id) {
         var options = {
             "key":"rzp_test_dka3Pol1L9thKD",
             "amount": order.amount,
@@ -280,7 +280,7 @@ document.head.appendChild(style);
             "order_id": order.id,
             "handler": function (response) {
                 console.log(response,order,"funnn")
-                verifyPayment(response, order,couponId)
+                verifyPayment(response, order,couponId,_id)
             },
             "prefill": {
                 "name": user.name,
@@ -304,7 +304,7 @@ document.head.appendChild(style);
 
 
 
-    function verifyPayment(payment, order,couponId) {
+    function verifyPayment(payment, order,couponId,_id) {
         console.log(payment,order,"kj");
         fetch('/razorpay-success', {
             method: 'post',
@@ -314,7 +314,8 @@ document.head.appendChild(style);
             body: JSON.stringify({
                 payment,
                 order,
-                couponId
+                couponId,
+                _id
             })
         }).then((res) => {
             

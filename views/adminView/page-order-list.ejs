@@ -7,13 +7,13 @@
             
         <div>
             <div class="col-search">
-                <form class="searchform">
+                <!-- <form class="searchform">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search term">
                         <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
                     </div>
                     
-                </form>
+                </form> -->
             </div>
         </div>
     </div> 
@@ -70,8 +70,12 @@
                                     <div class="dropdown">
                                         <a href="" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> cahnge status </a>
                                         <div class="dropdown-menu">
+                                            <% if(order.status == 'ordered'){%>
                                             <a class="dropdown-item" onclick="changeStatus('<%= index %>','<%=order._id%>','Delivered')">Delivered</a>
                                             <a class="dropdown-item"  onclick="changeStatus('<%=index%>','<%=order._id%>','Shipped')">Shipped</a>
+                                            <%}else if(order.status == 'Returned' || order.status=="Cancelled"){%>
+                                                <a class="dropdown-item"  onclick="changeStatus('<%=index%>','<%=order._id%>','Refunded')">Refunded</a>
+                                                <%}%>
                                         </div>
                                     </div> <!-- dropdown //end -->
                                 </td>
@@ -154,7 +158,27 @@
             body.innerHTML = '';
            order.forEach((order,index) => {
             const tr = document.createElement('tr');
-tr.innerHTML = `<td>${index + 1}</td><td><b>${order?.user?.name}</b></td><td><b>${order.payment}</b></td><td>$${order.total}</td><td><span class="badge rounded-pill alert-warning" id=${index} >${order.status} </span></td><td>${order.createdAt} </td> <td class='text-end'><a href='/admin/order/details/${order._id}' class='btn btn-md rounded font-sm'>Detail</a><div class='dropdown'><a data-bs-toggle='dropdown' class='btn btn-light rounded btn-sm font-sm'> cahnge status </a><div class='dropdown-menu'><a class='dropdown-item' onclick="changeStatus('${index}'','${order._id}','Delivered')">Delivered</a><a class='dropdown-item'  onclick="changeStatus('${index}','${order._id}','Shipped')">Shipped</a></div></div></td>`;
+tr.innerHTML = `<td>${index + 1}</td>
+<td><b>${order?.user?.name}</b></td>
+<td><b>${order.payment}</b></td>
+<td>$${order.total}</td>
+<td><span class="badge rounded-pill alert-warning" id=${index}>${order.status}</span></td>
+<td>${order.createdAt}</td>
+<td class='text-end'>
+  <a href='/admin/order/details/${order._id}' class='btn btn-md rounded font-sm'>Detail</a>
+  <div class='dropdown'>
+    <a data-bs-toggle='dropdown' class='btn btn-light rounded btn-sm font-sm'>Change status</a>
+    <div class='dropdown-menu'>
+      ${ order.status == 'ordered' ?
+         `<a class='dropdown-item' onclick="changeStatus('${index}','${order._id}','Delivered')">Delivered</a>
+          <a class='dropdown-item' onclick="changeStatus('${index}','${order._id}','Shipped')">Shipped</a>` :
+         (order.status == 'Returned' || order.status == 'Cancelled') ?
+         `<a class='dropdown-item' onclick="changeStatus('${index}', '${order._id}', 'Refunded')">Refunded</a>` :
+         ''
+      }
+    </div>
+  </div>
+</td>`;
 body.appendChild(tr);
            })   
 //         const pagination = document.querySelector('pagination');

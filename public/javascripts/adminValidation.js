@@ -69,10 +69,10 @@ const validatNum2 = (valueId, messageId, input) => {
     return false;
   }
   if ( value < 0) {
-    message.innerHTML = "dicount can't be greater than 100 or lessthan 0";
+    message.innerHTML = input + " is Not Correct";
     return false;
   }
-  // message.innerHTML = "";
+  message.innerHTML = "";
 
   return true;
 };
@@ -185,12 +185,15 @@ var validatAddressForm = () => {
   console.log("d");
   var message = document.getElementById("form_error");
   if (
+    !validatString('name','name_error','Name') ||
     !validatString("building", "building_error", "Hous Name/Building Number") ||
     !validatString("landmark", "landmark_error", "Land Mark") ||
     !validatString("streat", "streat_error", "Streat") ||
     !validatString("country", "country_error", "Country") ||
     !validatString("district", "district_error", "District") ||
-    !validatNum2("pincode", "pincode_error", "Pincode")
+    !validatString('state','state_error','State') ||
+    !validatNum2("pincode", "pincode_error", "Pincode") ||
+    !validatNum2('mobile','phone_error','Mobile')
   ) {
     console.log("ddfgggdhdygdryhgbdfghftdjhdygdfghhhhhhhhhhhhhf");
     message.style.display = "block";
@@ -203,5 +206,32 @@ var validatAddressForm = () => {
   }
   
   checkout();
+  return true;
+};
+
+var validatAddressForm2 = () => {
+  console.log("d");
+  var message = document.getElementById("form_error");
+  if (
+    !validatString('name','name_error','Name') ||
+    !validatString("building", "building_error", "Hous Name/Building Number") ||
+    !validatString("landmark", "landmark_error", "Land Mark") ||
+    !validatString("streat", "streat_error", "Streat") ||
+    !validatString("country", "country_error", "Country") ||
+    !validatString("district", "district_error", "District") ||
+    !validatString('state','state_error','State') ||
+    !validatNum2("pincode", "pincode_error", "Pincode") ||
+    !validatNum2('mobile','phone_error','Mobile')
+  ) {
+    console.log("ddfgggdhdygdryhgbdfghftdjhdygdfghhhhhhhhhhhhhf");
+    message.style.display = "block";
+    message.style.color = "red";
+    message.innerHTML = "Please Enter Correct Details";
+    setTimeout(() => {
+      message.style.display = "none";
+    }, 4000);
+    return false;
+  }
+  
   return true;
 };

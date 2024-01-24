@@ -27,13 +27,15 @@ rout.get("/unlistCategory", adminAuth.isAdminLogged, admin.unlistCategory);
 rout.get("/order", adminAuth.isAdminLogged, admin.loadOrderList);
 rout.get("/order/details/:id", adminAuth.isAdminLogged, admin.loadOrderDetails);
 rout.get("/reviews", adminAuth.isAdminLogged, admin.loadReviews);
+rout.get("/getProduct", adminAuth.isAdminLogged, product.getProduct);
+rout.get("/getCoupons", adminAuth.isAdminLogged, coupon.getCoupons);
 
-rout.post("/", admin.verifyLogin);
+rout.post("/", adminAuth.isAdminNot, admin.verifyLogin);
 rout.post("/editProduct1", adminAuth.isAdminLogged,upload.array('image',4), product.editProduct);
 rout.post("/addProduct", adminAuth.isAdminLogged,upload.array('image',4), product.addProduct);
 rout.post("/addCategory", adminAuth.isAdminLogged, admin.addCategory);
-rout.post('/login', admin.verifyLogin);
-rout.post("/changePassword", admin.changePassword);
+rout.post("/login", adminAuth.isAdminNot, admin.verifyLogin);
+rout.post("/changePassword", adminAuth.isAdminNot, admin.changePassword);
 rout.post("/addCoupon", adminAuth.isAdminLogged, coupon.addCoupon);
 rout.post("/changeOrderStatus", adminAuth.isAdminLogged, admin.changeOrderStatus);
 rout.post("/order", adminAuth.isAdminLogged, admin.filterOrder);

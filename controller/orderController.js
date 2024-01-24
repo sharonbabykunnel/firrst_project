@@ -34,35 +34,46 @@ const loadCheckout = asyncHandler(async (req, res) => {
         );
       } else {
         var product = await Product.findOne({ _id: _id });
-        var calculatTotal = product.price * quantity;
+        if (product.quantity < quantity) {
+          res.redirect(`/productDetails/${_id}?message='Not Enough Stock'`);
+        } else {
+          var calculatTotal = product.price * quantity;
+        }
       }
     } else {
       var cart = await Cart.findOne({ user_id: user._id }).populate(
         "product.product_id"
       );
       var product = cart?.product;
-      var calculatTotal = cart.product.reduce((total, product) => {
-        const productTotal =
-          product.product_id?.discountPrice * product.quantity;
-        return total + productTotal;
-      }, 0);
+      const check = cart.product.reduce((total, products) => {
+        if (products.quantity > products.product_id.quantity) {
+          return [products.product_id.quantity, products.product_id.title]
+        }
+      }, [])
+      console.log(check,'d')
+      if (check) {
+        res.redirect("/cart?discount=" + discount + "&counponId=" + couponId + "&message=Only " + check[0] + " " + check[1] + " left")
+      } else {
+        var calculatTotal = cart.product.reduce((total, product) => {
+          const productTotal =
+            product.product_id?.discountPrice * product.quantity;
+          return total + productTotal;
+        }, 0);
+      }
+      const address = await Address.findOne({ user: user._id });
+      const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+      res.render("userView/checkout", {
+        product,
+        cartNum,
+        user,
+        cart,
+        calculatTotal,
+        discount,
+        quantity,
+        address,
+        couponId,
+      });
     }
-    console.log(discount, "discount");
-    const address = await Address.findOne({ user: user._id });
-
-    const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product
-      ?.length;
-    res.render("userView/checkout", {
-      product,
-      cartNum,
-      user,
-      cart,
-      calculatTotal,
-      discount,
-      quantity,
-      address,
-      couponId,
-    });
   } catch (error) {
     throw error;
   }
@@ -75,7 +86,6 @@ const placeOrder = asyncHandler(async (req, res) => {
     const { building, landmark, streat, country, district, state, pincode, notes, payment, discount, status, stotal, total, couponId, id, name, mobile } = req.body;
     if (_id) {
       const product = await Product.findByIdAndUpdate(_id, { $inc: { quantity: -quantity } });
-      console.log(product, 'kkkkkkkkkkkkk', _id);
       var item = { product: product._id, price: product.price, quantity };
     } else {
       const cart = await Cart.findOne({ user_id: user }).populate('product.product_id')
@@ -95,12 +105,12 @@ const placeOrder = asyncHandler(async (req, res) => {
     const order = new Order({ user, stotal, total, status, payment, address, notes, item })
     if (payment == "COD") {
     const orderData = await order.save();
-      confirmOrder(user, orderData._id,couponId)
+      confirmOrder(user, orderData._id,couponId,_id)
       res.json({ orderData, payment: 'COD' });
     } else if (payment == 'razorpay') {
     const orderData = await order.save();
       const responce = await generateRazorpay(orderData._id, total);
-      res.json({ responce, user, payment: "razorpay", couponId });
+      res.json({ responce, user, payment: "razorpay", couponId ,_id});
     } else if (payment == 'wallet') {
       const wallet = await Wallet.findOne({user:user});
       console.log(wallet,'llll');
@@ -109,7 +119,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       } else {
         await Wallet.updateOne({user}, { $inc: { balance: -total } });
         const orderData = await order.save();
-        confirmOrder(user, orderData._id, couponId);
+        confirmOrder(user, orderData._id, couponId,_id);
         res.json({ orderData, payment: "wallet" });
       }
     } else if (payment == 'paypal') {
@@ -122,7 +132,7 @@ const placeOrder = asyncHandler(async (req, res) => {
   }
 });
 
-const confirmOrder = async (userId, orderId, couponId) => {
+const confirmOrder = async (userId, orderId, couponId,_id) => {
   if (couponId)
     await User.findByIdAndUpdate(
       userId,
@@ -131,7 +141,9 @@ const confirmOrder = async (userId, orderId, couponId) => {
     );
   await Order.updateOne({ _id: orderId }, { $set: { status: "ordered" } }).then(
     async () => {
-      await Cart.deleteOne({ user_id: userId });
+      if (!_id) {
+        await Cart.deleteOne({ user_id: userId });
+      }
     }
   );
 };
@@ -159,16 +171,16 @@ const generateRazorpay = async (orderId, total) => {
 
 const razorpaySuccess = asyncHandler(async (req, res) => {
   try {
-    const { payment, order, couponId } = req.body;
+    const { payment, order, couponId,_id } = req.body;
     const userId = req.session.user._id;
-    await verifyRazorpay(payment, order, userId, couponId);
+    await verifyRazorpay(payment, order, userId, couponId,_id);
     res.json({ status: true, order: order.receipt });
   } catch (error) {
     throw error;
   }
 });
 
-const verifyRazorpay = async (payment, order, userId, couponId) => {
+const verifyRazorpay = async (payment, order, userId, couponId,_id) => {
   return new Promise((resolve, reject) => {
     console.log(process.env.key_secret);
     let hmac = crypto.createHmac("sha256", process.env.key_secret);
@@ -176,7 +188,7 @@ const verifyRazorpay = async (payment, order, userId, couponId) => {
     hmac = hmac.digest("hex");
     console.log(hmac);
     if (hmac == payment.razorpay_signature) {
-      confirmOrder(userId, order.receipt, couponId);
+      confirmOrder(userId, order.receipt, couponId,_id);
       console.log("lll");
       resolve();
     } else {

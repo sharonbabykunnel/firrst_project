@@ -14,32 +14,42 @@
             </div>
             <div class="card mb-4">
                 <header class="card-header">
-                    <!-- <div class="row align-items-center">
-                        <div class="col col-check flex-grow-0">
-                            <div class="form-check ms-2">
-                                <input class="form-check-input" type="checkbox" value="">
+                    <div class="row align-items-center">
+                        <!-- <div class="col col-check flex-grow-0">
+                            <div class="col-lg-4 col-md-6 me-auto">
+                                <input onkeyup="filter()" id="search" type="search" placeholder="Search..." value="<%= typeof search == 'undefined' ? '' : search %>" class="form-control">
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <select class="form-select">
+                            <!-- <select class="form-select">
                                 <option selected>All category</option>
                                 <option>Electronics</option>
                                 <option>Clothes</option>
                                 <option>Automobile</option>
-                            </select>
+                            </select> -->
+                            <div class="col-lg-4 col-md-6 me-auto" o>
+                                <input onkeyup="filter()" id="search" type="search" placeholder="Search..." value="<%= typeof search == 'undefined' ? '' : search %>" class="form-control">
+                            </div>
                         </div>
                         <div class="col-md-2 col-6">
-                            <select class="form-select">
-                                <option selected>Status</option>
-                                <a href="/admin/product?status=Published"></a><option>Publishe</option></a>
-                                <a href="/admin/product?status=Draft"></a><option>Draft</option></a>
+                            <select class="form-select" id="status" onchange="filter()">
+                                <option selected  value="">Status(All)</option>
+                                <option value="Published">Publishe</option>
+                                <option value="Draft">Draft</option>
                             </select>
                         </div>
-                    </div> -->
+                        <div class="col-lg-2 col-6 col-md-3">
+                            <select class="form-select" id="count" onchange="filter()">
+                                <option value="10">Show 10</option>
+                                <option value="20">Show 20</option>
+                                <option value="30">Show 30</option>
+                            </select>
+                        </div>
+                    </div>
                 </header> <!-- card-header end// -->
-                <%if(product){
-                    for(let i=0;i<product.length;i++){%>
+                <%if(product){%>
                     <div class="card-body">
+                   <% for(let i=0;i<product.length;i++){%>
                         <article class="itemlist">
                             <div class="row align-items-center">
                                 <!-- <div class="col col-check flex-grow-0">
@@ -48,7 +58,7 @@
                                     </div>
                                 </div> -->
                                 <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
-                                    <a class="itemside" href="/admin/product-details/id=<%= product[i].product_id %>">
+                                    <a class="itemside" >
                                         <div class="left">
                                             <img src="/images/<%= product[i].image[0] %>" class="img-sm img-thumbnail" alt="Item">
                                         </div>
@@ -62,7 +72,7 @@
                                     <span class="badge rounded-pill alert-success"><%= product[i].status %></span>
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-status">
-                                    <% if (product[i].quantity == 0)  { %>
+                                    <% if (product[i].quantity < 1)  { %>
                                     <span class="badge rounded-pill alert-warning">out of stock</span> <% }else{ %>
                                     <span class="badge rounded-pill alert-success"><%= product[i].quantity %> item Left</span> <% } %>
                                 </div>
@@ -79,24 +89,95 @@
                                 </div>
                             </div> <!-- row .// -->
                         </article> <!-- itemlist  .// -->
+                        
+                        <% } %>
                     </div> <!-- card-body end// -->
-
-                   <% }
-                }else{%>
+               <% }else{%>
 
                 <%}%>
             </div> <!-- card end// -->
-            <!-- <div class="pagination-area mt-30 mb-50">
+            <div class="pagination-area mt-30 mb-50">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="/#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="/#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="/#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="/#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="/#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="/#"><i class="material-icons md-chevron_right"></i></a></li>
+                        <% for(let i=1; i<=totalPage; i++){%>
+                            <li class="page-item"><a id="page<%=i%>" onclick="getPage('page<%=i%>')"  class="page-link active"><%= i %></a></li>
+                        <%}%>
                     </ul>
                 </nav>
-            </div> -->
-        </section> <!-- content-main end// -->
+            </div>
+        </section> 
+<script>
+    let page
+    const getPage = (id)=>{
+        console.log('dd');
+        page = document.getElementById(id).innerHTML
+        filter();
+    }
+    const filter = ()=>{
+        console.log('ss');
+        const count = document.getElementById('count').value
+        const status = document.getElementById('status').value
+        const search = document.getElementById("search").value
+        fetch('/admin/getProduct?page='+page+'&search='+search+'&status='+status+'&count='+count,{
+            method:'get'
+        }).then(res=> {return res.json()}).then((res)=>{
+            const {product,totalPage} = res;
+        const body = document.querySelector(".card-body");
+        body.innerHTML="";
+        product.forEach((product,i)=>{
+            const article = document.createElement('article');
+            article.classList.add('itemslist');
+            article.innerHTML=`
+    <div class="row align-items-center">
+        <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+            <a class="itemside" >
+                <div class="left">
+                    <img src="/images/${product.image[0]}" class="img-sm img-thumbnail" alt="Item">
+                </div>
+                <div class="info">
+                    <h6 class="mb-0">${product.title}</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>$${product.price}</span> </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-status">
+            <span class="badge rounded-pill alert-success">${product.status}</span>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-status">
+            ${product.quantity < 1 ? 
+                `<span class="badge rounded-pill alert-warning">out of stock</span>` :
+                `<span class="badge rounded-pill alert-success">${product.quantity} item Left</span>`}
+        </div>
+        <div class="col-lg-1 col-sm-2 col-4 col-date">
+            <span></span>
+        </div>
+        <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+            <a href="/admin/editProduct?id=${product._id}" class="btn btn-sm font-sm rounded btn-brand pr-25">
+                <i class="material-icons md-edit"></i> Edit
+            </a>
+            <a href="/admin/deleteProduct?id=${product._id}" class="btn btn-sm font-sm btn-light rounded">
+                <i class="material-icons md-delete_forever"></i> Delete
+            </a>
+        </div>
+    </div> 
+`;
+body.appendChild(article);
+        })
+        const pagination = document.querySelector('.pagination');
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPage; i++) {
+    console.log(totalPage);
+  const a = document.createElement('a');
+  a.href = `javascript:void(0)`;
+  a.addEventListener("click", () => getPage(`page${i}`));
+  a.innerHTML = `${i}`;
+  a.id = `page${i}`
+  const li = document.createElement('li');
+  li.classList.add('page-item');
+  li.appendChild(a);
+  pagination.appendChild(li);
+}
+        })
+    }
+</script>
         <%- include("../layouts/footer.ejs")%>

@@ -158,7 +158,7 @@ for (let i = 0; i < products?.length; i++) {
                         </ul>
                     </div>
                     <div class="product__item__text">
-                        <h6><a href="/productDetails/<%= product[i]._id %>"><%= product[i].title %><br><span style="color: red;"><%if (product[i].quantity < 1 ){%>Out of Stoke <%} else if (product[i].quantity < 10){%> only <%=item.quantity%> items left <%}%></span></a></h6>
+                        <h6><a href="/productDetails/<%= product[i]._id %>"><%= product[i].title %><br><span style="color: red;"><%if (product[i].quantity < 1 ){%>Out of Stoke <%} else if (product[i].quantity < 10){%> only <%=product[i].quantity%> items left <%}%></span></a></h6>
                         <div class="rating">
                             <% for(let j=1; j<=5; j++){ if(j<= product[i].totalrating){%>
                             <i class="fa fa-star"></i>
