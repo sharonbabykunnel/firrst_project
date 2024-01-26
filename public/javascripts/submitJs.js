@@ -102,10 +102,15 @@ const removecoupon = () => {
     document.getElementById("coupon").style.display = "none";
 };
 
-const updateQuantity =  (productId,i)=> {
+const updateQuantity =  (productId,i,o)=> {
   var quantity = document.getElementById('quantityInput' + i);
+  if (o == 'dec'){
+    quantity.value--
+  } else {
+    quantity.value++ 
+  }
   console.log(quantity, 'q');
-  fetch(`/addtoCart?id=${productId}&quantity=${quantity.value}`, {
+  fetch(`/addtoCart?product_id=${productId}&quantity=${quantity.value}`, {
     method: 'get',
     headers:{'Content-Type':"application/json;charset=utf-8"}
   }).then((res) => {
@@ -115,6 +120,7 @@ const updateQuantity =  (productId,i)=> {
     if (message) {
       quantity.innerHTML = res.quantity;
       quantity.value = res.quantity;
+      
       const messageDiv = document.createElement("div");
       messageDiv.innerHTML = message;
       messageDiv.style.position = "fixed";

@@ -8,7 +8,6 @@
           </div>
         </div>
       </div>
-
       <div class="site-section">
         <div class="container">
           <div class="row mb-5">
@@ -36,9 +35,10 @@
                               <td colspan="7" class="text-center">No refunded orders available</td>
                             </tr>
                           <% } else { %>
-                            <% orders.reverse().forEach((order, index) => { %>
+                            <%let n = 1; orders.reverse().forEach((order, index) => { %>
+                              
                               <tr>
-                                <td><%= index + 1 %></td>
+                                <td><%= n++ %></td>
                                 <td>
                                   <% if (order.createdAt) { %>
                                     <%= order.createdAt.toLocaleDateString() %>
@@ -47,7 +47,7 @@
                                   <% } %>
                                 </td>
                                 <td><strong>
-                                  <% order.item.forEach((item) => { %>
+                                  <% order.item.forEach((item) => {  %>
                                     <%= item.product.title %> <br>
                                   <% }) %>
                                 </strong></td>
@@ -57,8 +57,32 @@
                                   <% }) %> 
                                 </td>
                                 <td><%= order.payment %></td>
-                                <td><strong>₹ <%= order.total %></strong></td>
+                                <td><% if(order.status != "ordered"){%>+<%}else{%>-<%}%><strong>₹ <%= order.total %></strong></td>
                               </tr>
+                              <% if(order.payment == 'wallet' && order.status == 'Cancelled'){%>
+                                <tr>
+                                  <td><%= n++ %></td>
+                                  <td>
+                                    <% if (order.createdAt) { %>
+                                      <%= order.createdAt.toLocaleDateString() %>
+                                    <% } else { %>
+                                      N/A
+                                    <% } %>
+                                  </td>
+                                  <td><strong>
+                                    <% order.item.forEach((item) => { %>
+                                      <%= item.product.title %> <br>
+                                    <% }) %>
+                                  </strong></td>
+                                  <td>
+                                    <% order.item.forEach((item) => { %>
+                                      <%= item.quantity %> <br>
+                                    <% }) %> 
+                                  </td>
+                                  <td><%= order.payment %></td>
+                                  <td><% if(order.status != "ordered"){%>-<%}else{%>+<%}%><strong>₹ <%= order.total %></strong></td>
+                                </tr>
+                                <%}%>
                             <% }) %>
                           <% } %>
                         </tbody>

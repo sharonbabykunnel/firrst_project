@@ -101,7 +101,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     const id = req.session.user._id;
     const { code, total } = req.query;
     const coupon = await Coupon.findOne({ code });
-    if (coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate" ) {
+    if (coupon && coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate" ) {
       const couponId = coupon?._id;
       if (coupon) {
         const used = await User.findOne({
@@ -112,7 +112,8 @@ const applyCoupon = asyncHandler(async (req, res) => {
           const discount = Number(coupon?.discount);
           console.log(discount, "discount");
           const Total = total - (total * discount) / 100;
-          res.json({ discount, couponId, Total });
+          const didected = total - Total
+          res.json({ discount, couponId, Total,didected });
         } else {
           console.log(used, "d");
           res.json({ message: "Used Coupons" });
@@ -121,7 +122,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
         console.log('ll');
         res.json({ message: "Coupon Not Valid" });
       }
-    } else if(coupon.createdDate >=Date.now() && coupon.expiryDate >= Date.now() && coupon.status != "Activate") {
+    } else if(coupon && coupon.createdDate >=Date.now() && coupon.expiryDate >= Date.now() && coupon.status != "Activate") {
       console.log('lll');
       res.json({ message: "Coupon Not Active" });
     } else {

@@ -27,6 +27,12 @@ const couponSchema = new mongoose.Schema({
     type: String,
     default: false,
   },
+  minAmount: {
+    type:Number,
+  },
+  maxDiscount: {
+    type:Number
+  }
 });
 
 module.exports = new mongoose.model("Coupon", couponSchema);

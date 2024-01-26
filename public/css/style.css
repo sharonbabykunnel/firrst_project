@@ -1074,6 +1074,10 @@ ol {
 	font-weight: 700;
 }
 
+.didected{
+color: #36a300;
+text-align: right;
+}
 .categories__text p {
 	margin-bottom: 10px;
 }

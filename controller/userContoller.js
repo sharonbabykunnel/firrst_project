@@ -333,43 +333,23 @@ const loadCart = asyncHandler(async (req, res) => {
 
 const addToCart = asyncHandler(async (req, res) => {
     try {
-        const product_id = req.query.id;
+      const user_id = req.session.user._id;
+        const {product_id, quantity} = req.query;
         console.log(product_id,"poooooo");
-      let quantity = req.body.quantity || req.query.quantity;
-      if (quantity == 0) quantity = 1;
-        console.log(req.body.quantity ,req.query.quantity);
       console.log(quantity, 'qqqqqqqqqqqqqqqq');
       const productQuantity = await Product.findById(product_id);
       console.log(productQuantity.quantity,"llllllllllllll");
-      if (quantity > productQuantity.quantity) {
-        await Cart.updateOne()
-        res.json({message: 'out of stock',quantity:productQuantity.quantity})
-      } else {
-        const user_id = req.session.user._id;
-        console.log( "kk", product_id,'ll');
           let cart = await Cart.findOne({ user_id: user_id });
-          if (!cart) {
-            const cartData = new Cart({ user_id: user_id, product: [] });
-            await cartData.save();
-            cart = cartData;
-          }
           const productIndex = cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);
-          if (productIndex == -1) {
-            cart.product.push({ quantity, product_id });
-            console.log(productIndex, cart.product)
-          } else {
-            if (quantity) {
-              console.log('enterd');
-              cart.product[productIndex].quantity = quantity;
+            if (quantity > productQuantity.quantity) {
+              cart.product[productIndex].quantity = productQuantity.quantity;
+              await cart.save();
+              res.json({ message: 'out of stock', quantity: productQuantity.quantity })
             } else {
-              cart.product[productIndex].quantity += 1;
+              cart.product[productIndex].quantity = quantity;
+              await cart.save();
+              res.json({ message: 'Cart Updated', quantity })
             }
-                  
-            console.log(cart.product, product_id)
-          }
-          await cart.save();
-          res.json({ message:'Cart Updated',quantity })
-      }
   } catch (error) {
     throw error;
   }

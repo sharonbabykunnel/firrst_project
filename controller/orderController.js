@@ -46,12 +46,15 @@ const loadCheckout = asyncHandler(async (req, res) => {
       );
       var product = cart?.product;
       const check = cart.product.reduce((total, products) => {
+        console.log(products.quantity , products.product_id.quantity,"gt");
         if (products.quantity > products.product_id.quantity) {
+          console.log(products.quantity , products.product_id.quantity,"g");
           return [products.product_id.quantity, products.product_id.title]
         }
+        return total
       }, [])
       console.log(check,'d')
-      if (check) {
+      if (check.length != 0) {
         res.redirect("/cart?discount=" + discount + "&counponId=" + couponId + "&message=Only " + check[0] + " " + check[1] + " left")
       } else {
         var calculatTotal = cart.product.reduce((total, product) => {
@@ -59,21 +62,21 @@ const loadCheckout = asyncHandler(async (req, res) => {
             product.product_id?.discountPrice * product.quantity;
           return total + productTotal;
         }, 0);
+        const address = await Address.findOne({ user: user._id });
+        const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
+        res.render("userView/checkout", {
+          product,
+          cartNum,
+          user,
+          cart,
+          calculatTotal,
+          discount,
+          quantity,
+          address,
+          couponId,
+        });
       }
-      const address = await Address.findOne({ user: user._id });
-      const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-      res.render("userView/checkout", {
-        product,
-        cartNum,
-        user,
-        cart,
-        calculatTotal,
-        discount,
-        quantity,
-        address,
-        couponId,
-      });
-    }
+      }
   } catch (error) {
     throw error;
   }
@@ -103,12 +106,11 @@ const placeOrder = asyncHandler(async (req, res) => {
     }
     const address = { country, streat, pincode, building, landmark, district, state, user,name,mobile };
     const order = new Order({ user, stotal, total, status, payment, address, notes, item })
-    if (payment == "COD") {
     const orderData = await order.save();
+    if (payment == "COD") {
       confirmOrder(user, orderData._id,couponId,_id)
       res.json({ orderData, payment: 'COD' });
     } else if (payment == 'razorpay') {
-    const orderData = await order.save();
       const responce = await generateRazorpay(orderData._id, total);
       res.json({ responce, user, payment: "razorpay", couponId ,_id});
     } else if (payment == 'wallet') {
@@ -117,8 +119,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       if (total > wallet.balance) {
         res.json({ message:'Insufficient Balance', payment: "wallet" });
       } else {
-        await Wallet.updateOne({user}, { $inc: { balance: -total } });
-        const orderData = await order.save();
+        await Wallet.updateOne({user}, { $inc: { balance: -total },$push:{orderId:orderData._id} });
         confirmOrder(user, orderData._id, couponId,_id);
         res.json({ orderData, payment: "wallet" });
       }
@@ -413,8 +414,16 @@ const cancel = asyncHandler(async (req, res) => {
 const loadWallet = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
-    const [wishlist, cart, wallet, orders] = await Promise.all([Wishlist.findOne( { user_id: user?._id },{ product: 1 }),Cart.findOne({ user_id: user?._id }),Wallet.findOne({ user: user._id }).populate('orderId'),Order.find({ user: user._id, $or: [{ status: 'Returned' }, { $and: [{ status: "Cancelled" }, { payment: 'razorpay' }] }] }).populate('item.product')])
-    const cartNum = cart.product?.length;
+    const [wishlist, cart, wallet, ] = await Promise.all([
+      Wishlist.findOne({ user_id: user?._id }, { product: 1 }),
+      Cart.findOne({ user_id: user?._id }),
+      Wallet.findOne({ user: user._id }).populate({ path: 'orderId', }),])
+    const orders = await Order.find({ _id: { $in: wallet.orderId } }).populate('item.product')
+    const sdf = wallet.orderId.map((item) => item.populate())
+    // console.log(sdf,'lkjlk');
+    const cartNum = cart?.product?.length;
+    // console.log(wallet.orderId.map((item)=>item.item))
+    console.log(orders,'asdf')
     res.render("userView/wallet", { wallet,user,cartNum ,orders,wishlist});
   } catch (error) {
     throw error;

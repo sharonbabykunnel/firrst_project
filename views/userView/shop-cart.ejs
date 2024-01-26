@@ -110,28 +110,16 @@
                                           
                                         <td class="cart__quantity">
                                             <div class="pro-qty"> 
-                                        <!-- <span class="dec qtybtn">-</span> -->
+                                        <span class="dec qtybtn" onclick="updateQuantity('<%= product[i].product_id._id %>','<%= i%>','dec')">-</span>
 
                                                 <input type="text"  value="<%= product[i].quantity %>" name="quantity" id="quantityInput<%= i %>">
-                                        <!-- <span class="inc qtybtn" id="<%= i %>" onclick="dec('<%= i %>')">+</span> -->
-
-                                                <span></span>
+                                        <span class="inc qtybtn" id="<%= i %>" onclick="updateQuantity('<%= product[i].product_id._id %>','<%= i%>')">+</span>
                                             </div>
-                                            <!-- <script>
-                                                const dec = (index)=>{
-                                                let value =   document.getElementById(index).value;
-                                                console.log(value,'d');
-                                                value = value+1;
-                                                console.log(value);
-                                                }
-
-
-                                            </script> -->
                                         </td>
-                                        <td class="cart__quantity">
+                                        <!-- <td class="cart__quantity">
                                             
                                         <a href="#" onclick="updateQuantity('<%= product[i].product_id._id %>','<%= i%>')">Update</a>
-                                        </td>
+                                        </td> -->
                                         
                                         <td class="cart__total" aria-valuenow="">$ <%= product[i].product_id?.discount || product[i].product_id.catDiscount ? product[i].product_id.discountPrice *product[i].quantity : product[i].product_id.price * product[i].quantity %></td>
                                         <td class="cart__close"><a href="/deleteCart?id=<%= product[i]._id %>"><span class="icon_close"></span></a></td>
@@ -175,8 +163,15 @@
                     <div class="discount__content">
                         <h6>Discount codes</h6>
                         <form onsubmit="" action="" method="get" >
+                            <div id="couponForm">
                             <input type="text" name="code" value='' placeholder='Enter coupon code' id="code">
                             <a onclick="applyCoupon()"><button type="button" class="site-btn"  >Apply</button></a>
+                        </div><div>
+                            <div id="appliedCoupon" style="display: none;">
+                                <input id="appliedCode"></input>
+                                <button type="button" class="site-btn" onclick="removeCoupon()">Remove</button>
+                            </div>
+                        </div>
                         </form>
                     </div>
                 </div>
@@ -185,7 +180,11 @@
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span>$ <span id="stotal"> <%= calculatTotal(product) %></span></span></li>
-                            <% if(typeof discount !="undefined"){%><li>Total <span  >$ <span id="total"> <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></span></li><%}else{%><li>Total <span>$ <span id="total" > <%= calculatTotal(product)  %></span></span></li><%}%>
+                                <!-- <% if(typeof discount !="undefined"){%>
+                            <li>Total <span  >$ <span id="total"> <%= calculatTotal(product) -(calculatTotal(product) * discount /100) %></span></span></li>
+                                <%}else{%> -->
+                            <li><p id="didected" class="didected"></p>Total <span>$ <span id="total" > <%= calculatTotal(product)  %></span></span></li>
+                               <!-- <%}%> -->
                         </ul>
                         <a id="href" href="/checkout" class="primary-btn">Proceed to checkout</a>
                     </div>
@@ -194,7 +193,7 @@
         </div>
     </section>
     <!-- Shop Cart Section End -->
-                            <%}else{%>
+                            <%}else{%>asddf
 
 <p>No cart product</p>
                             <%}%>
@@ -266,11 +265,14 @@
         }).then((res) => {
             return res.json()
         }).then((data) => {
-            let { Total, discount, couponId,message } = data
+            let { Total, discount, couponId,message ,didected} = data
             console.log(Total)
                 if (Total ) {
-                    document.getElementById('total').innerHTML = Total
-
+                    document.getElementById('total').innerHTML = Math.floor(Total)
+                    document.getElementById('appliedCode').value = `Coupon: ${code}(${30}) Applied  `;
+            document.getElementById('didected').innerHTML=`$${Math.ceil(didected)} didected`
+            document.getElementById('appliedCoupon').style.display = 'block';
+            document.getElementById('couponForm').style.display = 'none';
                     const a = document.getElementById('href')
                     a.setAttribute('href', `/checkout?discount=${discount}&couponId=${couponId}`);
                     // document.getElementById('coupon_applied').value = ''
@@ -327,6 +329,18 @@ document.head.appendChild(style);
             }
         )
     }
+    const originalTotal = document.getElementById('stotal').innerHTML;
+
+    function removeCoupon() {
+    document.getElementById('didected').innerHTML = ''; 
+    document.getElementById('total').innerHTML = originalTotal; 
+    document.getElementById('total').value = originalTotal;
+    document.getElementById('appliedCode').innerText = '';
+    document.getElementById('appliedCoupon').style.display = 'none';
+    document.getElementById('couponForm').style.display = 'block';
+                        const a = document.getElementById('href')
+                    a.setAttribute('href', `/checkout`);
+}
     </script>
 
 <%- include("../layouts/userFooter.ejs") %>
