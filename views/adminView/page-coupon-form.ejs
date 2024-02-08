@@ -25,12 +25,25 @@
                                 </div>
                                 <div class="col-md-4  mb-3">
                                     <label for="product_color" class="form-label">Expiery Date</label>
-                                    <input type="date" name="expiryDate" placeholder="Type here" class="form-control" id="product_color" value="<%= typeof coupon == 'undefined' ? '' : coupon?.expiryDate %>">
+                                    <input type="date" name="expiryDate" placeholder="Type here" class="form-control" id="product_color" value="<%= typeof coupon == 'undefined' ? 'ddd' : coupon?.expiryDate %>">
+                                    <span id="exp_error"></span>
                                 </div>
                                 <div class="col-md-4  mb-3">
                                     <label for="product_size" class="form-label">Discount</label>
                                     <input type="number" name="discount" placeholder="Type here" class="form-control" id="product_discount" value="<%= typeof coupon == 'undefined' ? '' : coupon?.discount %>" onkeyup="validatNum('product_discount','discount_error','Discount')">
                                     <span id="discount_error"></span>
+                                </div>
+                            </div>
+                            <div class="row gx-2">
+                                <div class="col-md-6  mb-3">
+                                    <label for="product_size" class="form-label">Minimum Amount to Apply</label>
+                                    <input type="number" name="minAmount" placeholder="Type here" class="form-control" id="product_minamount" value="<%= typeof coupon == 'undefined' ? '' : coupon?.minAmount %>" onkeyup="validatNum2('product_minamount','minamount_error','Discount')">
+                                    <span id="minamount_error"></span>
+                                </div> 
+                               <div class="col-md-6  mb-3">
+                                    <label for="product_size" class="form-label">Maximum Discount Amount</label>
+                                    <input type="number" name="maxDiscount" placeholder="Type here" class="form-control" id="product_maxdiscount" value="<%= typeof coupon == 'undefined' ? '' : coupon?.maxDiscount %>" onkeyup="validatNum2('product_maxdiscount','maxdiscount_error','Discount')">
+                                    <span id="maxdiscount_error"></span>
                                 </div>
                             </div>
                             <div class="mb-4">

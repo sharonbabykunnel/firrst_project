@@ -43,17 +43,21 @@ const loadAddCoupon = asyncHandler(async (req, res) => {
 
 const addCoupon = asyncHandler(async (req, res) => {
   try {
-    const { code, createdDate, expiryDate, discount, discription, status, id } = req.body;
+    let message
+    const { code, createdDate, expiryDate, discount, discription, status, id, maxDiscount, minAmount } = req.body;
     if (id) {
-      let update = {code,discount,discription,status};
+      let update = { code, discount, discription, status, maxDiscount, minAmount };
       if (createdDate) {
         update.createdDate = createdDate;
       }
       if (expiryDate) {
         update.expiryDate = expiryDate;
       }
-      await Coupon.findByIdAndUpdate(id, { $set:update});
-    } else {
+      await Coupon.findByIdAndUpdate(id, { $set: update });
+      message ='coupon added successfuly'
+    } else if (!expiryDate) {
+      message = "Add Expiry Date"
+     } else {
       const duplicate = await Coupon.findOne({ code });
       if (duplicate) {
         res.render("adminView/page-coupon-form", {
@@ -70,12 +74,13 @@ const addCoupon = asyncHandler(async (req, res) => {
           expiryDate,
           discount,
           discription,
-          status,
+          status, minAmount, maxDiscount
         });
         await coupon.save();
+        message = "coupon added successfuly";
       }
     }
-    res.redirect("/admin/addcoupon?message=coupon added successfuly");
+    res.redirect("/admin/addcoupon?message="+message);
   } catch (error) {
     throw error;
   }
@@ -101,33 +106,39 @@ const applyCoupon = asyncHandler(async (req, res) => {
     const id = req.session.user._id;
     const { code, total } = req.query;
     const coupon = await Coupon.findOne({ code });
-    if (coupon && coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate" ) {
-      const couponId = coupon?._id;
-      if (coupon) {
+    if (coupon) {
+      if (coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate") {
+        const couponId = coupon?._id;
         const used = await User.findOne({
           _id: id,
           used_coupons: { $in: couponId },
         });
         if (!used) {
-          const discount = Number(coupon?.discount);
-          console.log(discount, "discount");
-          const Total = total - (total * discount) / 100;
-          const didected = total - Total
-          res.json({ discount, couponId, Total,didected });
+          if (coupon.minAmount <= total) {
+            const discount = Number(coupon?.discount);
+            console.log(discount, "discount");
+            let Total = total - (total * discount) / 100;
+            if (Total > coupon.maxDiscount) {
+             Total = total - coupon.maxDiscount 
+            }
+            const didected = total - Total;
+            res.json({ discount, couponId, Total, didected });
+          } else {
+            res.json({message:'Want minimum Purchese Amount of $'+coupon.minAmount})
+          }
         } else {
           console.log(used, "d");
           res.json({ message: "Used Coupons" });
         }
+      } else if (coupon.createdDate >= Date.now() && coupon.expiryDate >= Date.now()) {
+        console.log('lll');
+        res.json({ message: "Coupon Not Active" });
       } else {
-        console.log('ll');
-        res.json({ message: "Coupon Not Valid" });
+        console.log("ll");
+        res.json({ message: "Coupon Expired" });
       }
-    } else if(coupon && coupon.createdDate >=Date.now() && coupon.expiryDate >= Date.now() && coupon.status != "Activate") {
-      console.log('lll');
-      res.json({ message: "Coupon Not Active" });
     } else {
-      console.log("ll");
-      res.json({ message: "Coupon Expired" });
+      res.json({message:'Code is Invalid'})
     }
 
   } catch (error) {

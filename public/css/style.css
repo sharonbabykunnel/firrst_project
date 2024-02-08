@@ -1074,6 +1074,17 @@ ol {
 	font-weight: 700;
 }
 
+.pagination-area .page-item{margin:0 5px}
+.pagination-area .page-item:first-child{margin-left:0}
+.pagination-area .page-item:first-child .page-link{border-top-left-radius:50%;border-bottom-left-radius:50%}
+.pagination-area .page-item:last-child .page-link{border-top-right-radius:50%;border-bottom-right-radius:50%}
+.pagination-area .page-item.active .page-link,.pagination-area .page-item:hover .page-link{color:#fff;background:#088178}
+.pagination-area .page-item .page-link{border:0;padding:0 10px;-webkit-box-shadow:none;box-shadow:none;outline:0;width:34px;height:34px;display:block;border-radius:4px;background:#e9ecee;line-height:34px;text-align:center;font-size:13px;color:#383e50}
+.pagination-area .page-item .page-link.dot{background-color:transparent;color:#adb5bd;letter-spacing:2px}
+.pagination-area .page-item .page-link:first-child{border-top-left-radius:4px;border-bottom-left-radius:4px}.pagination-area .page-item .page-link:last-child{border-top-right-radius:4px;border-bottom-right-radius:4px}
+.pagei{
+	align-items: center;
+}
 .didected{
 color: #36a300;
 text-align: right;
@@ -1081,6 +1092,151 @@ text-align: right;
 .categories__text p {
 	margin-bottom: 10px;
 }
+
+.firstdiv{
+
+	margin:0px;
+	
+	padding:0px;
+	
+	box-sizing: border-box;
+	
+	}
+	
+	.secnddiv {
+	
+	font-family: "Roboto", sans-serif; background:#f0f2f7;
+	
+	}
+	
+	.containerr {
+	
+	position:absolute;
+	
+	top:50%;
+	
+	left:50%;
+	
+	transform:translate(-50%,-50%);
+	
+	}
+	
+	label {
+	
+	padding:10px;
+	
+	font-size:18px;
+	
+	color: #111;
+	
+	}
+	
+	.copy-text{
+	position: relative;
+
+	padding:10px;
+	
+	background:#fff;
+	
+	border:1px solid #ddd;
+	
+	border-radius:10px;
+	
+	display: inline-block;
+
+	align-items: center;
+	
+	}
+	
+	.copy-text input.text {
+	
+	padding:10px;
+	
+	font-size:18px;
+	
+	color:#555;
+	
+	border:none;
+	
+	outline: none;
+
+	
+	}
+	
+	.copy-text button {
+	
+	padding:10px;
+	
+	background:#5784f5;
+	
+	color:#fff;
+	
+	font-size:18px;
+	
+	border:none;
+	
+	outline: none;
+	
+	
+	border-radius:10px;
+	
+	cursor:pointer;
+
+	}
+
+	.copy-text button:before { 
+
+		content: "Copied";
+		
+		position:absolute;
+		
+		top:-50px;
+		
+		right:0px;
+		
+		background:#5c81dc;
+		
+		padding: 8px 10px;
+		
+		border-radius: 20px;
+		
+		font-size:15px;
+
+		display:none;
+
+		
+		}
+
+		.copy-text button:after {
+
+			content:"";
+			
+			position:absolute;
+			
+			top: -20px;
+			
+			right:25px;
+			
+			width:10px;
+			
+			height:10px;
+			
+			background:#5c81dc;
+			
+			transform:rotate(45deg);
+
+			display:none;
+
+			
+			}
+
+			.copy-text.active button:before,
+
+			.copy-text.active button:after {
+			
+			display:block;
+			
+			}
 
 .categories__text a {
 	font-size: 14px;

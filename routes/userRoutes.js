@@ -38,7 +38,8 @@ rout.get("/deleteAddress/:id",address.deleteAddress)
 rout.get("/cart/coupon", auth.isLogged, coupon.applyCoupon);
 rout.get("/home/getProduct", auth.isLogged, user.getProducts);
 rout.get("/getProduct", auth.isLogged, user.getProducts);
-rout.get("/filter", auth.isLogged, user.filterProducts);
+rout.get("/filter", user.filterProducts);
+rout.get("/referral", user.loadReferral);
 
 rout.post("/razorpay-success", auth.isLogged, order.razorpaySuccess);
 rout.post("/addReview", auth.isLogged, product.rating);

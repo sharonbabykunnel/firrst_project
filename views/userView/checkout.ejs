@@ -336,4 +336,62 @@ document.head.appendChild(style);
 
     
 </script>
+<script>
+function showPopup() {
+  const popupDiv = document.createElement('div');
+  popupDiv.innerHTML = '<p>Confirm your order</p>';
+  popupDiv.style.position = 'fixed';
+  popupDiv.style.top = '50%';
+  popupDiv.style.left = '50%';
+  popupDiv.style.transform = 'translate(-50%, -50%)';
+  popupDiv.style.backgroundColor = '#fff';
+  popupDiv.style.padding = '20px';
+  popupDiv.style.color = '#333';
+  popupDiv.style.borderRadius = '10px';
+  popupDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+  popupDiv.style.maxWidth = '400px';
+  popupDiv.style.width = '80%';
+  popupDiv.style.textAlign = 'center';
+  popupDiv.style.fontSize = '18px';
+  popupDiv.style.fontWeight = 'bold';
+  popupDiv.style.animation = 'fadeInOut 5s ease-in-out';
+
+  const cancelButton = document.createElement('button');
+  cancelButton.innerHTML = 'Cancel';
+  cancelButton.style.backgroundColor = '#FF5757';
+  cancelButton.style.color = '#fff';
+  cancelButton.style.padding = '10px';
+  cancelButton.style.border = 'none';
+  cancelButton.style.borderRadius = '5px';
+  cancelButton.style.marginRight = '10px';
+  cancelButton.style.cursor = 'pointer';
+  cancelButton.addEventListener('click', closePopup);
+
+  const confirmButton = document.createElement('button');
+  confirmButton.innerHTML = 'Confirm';
+  confirmButton.style.backgroundColor = '#4CAF50';
+  confirmButton.style.color = '#fff';
+  confirmButton.style.padding = '10px';
+  confirmButton.style.border = 'none';
+  confirmButton.style.borderRadius = '5px';
+  confirmButton.style.cursor = 'pointer';
+  confirmButton.addEventListener('click', handleConfirm);
+
+  popupDiv.appendChild(cancelButton);
+  popupDiv.appendChild(confirmButton);
+
+  document.body.appendChild(popupDiv);
+
+  function closePopup() {
+    document.body.removeChild(popupDiv);
+  }
+
+  function handleConfirm() {
+    checkout();
+    console.log('Order confirmed!');
+    closePopup();
+  }
+}
+
+  </script>
 <%- include('../layouts/userFooter.ejs') %>

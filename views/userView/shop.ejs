@@ -208,6 +208,17 @@
                 </div>
             </div>
         </div>
+<div class="pagei">
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <% for(let i=1; i<=totalPage; i++){%>
+                    <li class="page-item"><a id="page<%=i%>" onclick="getPage('page<%=i%>')"  class="page-link active"><%= i %></a></li>
+                <%}%>
+            </ul>
+        </nav>
+    </div>
+</div>
     </section>
     <!-- Shop Section End -->
 
@@ -276,8 +287,10 @@
             document.getElementById('sub').value = sub;
             filter();
         }    
-
+let choosedpage ;
 const filter = ()=>{
+    console.log(choosedpage,'kk');
+    const page = document.getElementById(choosedpage).innerHTML;
     const search = document.getElementById('search').value;
     const main = document.getElementById('main').value;
     const sub = document.getElementById('sub').value;
@@ -288,7 +301,7 @@ const filter = ()=>{
     const sizeValues = Array.from(size).map(checkbox => checkbox.value);
     const sizeQueryString = sizeValues.length > 0 ? `&size=${sizeValues.join(',')}` : '';
     console.log(sizeValues,'ddd');
-    fetch(`/filter?main=${main}&sub=${sub}&max=${max}&min=${min}${sizeQueryString}&sort=${sort}&search=${search}`,{
+    fetch(`/filter?main=${main}&sub=${sub}&max=${max}&min=${min}${sizeQueryString}&sort=${sort}&search=${search}&page=${page}`,{
         method:'get',
         headers:{
             'Content-Type' : 'application/json'
@@ -341,6 +354,10 @@ for (let i = 0; i < products?.length; i++) {
     mix.appendChild(productItem)
     propertyGallery.appendChild(mix);
 }
+const pagination = document.getElementsByClassName('.pagination')
+pagination.classList.add('pagination justify-content-center');
+pagination.innerHTML=''
+
 }
     })
 }

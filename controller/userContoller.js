@@ -77,8 +77,9 @@ const verifySignin = asyncHandler(async (req, res) => {
 })
 
 const loadSignup = asyncHandler(async (req, res) => {
-    try {
-        res.render('auth/page-account-register');
+  try {
+    const code = req.query.code;
+        res.render('auth/page-account-register',{code});
     } catch (error) {
         throw error;
     }
@@ -158,12 +159,13 @@ const getProducts = asyncHandler(async (req, res) => {
 const filterProducts = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
+    const limit = 8;
     console.log(req.query.category, "ii");
-    const { main, sub, max, min, size ,sort, search} = req.query;
+    const { main, sub, max, min, size, sort, search, page } = req.query;
     console.log(size, 'lll', req.query.size);
-    const newsize =  size?.split(',') 
+    const newsize = size?.split(',')
     console.log(newsize);
-    const wishlist = await Wishlist.findOne({ user_id: user?._id },{ product: 1 });
+    const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
     const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
     let filterCriteria = {};
 
@@ -189,14 +191,16 @@ const filterProducts = asyncHandler(async (req, res) => {
     
     let by = {};
     if (sort == 'low-to-high') {
-      by = {discountPrice : 1} 
-    } else if(sort == 'high-to-low'){
-      by = {discountPrice: -1}
+      by = { discountPrice: 1 }
+    } else if (sort == 'high-to-low') {
+      by = { discountPrice: -1 }
     }
     console.log(filterCriteria);
-    const products = await Product.find(filterCriteria).sort(by);
+    console.log(by)
+    const [products, count ]= await Promise.all([Product.find(filterCriteria).sort(by).limit(limit).skip((page-1)*limit), Product.countDocuments(filterCriteria)]);
     console.log(products?.length, "pro");
-    res.json({ products, user, cartNum, wishlist, main, sub });
+    const totalPage = Math.ceil(count/limit)
+    res.json({ products, user, cartNum, wishlist, main, sub, totalPage});
   } catch (error) {
     throw error;
   }
@@ -219,7 +223,6 @@ const verifyotp = asyncHandler(async (req, res) => {
       if (req.session.user.referral) {
         var referrer = await User.findOne({ referral: req.session.user.referral }, { _id: 1 });
         console.log(referrer,'referrer');
-        await Wallet.updateOne({ user: referrer },{$inc:{balance:50}});
       }
       console.log(referral,'referral');
       const spassword = await securePassword(req.session.user.password);
@@ -232,13 +235,7 @@ const verifyotp = asyncHandler(async (req, res) => {
         referrer
       }); 
       await user.save();
-      console.log(user, 'user');
-      await Wallet.create
-      if (referrer) {
-        await Wallet.create({ balance: 20, user: user._id });
-      } else {
-        await Wallet.create({ user: user._id ,balance: 0});
-      }
+      await Wallet.create({ user: user._id ,balance: 0});
       res.redirect('/signin');
     } else {
       res.render('auth/otp', { message: 'incorrect otp' });
@@ -419,9 +416,10 @@ const loadError = asyncHandler(async (req, res) => {
 const loadShop = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
-    const [wishlist,cart,product,category] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id }),Product.find(),Category.find()])
+    const [wishlist,cart,product,Plength,category] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id }),Product.find().limit(8),Product.find().countDocuments(),Category.find()])
     const cartNum = cart?.product?.length;
-    res.render("userView/shop",{user,product,cartNum,wishlist, category});
+    const totalPage = Math.ceil(Plength/12)
+    res.render("userView/shop",{user,product,cartNum,wishlist, category,totalPage});
   } catch (error) {
     throw error;
   }
@@ -539,6 +537,14 @@ const loadBlog = asyncHandler(async (req, res) => {
   }
 });
 
+const loadReferral = asyncHandler(async (req, res) => {
+  try {
+    const user = req.session.user;
+    res.render('userView/referral', {user});
+  } catch (error) {
+    throw error;
+  }
+})
 
 
   module.exports = {
@@ -567,4 +573,5 @@ const loadBlog = asyncHandler(async (req, res) => {
     getProducts,
     filterProducts,
     loadBlog,
+    loadReferral,
 };

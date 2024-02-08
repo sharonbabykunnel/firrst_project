@@ -4,7 +4,8 @@
     <div class="bg-light py-3">
         <div class="container">
           <div class="row">
-            <div class="col-md-12 mb-0"><a href="/user">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">My Wallet</strong></div>
+            <div class="col-md-6 mb-0"><a href="/user">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">My Wallet</strong></div>
+            <div class="col-md-6 justify-content-end d-flex"><button onclick="addMoney()" type="button" class="site-btn"  >Add Money</button></div>
           </div>
         </div>
       </div>
@@ -100,5 +101,78 @@
         </div>
       </div>
 
-     
+   <script>
+    function addMoney(){
+      fetch('/addmoney',{method:'get'})
+      .then((res)=>{
+        return res.JSON();
+      })
+      .then((res)=>{
+        const {payment,user} = res;
+        razorpayPayment(payment,user)
+      })
+    }
+    
+    function razorpayPayment(order, user) {
+        var options = {
+            "key":"rzp_test_dka3Pol1L9thKD",
+            "amount": order.amount,
+            "currency": "INR",
+            "name": "Fcart",
+            "description": "Test Transaction",
+            "image": "https://previews.123rf.com/images/subhanbaghirov/subhanbaghirov1605/subhanbaghirov160500087/56875269-vector-light-bulb-icon-with-concept-of-idea-brainstorming-idea-illustration-.jpg",
+            "order_id": order.id,
+            "handler": function (response) {
+                console.log(response,order,"funnn")
+                verifyPayment(response, order)
+            },
+            "prefill": {
+                "name": user.name,
+                "email": user.email,
+                "contact": user.mobile
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options)
+        
+        rzp1.on('payment.failed', function (response) {
+            alert(response.error.code,"Payment failed");
+        })
+        rzp1.open()
+    }
+
+    function verifyPayment(payment, order) {
+        console.log(payment,order,"kj");
+        fetch('/razorpay-success', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                payment,
+                order,
+                couponId,
+                _id
+            })
+        }).then((res) => {
+            
+            return res.json()
+        }).then((response) => {
+            if (response.status) {
+                console.log(response.status,"kl");
+                location.href = `/order-success/${response.order}`
+            } else {
+                location.href = `/cart`
+            }
+        }).catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+    }
+   </script>  
 <%- include('../layouts/userFooter.ejs') -%>

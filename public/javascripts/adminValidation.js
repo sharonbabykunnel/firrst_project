@@ -166,7 +166,9 @@ var validatCouponForm = () => {
   if (
     !validatString("product_code", "code_error", "Code") ||
     !validatString("coupon_dis", "dis_error", "discription") ||
-    !validatNum("product_discount", "discount_error", "Discount")
+    !validatNum("product_discount", "discount_error", "Discount") ||
+    !validatNum2("product_maxdiscount", "maxdiscount_error", "Discount") ||
+    !validatNum2("product_minamount", "minamount_error", "Discount") || !exp
   ) {
     console.log("ddfgggdhdygdryhgbdfghftdjhdygdfghhhhhhhhhhhhhf");
     message.style.display = "block";
@@ -204,8 +206,8 @@ var validatAddressForm = () => {
     }, 4000);
     return false;
   }
-  
-  checkout();
+  showPopup();
+  // checkout();
   return true;
 };
 
