@@ -16,13 +16,11 @@ const getCoupons = asyncHandler(async (req, res) => {
   try {
     const limit = 5
     const { search, page } = req.query;
-    console.log(req.query);
     const [coupon, count] = await Promise.all([
       Coupon.find({ code: { $regex: ".*" + search.trim() + ".*", $options: "i" } }).sort({ _id: -1 }).skip((page - 1) * limit).limit(limit),
       Coupon.find({ code: { $regex: ".*" + search.trim() + ".*", $options: "i" } }).countDocuments()
     ]);
     const totalPage = Math.ceil(count / limit);
-    console.log(coupon, totalPage,'dd');
     res.json( { coupon,totalPage });
   } catch (error) {
     throw error;
@@ -33,7 +31,6 @@ const loadAddCoupon = asyncHandler(async (req, res) => {
   try {
     const id = req.query?.id;
     const message = req.query?.message;
-    console.log(message);
     const coupon = await Coupon.findOne({_id:id});
     res.render("adminView/page-coupon-form",{coupon,message})
   } catch (error) {
@@ -88,13 +85,9 @@ const addCoupon = asyncHandler(async (req, res) => {
 
 const status = asyncHandler(async (req, res) => {
   try {
-      const { id, status } = req.query;
-      console.log(id, status);
-    if (status == 'Activate') {
-      await Coupon.findByIdAndUpdate({ _id: id }, { $set: { status:"Deactivate" } });
-    } else {
-      await Coupon.findByIdAndUpdate({ _id: id }, { $set: { status:"Activate" } });
-    }
+    const { id, status } = req.query;
+    const newStatus = status === 'Activate' ? 'Deactivate' : 'Activate';
+    await Coupon.findByIdAndUpdate({ _id: id }, { $set: { status: newStatus } });
     res.redirect("/admin/coupon");
   } catch (error) {
     throw error;
@@ -103,48 +96,38 @@ const status = asyncHandler(async (req, res) => {
 
 const applyCoupon = asyncHandler(async (req, res) => {
   try {
-    const id = req.session.user._id;
+    const userId = req.session.user._id;
     const { code, total } = req.query;
     const coupon = await Coupon.findOne({ code });
-    if (coupon) {
-      if (coupon.expiryDate >= Date.now() && coupon.createdDate <= Date.now() && coupon.status == "Activate") {
-        const couponId = coupon?._id;
-        const used = await User.findOne({
-          _id: id,
-          used_coupons: { $in: couponId },
-        });
-        if (!used) {
-          if (coupon.minAmount <= total) {
-            const discount = Number(coupon?.discount);
-            console.log(discount, "discount");
-            let Total = total - (total * discount) / 100;
-            if (Total > coupon.maxDiscount) {
-             Total = total - coupon.maxDiscount 
-            }
-            const didected = total - Total;
-            res.json({ discount, couponId, Total, didected });
-          } else {
-            res.json({message:'Want minimum Purchese Amount of $'+coupon.minAmount})
-          }
-        } else {
-          console.log(used, "d");
-          res.json({ message: "Used Coupons" });
-        }
-      } else if (coupon.createdDate >= Date.now() && coupon.expiryDate >= Date.now()) {
-        console.log('lll');
-        res.json({ message: "Coupon Not Active" });
-      } else {
-        console.log("ll");
-        res.json({ message: "Coupon Expired" });
-      }
-    } else {
-      res.json({message:'Code is Invalid'})
+
+    if (
+      !coupon ||
+      coupon.status !== "Activate" ||
+      coupon.expiryDate < Date.now() ||
+      coupon.createdDate > Date.now()
+    ) {
+      return res.json({ message: !coupon ? "Code is Invalid" : "Coupon Expired or Not Active", });
     }
 
+    const used = await User.findOne({ _id: userId, used_coupons: { $in: coupon._id }, });
+
+    if (used) {
+      return res.json({ message: "Used Coupons" });
+    }
+
+    if (coupon.minAmount > total) {
+      return res.json({ message: "Want minimum Purchase Amount of $" + coupon.minAmount, });
+    }
+
+    const discount = Math.min(Number(coupon.discount), coupon.maxDiscount);
+    const discountedTotal = Math.max( total - (total * discount) / 100, total - coupon.maxDiscount );
+
+    res.json({ discount, couponId: coupon._id, Total: discountedTotal, deducted: total - discountedTotal, });
   } catch (error) {
     throw error;
   }
 });
+
 
 const deleteCoupon = asyncHandler(async (req, res) => {
   try {

@@ -5,7 +5,7 @@
         <div class="container">
           <div class="row">
             <div class="col-md-6 mb-0"><a href="/user">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">My Wallet</strong></div>
-            <div class="col-md-6 justify-content-end d-flex"><button onclick="addMoney()" type="button" class="site-btn"  >Add Money</button></div>
+            <div class="col-md-6 justify-content-end d-flex"><button onclick="showPopup()" type="button" class="site-btn"  >Add Money</button></div>
           </div>
         </div>
       </div>
@@ -37,7 +37,17 @@
                             </tr>
                           <% } else { %>
                             <%let n = 1; orders.reverse().forEach((order, index) => { %>
-                              
+                            <% if(order.address == ''){%>
+                              <tr class="justify-content-end bg-success">
+                                <td ></td>
+                                <td ></td>
+                                <td ></td>
+                                <td ></td>
+                                <td ></td>
+                                <td >+<%= order.total %></td>
+                              </tr>
+                            <%}else{%>
+                                                            
                               <tr>
                                 <td><%= n++ %></td>
                                 <td>
@@ -84,6 +94,7 @@
                                   <td><% if(order.status != "ordered"){%>-<%}else{%>+<%}%><strong>₹ <%= order.total %></strong></td>
                                 </tr>
                                 <%}%>
+                              <%}%>
                             <% }) %>
                           <% } %>
                         </tbody>
@@ -102,18 +113,8 @@
       </div>
 
    <script>
-    function addMoney(){
-      fetch('/addmoney',{method:'get'})
-      .then((res)=>{
-        return res.JSON();
-      })
-      .then((res)=>{
-        const {payment,user} = res;
-        razorpayPayment(payment,user)
-      })
-    }
-    
     function razorpayPayment(order, user) {
+      console.log(order,'kkkkkkkkkkkkkkkkkkk')
         var options = {
             "key":"rzp_test_dka3Pol1L9thKD",
             "amount": order.amount,
@@ -156,8 +157,6 @@
             body: JSON.stringify({
                 payment,
                 order,
-                couponId,
-                _id
             })
         }).then((res) => {
             
@@ -165,9 +164,89 @@
         }).then((response) => {
             if (response.status) {
                 console.log(response.status,"kl");
-                location.href = `/order-success/${response.order}`
+                const messageDiv = document.createElement('div');
+
+messageDiv.innerHTML = 'Amount Added';
+messageDiv.style.position = 'fixed';
+messageDiv.style.top = '50%';
+messageDiv.style.left = '50%';
+messageDiv.style.transform = 'translate(-50%, -50%)';
+messageDiv.style.backgroundColor = '#fff';
+messageDiv.style.padding = '20px';
+messageDiv.style.color = '#333';
+messageDiv.style.borderRadius = '10px';
+messageDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+messageDiv.style.maxWidth = '400px';
+messageDiv.style.width = '80%';
+messageDiv.style.textAlign = 'center';
+messageDiv.style.fontSize = '18px';
+messageDiv.style.fontWeight = 'bold';
+messageDiv.style.animation = 'fadeInOut 5s ease-in-out';
+
+document.body.appendChild(messageDiv);
+
+setTimeout(() => {
+    messageDiv.style.opacity = '0';
+    setTimeout(() => {
+        document.body.removeChild(messageDiv);
+    }, 1000); // Assuming the fadeOut animation takes 1 second
+}, 2000); // Display for 5 seconds
+
+// Add a keyframe animation for fadeInOut
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+`;
+
+document.head.appendChild(style);
+
             } else {
-                location.href = `/cart`
+              const messageDiv = document.createElement('div');
+
+messageDiv.innerHTML = "Amount Dosent Added";
+messageDiv.style.position = 'fixed';
+messageDiv.style.top = '50%';
+messageDiv.style.left = '50%';
+messageDiv.style.transform = 'translate(-50%, -50%)';
+messageDiv.style.backgroundColor = '#fff';
+messageDiv.style.padding = '20px';
+messageDiv.style.color = '#333';
+messageDiv.style.borderRadius = '10px';
+messageDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+messageDiv.style.maxWidth = '400px';
+messageDiv.style.width = '80%';
+messageDiv.style.textAlign = 'center';
+messageDiv.style.fontSize = '18px';
+messageDiv.style.fontWeight = 'bold';
+messageDiv.style.animation = 'fadeInOut 5s ease-in-out';
+
+document.body.appendChild(messageDiv);
+
+setTimeout(() => {
+    messageDiv.style.opacity = '0';
+    setTimeout(() => {
+        document.body.removeChild(messageDiv);
+    }, 1000); // Assuming the fadeOut animation takes 1 second
+}, 2000); // Display for 5 seconds
+
+// Add a keyframe animation for fadeInOut
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+`;
+
+document.head.appendChild(style);
+
             }
         }).catch((error) => {
         console.error('Error:', error);
@@ -175,4 +254,67 @@
     });
     }
    </script>  
+   <script>
+    function showPopup() {
+      const popupDiv = document.createElement('div');
+      popupDiv.innerHTML = `
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+        <p>Add money to your cart</p>
+        <label for="amount">Amount:</label>
+        <input type="text" id="amount" placeholder="Enter amount">
+        <span id="message"></span>
+        <button class="site-btn" onclick="addMoney()">Pay with RazorPay</button>
+      `;
+      popupDiv.classList.add('popup'); 
+      popupDiv.style.position = 'fixed';
+      popupDiv.style.top = '50%';
+      popupDiv.style.left = '50%';
+      popupDiv.style.transform = 'translate(-50%, -50%)';
+      popupDiv.style.backgroundColor = '#fff';
+      popupDiv.style.padding = '20px';
+      popupDiv.style.color = '#333';
+      popupDiv.style.borderRadius = '10px';
+      popupDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+      popupDiv.style.maxWidth = '400px';
+      popupDiv.style.width = '80%';
+      popupDiv.style.textAlign = 'center';
+      popupDiv.style.fontSize = '18px';
+      popupDiv.style.fontWeight = 'bold';
+      popupDiv.querySelector('.close-btn').style.cursor = 'pointer';
+      popupDiv.style.animation = 'fadeInOut 5s ease-in-out';
+    
+      document.body.appendChild(popupDiv);
+    }
+    
+    function addMoney() {
+      // Add logic to handle adding money to the cart with RazorPay
+      // You can customize this function based on your needs
+      const amountInput = document.getElementById('amount');
+      const amount = Number(amountInput.value);
+      if(amount < 0 || isNaN(amount) || !amount){
+        document.getElementById('message').innerHTML = 'Give a Proper Amount'
+        setTimeout(()=>{document.getElementById('message').innerHTML = ''},2000)
+      }else{
+            
+      fetch('/addMoney?amount='+amount,{method:'get'})
+      .then((res)=>{
+        return res.json();
+      })
+      .then((res)=>{
+        const {responce,user} = res;
+        console.log(responce)
+        razorpayPayment(responce,user)
+      })
+      closePopup();
+      }
+
+    }
+    
+    function closePopup() {
+      const popupDiv = document.body.lastChild; // Select the last child of the body
+      document.body.removeChild(popupDiv);
+    }
+    </script>
+    
+    
 <%- include('../layouts/userFooter.ejs') -%>

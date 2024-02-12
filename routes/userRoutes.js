@@ -40,7 +40,7 @@ rout.get("/home/getProduct", auth.isLogged, user.getProducts);
 rout.get("/getProduct", auth.isLogged, user.getProducts);
 rout.get("/filter", user.filterProducts);
 rout.get("/referral", user.loadReferral);
-
+rout.get("/addMoney", order.addMoney);
 rout.post("/razorpay-success", auth.isLogged, order.razorpaySuccess);
 rout.post("/addReview", auth.isLogged, product.rating);
 rout.post("/signup", auth.isNOtLogged, user.verifySignup);

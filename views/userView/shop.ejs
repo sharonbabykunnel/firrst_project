@@ -287,7 +287,7 @@
             document.getElementById('sub').value = sub;
             filter();
         }    
-let choosedpage ;
+let choosedpage = 'page1' ;
 const filter = ()=>{
     console.log(choosedpage,'kk');
     const page = document.getElementById(choosedpage).innerHTML;
@@ -296,6 +296,7 @@ const filter = ()=>{
     const sub = document.getElementById('sub').value;
     const max = document.getElementById('maxamount').value;
     const min = document.getElementById('minamount').value;
+    console.log(min,'df')
     const sort = document.getElementById('dropdownMenuReference').value;
     const size = document.querySelectorAll("input[name='size']:checked");
     const sizeValues = Array.from(size).map(checkbox => checkbox.value);
@@ -317,6 +318,7 @@ const filter = ()=>{
             // document.getElementById('min')
             const products = res.products;
             const wishlist = res.wishlist;
+            const totalPage = res.totalPage;
             const propertyGallery = document.querySelector('.property__gallery');
                 propertyGallery.innerHTML = ''; 
 if(products.length<1){
@@ -334,7 +336,7 @@ for (let i = 0; i < products?.length; i++) {
                 <div class="product__item__pic set-bg" style="background-image: url(${imagePath});">
                     <div class="label new">${products[i].status}</div>
                     <ul class="product__hover">
-                        <li><a href="${imagePath}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                        <li><a href="${imagePath}" class="image-popup" ><span class='arrow_expand' ></span></a></li>
                         <li><a href="/addtoWishlist?id=${products[i]._id}"><span id='${products[i]._id}' class="${wishlist?.product?.includes(products[i]._id) ? 'icon_heart' : 'icon_heart_alt red'}" onclick="change('${products[i]._id}')"></span></a></li>
                         <li><a href="/addtoCartProduct?id=${products[i]._id}"><span class="icon_bag_alt"></span></a></li>
                     </ul>
@@ -344,21 +346,35 @@ for (let i = 0; i < products?.length; i++) {
                     <div class="rating">
                         ${Array.from({ length: 5 }, (_, j) => `<i class="fa fa-star${j < products[i].totalrating ? '' : '-o'}"></i>`).join('')}
                     </div>
-                    <div class="product__details__price">$${products[i].discount ? products[i].price - (products[i].price * (products[i].discount / 100)) : products[i].price} <span>${products[i].discount ? `$${products[i].price}` : ''}</span></div>
+                    <div class="product__details__price">$${products[i].discount || products[i].catDiscount ? products[i].discountPrice : products[i].price} <span>${products[i].discount || products[i].catDiscount ? `$${products[i].price}` : ''}</span></div>
                 </div>
     `;
-    
 
     const mix = document.createElement('div');
     mix.classList.add('col-lg-3', 'col-md-6', 'col-sm-24', 'mix', 'women');
     mix.appendChild(productItem)
     propertyGallery.appendChild(mix);
 }
-const pagination = document.getElementsByClassName('.pagination')
-pagination.classList.add('pagination justify-content-center');
-pagination.innerHTML=''
-
+$('.image-popup').magnificPopup({
+    type: 'image'
+});
+const pagination = document.querySelector('.pagination');
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPage; i++) {
+    console.log(totalPage);
+  const a = document.createElement('a');
+  a.href = `javascript:void(0)`;
+  a.addEventListener("click", () => getPage(`page${i}`));
+  a.innerHTML = `${i}`;
+  a.id = `page${i}`
+  const li = document.createElement('li');
+  li.classList.add('page-item');
+  li.appendChild(a);
+  pagination.appendChild(li);
 }
+    }
+
+
     })
 }
     </script>

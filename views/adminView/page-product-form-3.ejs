@@ -2,7 +2,7 @@
 
         <section class="content-main">
             <div class="row">
-                <form action="/admin/addProduct" method="post" enctype="multipart/form-data" onsubmit="return validatFromEditPage()">
+                <form onsubmit="return validatFromEditPage()" action="/admin/addProduct" method="post" enctype="multipart/form-data" >
                 <div class="col-9">
                     <div class="content-header">
                         <h2 class="content-title">Add New Product</h2>
@@ -54,8 +54,8 @@
                         <div class="card-body">
                             <div>
                                 <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" class="form-control" rows="4" id="product_dis" name="discription" onkeyup="validatString('product_dis','dis_error','Discription')"></textarea>
-                                <span id="dis_error"></span>
+                                <textarea placeholder="Type here" class="form-control" rows="4" id="product_discription" name="discription" onkeyup="validatString('productproduct_discription_dis','discription_error','Discription')"></textarea>
+                                <span id="discription_error"></span>
                             </div>
                         </div>
                     </div> <!-- card end// -->
@@ -89,12 +89,28 @@
                                 </select>
                             </div>
                             <h5 class="mb-3">Categories</h5>
-                            <% for (let i=0; i<category.length; i++){%>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"  id="product-cat<%=i%>" name="category" value="<%= category[i].name %>" >
-                                    <label class="form-check-label" for="product-cat<%=i%>"> <%= category[i].name %> </label>
-                                </div>
-                            <%}%>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 col-sm-6">   
+                                    <label for="">sub</label> 
+                                    <% for (let i=0; i<category.length; i++){%>
+                                    <% if(category[i].status == 'sub'){%>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"  id="product-cat<%=i%>" name="subcategory" value="<%= category[i].name %>" >
+                                        <label class="form-check-label" for="product-cat<%=i%>"> <%= category[i].name %> </label>
+                                    </div>
+                                    <%}%>
+                                <%}%></div>
+                                <div class="col-md-6 col-lg-6 col-sm-6">
+                                    <label for="">main</label>
+                                    <% for (let i=0; i<category.length; i++){%>
+                                    <% if(category[i].status !== 'sub'){%>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"  id="product-cat<%=i%>" name="maincategory" value="<%= category[i].name %>" >
+                                        <label class="form-check-label" for="product-cat<%=i%>"> <%= category[i].name %> </label>
+                                    </div>
+                                    <%}%>
+                                <%}%></div>
+                            </div>
                             <!-- <div class="mb-4">
                                 <label class="form-label">Tags</label>
                                 <input type="text" placeholder="Type here" class="form-control" name="tags">
@@ -133,7 +149,7 @@
                                 <label class="form-check-label" for="product-cat-8"> Shorts </label>
                             </div> -->
                         </div>
-                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up type="submit"">Save to draft</button>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up" type="submit">Save to draft</button>
                     </div> <!-- card end// -->
                 </div>
                 <span id="form_error"></span>

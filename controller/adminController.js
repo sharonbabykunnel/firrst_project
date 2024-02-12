@@ -16,13 +16,14 @@ const loadLogin = asyncHandler(async (req, res) => {
   }
 });
 
-const verifyLogin = asyncHandler(async (req, res) => {
+const verifyLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
     const adminData = await User.findOne({ email: email, is_admin: 1 });
+
     if (adminData) {
       const passwordMatch = await bcrypt.compare(password, adminData.password);
+
       if (passwordMatch) {
         req.session.admin = adminData;
         res.redirect("/admin");
@@ -30,14 +31,12 @@ const verifyLogin = asyncHandler(async (req, res) => {
         res.render("auth/page-admin-login", { message: "Incorrect Password." });
       }
     } else {
-      res.render("auth/page-admin-login.ejs", {
-        message: "Your are not Admin.",
-      });
+      res.render("auth/page-admin-login.ejs", {message: "You are not an admin.",});
     }
   } catch (error) {
-    throw error;
+    next(error);
   }
-});
+};
 
 const loadDashboard = asyncHandler(async (req, res) => {
   try {
@@ -61,7 +60,7 @@ const loadUsers = asyncHandler(async (req, res) => {
     if (req.query.search) {
       search = req.query.search;
     }
-    const page = req.query.page;
+    const page = parseInt(req.query.page) || 1;
     const limit = 5;
     const [userData, count] = await Promise.all([
       User.find({
@@ -135,40 +134,34 @@ const addCategory = asyncHandler(async (req, res) => {
   try {
     const { name, slug, discription, id, status, discount } = req.body;
     const [Name, Slug] = await Promise.all([Category.find({ name: name }), Category.findOne({ slug: slug })]);
-        if ( Name[0] && id != Name[0]?._id) {
-            res.redirect(`/admin/category?id=${id}&message='The Product is Already Exist'`);
-        }
-        else if (Slug && id != Slug._id) {
-            res.redirect(`/admin/category?id=${id}&message='The Slug is already exist'`);
-        }
-        else if (id) {
-          await Category.findByIdAndUpdate(id, { $set: { name, slug, discription, status, discount } });
-          if (discount) {
-                        const product = await Product.find({ category: { $in: name } })
-            const Uproduct = Promise.all(product.map(async product => {
-              const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
-              await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
-            }))
-            console.log(Uproduct,"l;");
-            // const prodcut = await Product.updateMany({ category: { $in: name } }, {  $set: { discountPrice: { $toDouble: { $multiply: ["$price" , 0.9] } } } } );
-            console.log(product,"miss") 
-          }
-            res.redirect(`/admin/category?&message='Category Updatd successfully'`);
-        } else {
-          const category = new Category({ name, slug, discription, status, discount });
-          category.save();
-          if (discount) {
-            console.log(discount, "isds");
-            const product = await Product.find({ category: { $in: name } })
-            const Uproduct = Promise.all(product.map(async product => {
-              const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
-              await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
-            }))
-            console.log(Uproduct, "l;");
-            // await Product.updateMany({ category: { $in: name } }, [{ $inc: { discount } }, { $set: { discountPrice: { $subtract: ['$price', { $multiply: ['$price', { $divide: ['$discount', 100] }] }] } }  }]);
-          }
-        res.redirect(`/admin/category?${id}&message=Category Added Successfully`); 
-        }
+    if ( Name[0] && id != Name[0]?._id) {
+      res.redirect(`/admin/category?id=${id}&message='The Product is Already Exist'`);
+    }
+    else if (Slug && id != Slug._id) {
+      res.redirect(`/admin/category?id=${id}&message='The Slug is already exist'`);
+    }
+    else if (id) {
+      await Category.findByIdAndUpdate(id, { $set: { name, slug, discription, status, discount } });
+      if (discount) {
+        const product = await Product.find({ category: { $in: name } })
+        const Uproduct = Promise.all(product.map(async product => {
+        const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
+        await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
+        }))
+      }
+      res.redirect(`/admin/category?&message='Category Updatd successfully'`);
+    } else {
+      const category = new Category({ name, slug, discription, status, discount });
+      category.save();
+      if (discount) {
+        const product = await Product.find({ category: { $in: name } })
+        const Uproduct = Promise.all(product.map(async product => {
+        const discountPrice = product.price - (product.price * ((Number(product.discount) + Number(discount))/100))
+        await Product.findByIdAndUpdate(product._id,{catDiscount:discount,discountPrice})
+        }))
+      }
+      res.redirect(`/admin/category?${id}&message=Category Added Successfully`); 
+    }
   } catch (error) {
     throw  error;
   }
@@ -186,12 +179,9 @@ const deletCategory = asyncHandler(async (req, res) => {
 
 const unlistCategory = asyncHandler(async (req, res) => {
   try {
-      const { id, status } = req.query;
-    if (status == 'true') {
-      await Category.findByIdAndUpdate({ _id: id }, { $set: { is_unlisted: 0 } });
-    } else {
-      await Category.findByIdAndUpdate({ _id: id }, { $set: { is_unlisted: 1 } });
-    }
+    const { id, status } = req.query;
+    const isUnlisted = status == 'true' ? 0 : 1;
+    await Category.findByIdAndUpdate({ _id: id }, { $set: { is_unlisted: isUnlisted } });
     res.redirect("/admin/category");
   } catch (error) {
     throw error;
@@ -201,11 +191,8 @@ const unlistCategory = asyncHandler(async (req, res) => {
 const status = asyncHandler(async (req, res) => {
   try {
     const { id, status } = req.query;
-    if (status == 0) {
-      await User.findByIdAndUpdate({ _id: id }, { $set: { is_blocked: 1 } });
-    } else {
-      await User.findByIdAndUpdate({ _id: id }, { $set: { is_blocked: 0 } });
-    }
+    const isBlocked = status == 0 ? 1 : 0;
+    await User.findByIdAndUpdate({ _id: id }, { $set: { is_blocked: isBlocked } });
     res.redirect("/admin/users");
   } catch (error) {
     throw error;
@@ -231,7 +218,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 const changePassword = asyncHandler(async (req, res) => {
     try {
         const { email, password } = req.body;
-        const Email = await User.findOne({ email: email });
+        const Email = await User.findOne({ email });
         if (Email) {
             const spassword = await bcrypt.hash(password, 10);
             await User.updateOne({ email: email }, { $set: { password: spassword } });
@@ -246,8 +233,6 @@ const changePassword = asyncHandler(async (req, res) => {
 
 const loadOrderList = asyncHandler(async (req, res) => {
   try {
-    console.log("logout");
-    console.log(req.session);
     let page = req.query.page;
     if (!page) page = 1;
     const limit = 10;
@@ -261,28 +246,17 @@ const loadOrderList = asyncHandler(async (req, res) => {
 
 const filterOrder = asyncHandler(async (req, res) => {
   try {
-    console.log("logout");
-    console.log(req.session);
     let { page, status, count, search } = req.body;
-    console.log(req.body);
     if (!status || status == "Show All" || status == "Status") status = "all";
     if (!count) count = 20;
     if (!search) search = "all";
     if (!page) page = 1;
-    console.log(page, status, count, search);
     const order = await Order.aggregate([
       {
-        $sort: {
-          createdAt: -1,
-        },
+        $sort: {createdAt: -1,},
       },
       {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
+        $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user", },
       },
       {
         $unwind: "$user",
@@ -295,15 +269,11 @@ const filterOrder = asyncHandler(async (req, res) => {
               : {
                   $or: [
                     {
-                      "user.name": {
-                        $regex: ".*" + search + ".*",
-                        $options: "i",
+                      "user.name": { $regex: ".*" + search + ".*", $options: "i",
                       },
                     },
                     {
-                      payment: {
-                        $regex: ".*" + search + ".*",
-                        $options: "i",
+                      payment: { $regex: ".*" + search + ".*", $options: "i",
                       },
                     },
                   ],
@@ -324,12 +294,7 @@ const filterOrder = asyncHandler(async (req, res) => {
     const newcount = (
       await Order.aggregate([
         {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
-          },
+          $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user", },
         },
         {
           $unwind: "$user",
@@ -342,16 +307,10 @@ const filterOrder = asyncHandler(async (req, res) => {
                 : {
                     $or: [
                       {
-                        "user.name": {
-                          $regex: ".*" + search + ".*",
-                          $options: "i",
-                        },
+                        "user.name": { $regex: ".*" + search + ".*", $options: "i", },
                       },
                       {
-                        payment: {
-                          $regex: ".*" + search + ".*",
-                          $options: "i",
-                        },
+                        payment: { $regex: ".*" + search + ".*", $options: "i", },
                       },
                     ],
                   },
@@ -401,7 +360,6 @@ const changeOrderStatus = asyncHandler(async (req, res) => {
 
 const loadReviews = asyncHandler(async (req, res) => {
   try {
-    console.log("logout");
     const reviews = await Product.aggregate([
       { $unwind: "$rating" },
       {

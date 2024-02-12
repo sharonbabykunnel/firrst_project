@@ -119,7 +119,8 @@ var validatFromEditPage = () => {
     !validatString("product_price", "price_error", "Price") ||
     !validatString("product_quantity", "quantity_error", "Quantity") ||
     !validatNum("product_discount", "discount_error", "Discount") ||
-    !checkStatus('category','checkbox')
+    !checkStatus('subcategory','radio') || 
+    !checkStatus('maincategory','radio')  
   ) {
     console.log("ddfgggdhdygdryhgbdfghftdjhdygdfghhhhhhhhhhhhhf");
     message.style.display = "block";

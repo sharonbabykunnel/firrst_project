@@ -15,15 +15,15 @@ const session = require('express-session');
 
 
 const generateOtp = asyncHandler(async () => {
-    try {
-        const OTP = otpGenerator.generate(6,{
-            upperCaseAlphabets: false,
-            specialChars:false
-        })
-        return OTP;
-    } catch (error) {
-        throw error;
-    }
+  try {
+    const OTP = otpGenerator.generate(6,{
+      upperCaseAlphabets: false,
+      specialChars:false
+    })
+    return OTP;
+  } catch (error) {
+    throw error;
+  }
 })
 
 const securePassword = async (password) => {
@@ -130,7 +130,6 @@ const getProducts = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
     const { main, sub } = req.query;
-    console.log(sub);
     const wishlist = await Wishlist.findOne(
       { user_id: user?._id },
       { product: 1 }
@@ -148,7 +147,6 @@ const getProducts = asyncHandler(async (req, res) => {
       ? Product.find(query)
       : Product.find());
 
-    console.log(products, "pro");
     res.json({ products, user, cartNum, wishlist, main, sub });
   } catch (error) {
     throw error;
@@ -160,11 +158,8 @@ const filterProducts = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
     const limit = 8;
-    console.log(req.query.category, "ii");
     const { main, sub, max, min, size, sort, search, page } = req.query;
-    console.log(size, 'lll', req.query.size);
     const newsize = size?.split(',')
-    console.log(newsize);
     const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
     const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
     let filterCriteria = {};
@@ -186,7 +181,7 @@ const filterProducts = asyncHandler(async (req, res) => {
     }
 
     if (max !== undefined) {
-      filterCriteria.discountPrice = { ...filterCriteria.price, $lte: parseFloat(max) };
+      filterCriteria.discountPrice = { ...filterCriteria.discountPrice, $lte: parseFloat(max) };
     }
     
     let by = {};
@@ -195,10 +190,7 @@ const filterProducts = asyncHandler(async (req, res) => {
     } else if (sort == 'high-to-low') {
       by = { discountPrice: -1 }
     }
-    console.log(filterCriteria);
-    console.log(by)
     const [products, count ]= await Promise.all([Product.find(filterCriteria).sort(by).limit(limit).skip((page-1)*limit), Product.countDocuments(filterCriteria)]);
-    console.log(products?.length, "pro");
     const totalPage = Math.ceil(count/limit)
     res.json({ products, user, cartNum, wishlist, main, sub, totalPage});
   } catch (error) {
@@ -222,9 +214,7 @@ const verifyotp = asyncHandler(async (req, res) => {
       const referral = req.session.user.name + otp;
       if (req.session.user.referral) {
         var referrer = await User.findOne({ referral: req.session.user.referral }, { _id: 1 });
-        console.log(referrer,'referrer');
       }
-      console.log(referral,'referral');
       const spassword = await securePassword(req.session.user.password);
       const user = new User({
         name: req.session.user.name,
@@ -288,16 +278,13 @@ const loadProductDetails = asyncHandler(async (req, res) => {
         const user = req.session.user;
         const id = req.params.id;
         const message = req.query.message;
-        console.log(message);
         const wishlist = await Wishlist.findOne({ user_id: user?._id }, { product: 1 });
         const cart = await Cart.findOne({ user_id: user?._id })
         const cartData = cart?.product.find((product) => product.product_id == id);
-        console.log(cartData,'cartttt');
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
         const objectId = mongoose.Types.ObjectId.isValid(id)
         if (objectId) {
             const product = await Product.findById(id);
-            console.log(product,"prrrrr");
             const products = await Product.find({_id:{$ne:id}})
             res.render('userView/product-details.ejs', { product, products,user,cartNum, cartData,message,wishlist }); 
         } else {
@@ -311,7 +298,6 @@ const loadProductDetails = asyncHandler(async (req, res) => {
 const loadCart = asyncHandler(async (req, res) => {
     try {
         const { discount, message ,couponId} = req.query;
-        console.log(discount,"discount");
         const user = req.session.user;
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
         const cart = await Cart.findOne({ user_id: user._id }).populate('product.product_id');
@@ -332,10 +318,7 @@ const addToCart = asyncHandler(async (req, res) => {
     try {
       const user_id = req.session.user._id;
         const {product_id, quantity} = req.query;
-        console.log(product_id,"poooooo");
-      console.log(quantity, 'qqqqqqqqqqqqqqqq');
       const productQuantity = await Product.findById(product_id);
-      console.log(productQuantity.quantity,"llllllllllllll");
           let cart = await Cart.findOne({ user_id: user_id });
           const productIndex = cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);
             if (quantity > productQuantity.quantity) {
@@ -471,11 +454,9 @@ const addtoWishlist = asyncHandler(async (req, res) => {
       await wish.save();
       wishlist = wish;
     }
-    console.log(wishlist);
     const productIndex = wishlist.product.findIndex(
       (item) => item == product_id
     );
-    console.log(productIndex);
     if (productIndex == -1) {
       wishlist.product.push(product_id);
     } else {
@@ -497,9 +478,7 @@ const removeWishlist = asyncHandler(async (req, res) => {
       await wish.save();
       wishlist = wish;
     }
-    console.log(wishlist);
     const productIndex = wishlist.product.findIndex((item) => item == product_id);
-    console.log(productIndex);
     if (productIndex == -1) {
       wishlist.product.push(product_id);
     } else {
@@ -517,9 +496,7 @@ const addReview = asyncHandler(async (req, res) => {
         const user = req.session.user;
         const { star, review } = req.body;
         const id = req.query.id;
-        console.log(id);
         const product = await Product.findByIdAndUpdate(id, { $push: { rating: { star, review, postedby: user._id } } });
-        console.log(product, 'kkk');
         res.redirect('/productDetails/' + id);
     } catch (error) {
         throw error;

@@ -7,12 +7,10 @@ const isLogged = ((req, res, next) => {
                 if (data.is_blocked == false) {
                     next();
                 } else {
-                    // next();
                     res.redirect('/signin');
                 }
             })
     } else {
-        // next();
         res.redirect('/signin');
     }
 });

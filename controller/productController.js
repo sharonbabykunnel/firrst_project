@@ -22,18 +22,8 @@ const loadAddProduct = asyncHandler(async (req, res) => {
 const addProduct = asyncHandler(async (req, res) => {
   try {
     const imageArray = req.files?.map((image) => image.filename);
-    let {
-      title,
-      color,
-      size,
-      brand,
-      discription,
-      price,
-      status,
-      category,
-      quantity,
-      discount,
-    } = await req.body;
+    let { title, color, size, brand, discription, price, status, maincategory, subcategory, quantity, discount, } = await req.body;
+    const category = [maincategory, subcategory];
     let Title = await Product.findOne({ title: title });
     if (Title) {
       res.redirect("/admin/addProduct?message=Product is Already Exist.");
@@ -49,7 +39,6 @@ const addProduct = asyncHandler(async (req, res) => {
       if (Array.isArray(category)) {
         const catPromise = category.map(async (name) => {
           const cat = await Category.findOne({ name, discount: { $gt: 0 } });
-          console.log(cat?.discount, "s");
           return cat?.discount || 0;
         });
         const catResult = await Promise.all(catPromise);
@@ -60,16 +49,16 @@ const addProduct = asyncHandler(async (req, res) => {
       }
       const totalDiscount = Number(catDiscount) + Number(discount);
       const productObj = {
-        title: title,
-        color: color,
-        size: size,
-        brand: brand,
-        quantity: quantity,
-        discription: discription,
+        title,
+        color,
+        size,
+        brand,
+        quantity,
+        discription,
         image: imageArray,
-        price: price,
-        status: status,
-        category: category,
+        price,
+        status,
+        category,
         discount,
         catDiscount,
         discountPrice: calculateDiscountPrice.call({price,discount:totalDiscount})
@@ -108,7 +97,6 @@ const loadProduct = asyncHandler(async (req, res) => {
 const getProduct = asyncHandler(async (req, res) => {
   try {
     const { page, status, search, count } = req.query;
-    console.log(req.query);
     const limit = count || 10
     let filter = {}
     if (status) {
@@ -117,10 +105,8 @@ const getProduct = asyncHandler(async (req, res) => {
     if (search) {
       filter.title = { $regex: ".*" + search.trim() + ".*", $options: "i" };
     }
-    console.log(filter);
     const [product, productCount] = await Promise.all([ Product.find(filter).sort({ _id: -1 }).limit(limit).skip((page-1)*limit),Product.find(filter).countDocuments()])
     const totalPage = Math.ceil(productCount / limit)
-    console.log(productCount,limit,totalPage);
     res.json({ product: product ,totalPage});
   } catch (error) {
     throw error;
@@ -157,11 +143,13 @@ const editProduct = asyncHandler(async (req, res) => {
       color,
       size,
       brand,
-      category,
+      subcategory,
+      maincategory,
       quantity,
       status,
       discount,
     } = req.body;
+    const category = [subcategory,maincategory]
     const Title = await Product.findOne({ title: title, _id: { $ne: id } });
     const data = await Product.findById(id);
     const categoryData = await Category.find();
@@ -203,7 +191,6 @@ const editProduct = asyncHandler(async (req, res) => {
       if (Array.isArray(category)) {
         const catPromise = category.map(async (name) => {
           const cat = await Category.findOne({ name, discount: { $gt: 0 } })
-          console.log(cat?.discount, 's');
           return cat?.discount || 0;
         })
         const catResult = await Promise.all(catPromise)
@@ -215,17 +202,17 @@ const editProduct = asyncHandler(async (req, res) => {
       const totalDiscount = Number(catDiscount)+Number(discount)
           const updateObj = {
             $set: {
-              title: title,
-              price: price,
-              color: color,
-              brand: brand,
-              category: category,
-              discription: discription,
-              quantity: quantity,
-              size: size,
-              status: status,
-              image: image,
-              discount: discount,
+              title,
+              price,
+              color,
+              brand,
+              category,
+              discription,
+              quantity,
+              size,
+              status,
+              image,
+              discount,
               catDiscount,
               discountPrice: calculateDiscountPrice.call({ price, discount:totalDiscount }),
             },
@@ -244,23 +231,15 @@ const rating = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
     const { review, star } = req.body;
-    console.log(review,star,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     const id = req.query.id;
     const product = await Product.findById(id);
     const alreadyRated = product.rating.find((userId) => userId.postedby == user._id);
-    console.log(alreadyRated);
-
     if (alreadyRated) {
-      console.log('enene');
       const ss = await Product.updateOne({ rating: { $elemMatch: alreadyRated } }, { $set: { "rating.$.star": star, "rating.$.review": review } }, { new: true });
-      console.log(ss,'kkkk');
     } else {
       await Product.findByIdAndUpdate(id, { $push: { rating: { review,star, postedby: user._id } } }, { new: true });
     }
     const getallratings = await Product.findById(id)
-    console.log(getallratings,'ttt');
-    
-
     const ratingsum = getallratings.rating.map((item) => item.star).reduce((prev, curr) => prev + curr, 0);
     const ratingcount = getallratings.rating.length || 1;
     const totalrating = Math.round(ratingsum / ratingcount);
