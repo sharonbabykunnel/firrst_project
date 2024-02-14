@@ -268,9 +268,9 @@
             let { Total, discount, couponId,message ,didected} = data
             console.log(Total)
                 if (Total ) {
-                    document.getElementById('total').innerHTML = Math.floor(Total)
-                    document.getElementById('appliedCode').value = `Coupon: ${code}(${30}) Applied  `;
-            document.getElementById('didected').innerHTML=`$${Math.ceil(didected)} didected`
+                    document.getElementById('total').innerHTML = Total
+                    document.getElementById('appliedCode').value = `Coupon: ${code}(${discount}) Applied  `;
+            document.getElementById('didected').innerHTML=`$${didected} didected`
             document.getElementById('appliedCoupon').style.display = 'block';
             document.getElementById('couponForm').style.display = 'none';
                     const a = document.getElementById('href')

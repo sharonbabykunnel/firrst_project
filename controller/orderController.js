@@ -5,6 +5,7 @@ const Product = require("../model/productModel");
 const Wallet = require("../model/walletModel");
 const Wishlist= require("../model/wishlistModel");
 const User = require("../model/userModel");
+const Coupon = require("../model/couponModel");
 const Address = require("../model/addressModel");
 const Razorpay = require("razorpay");
 const Paypal = require("paypal-rest-sdk");
@@ -40,13 +41,14 @@ const loadCheckout = asyncHandler(async (req, res) => {
   try {
     const user = req.session.user;
     const { discount, message, _id, quantity, couponId } = req.query;
+    let product;
     if (_id) {
       if (quantity < 1) {
         res.redirect(
           `/productDetails/${_id}?message='quantity cant be lessthan 1'`
         );
       } else {
-        var product = await Product.findOne({ _id: _id });
+        product = await Product.findOne({ _id: _id });
         if (product.quantity < quantity) {
           res.redirect(`/productDetails/${_id}?message='Not Enough Stock'`);
         } else {
@@ -57,7 +59,7 @@ const loadCheckout = asyncHandler(async (req, res) => {
       var cart = await Cart.findOne({ user_id: user._id }).populate(
         "product.product_id"
       );
-      var product = cart?.product;
+      product = cart?.product;
       const check = cart.product.reduce((total, products) => {
         if (products.quantity > products.product_id.quantity) {
           return [products.product_id.quantity, products.product_id.title]
@@ -74,7 +76,13 @@ const loadCheckout = asyncHandler(async (req, res) => {
         }, 0);
         const address = await Address.findOne({ user: user._id });
         const cartNum = (await Cart.findOne({ user_id: user?._id }))?.product?.length;
-        res.render("userView/checkout", { product, cartNum, user, cart, calculatTotal, discount, quantity, address, couponId, });
+        let discountedTotal = calculatTotal;
+        if (couponId) {
+          const coupon = await Coupon.findById(couponId);
+          const discount = Math.min(Number(coupon.discount), coupon.maxDiscount);
+          discountedTotal = Math.max( calculatTotal - (calculatTotal * discount) / 100, calculatTotal - coupon.maxDiscount );
+        }
+        res.render("userView/checkout", { product, cartNum, user, cart, calculatTotal, discount, quantity, address, couponId, discountedTotal });
       }
       }
   } catch (error) {

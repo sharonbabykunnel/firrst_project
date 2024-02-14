@@ -122,7 +122,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     const discount = Math.min(Number(coupon.discount), coupon.maxDiscount);
     const discountedTotal = Math.max( total - (total * discount) / 100, total - coupon.maxDiscount );
 
-    res.json({ discount, couponId: coupon._id, Total: discountedTotal, deducted: total - discountedTotal, });
+    res.json({ discount, couponId: coupon._id, Total: discountedTotal, didected: total - discountedTotal, });
   } catch (error) {
     throw error;
   }

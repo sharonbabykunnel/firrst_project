@@ -129,10 +129,7 @@
                             <div class="checkout__order__total">
                                 <ul>
                                     <li>Subtotal <span>$<span id="stotal"> <%= calculatTotal %></span></span></li>
-                                    <% if(typeof discount !="undefined"){%>
-                                        <li>Total <span>$<span id="total" > <%= calculatTotal -(calculatTotal * discount /100) %></span></span></li>  
-                                        <%}else{%>
-                                        <li>Total <span>$<span id="total" > <%= calculatTotal  %></span></span></li><%}%>
+                                        <li><p id="didected" class="didected"><%= calculatTotal - discountedTotal %> didected</p>Total <span>$<span id="total" > <%= discountedTotal  %></span></span></li>
                                 </ul>
                             </div>
                             <div class="checkout__order__widget">

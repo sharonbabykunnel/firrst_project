@@ -401,7 +401,7 @@ const loadShop = asyncHandler(async (req, res) => {
     const user = req.session.user;
     const [wishlist,cart,product,Plength,category] = await Promise.all([Wishlist.findOne({ user_id: user?._id }, { product: 1 }),Cart.findOne({ user_id: user?._id }),Product.find().limit(8),Product.find().countDocuments(),Category.find()])
     const cartNum = cart?.product?.length;
-    const totalPage = Math.ceil(Plength/12)
+    const totalPage = Math.ceil(Plength/8)
     res.render("userView/shop",{user,product,cartNum,wishlist, category,totalPage});
   } catch (error) {
     throw error;
