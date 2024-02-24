@@ -104,11 +104,17 @@ const removecoupon = () => {
 
 const updateQuantity =  (productId,i,o)=> {
   var quantity = document.getElementById('quantityInput' + i);
-  if (o == 'dec'){
-    quantity.value--
+
+  if (o == "dec") {
+    if (quantity.value > 1) {
+      quantity.value--;
+    }
   } else {
-    quantity.value++ 
-  }
+    if (quantity.value > 0) {
+      quantity.value++;
+    }
+    }
+
   console.log(quantity, 'q');
   fetch(`/addtoCart?product_id=${productId}&quantity=${quantity.value}`, {
     method: 'get',

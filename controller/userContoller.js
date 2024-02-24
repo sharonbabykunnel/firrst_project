@@ -317,7 +317,7 @@ const loadCart = asyncHandler(async (req, res) => {
 const addToCart = asyncHandler(async (req, res) => {
     try {
       const user_id = req.session.user._id;
-        const {product_id, quantity} = req.query;
+      const {product_id, quantity} = req.query;
       const productQuantity = await Product.findById(product_id);
           let cart = await Cart.findOne({ user_id: user_id });
           const productIndex = cart.product.findIndex((product) => product.product_id == product_id || product._id == product_id);

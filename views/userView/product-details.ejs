@@ -56,7 +56,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="product__details__text">
-                        <h3><%= product.title %><span>Brand: <%= product.brand %></span></h3>
+                        <h3><%= product.title %><span>Brand: <%= product.brand %></span><br><span style="color: red;"><%if (product.quantity < 1 ){%>Out of Stoke <%} else if (product.quantity < 10){%> only <%=product.quantity%> items left <%}%></span></h3>
                         <div class="rating">
                         <a href="">
                             <% for(let s=0; s<product?.totalrating; s++){%><i class="fa fa-star"></i><span> </span><%}%>
@@ -71,7 +71,7 @@
                                 <div class="quantity">
                                     <span>Quantity:</span>
                                     <div class="pro-qty">
-                                        <input type="text" id="q" value="<%= typeof cartData !== 'undefined' ? cartData?.quantity : '0' %>" name="quantity">
+                                        <input type="text" id="q" value="<%= typeof cartData !== 'undefined' ? cartData?.quantity : '1' %>" name="quantity">
                                     </div>
                                     <% if (message) { %>
                                         <script>
