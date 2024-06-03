@@ -17,7 +17,7 @@ mongoose.connect(URL);
 app.set('view engine', "ejs");
 app.set('views', path.join(__dirname,'views')); 
 
-app.use(session({secret:KEY,resave:false,saveUninitialized:true,cookie:{maxAge:72 * 60 * 60 * 1000,httpOnly: true}}))
+app.use(session({secret:KEY,resave:false,saveUninitialized:true,cookie:{maxAge:60*60*24*1000,httpOnly: true}}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));

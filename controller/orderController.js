@@ -30,7 +30,9 @@ const addMoney = asyncHandler(async (req,res) => {
   try {
     const user = req.session.user;
     const total = req.query.amount;
-    const [order, responce] = await Promise.all([Order.create({ user: user._id, total, stotal: total, address: '', status: 'Pending', payment: 'razorpay' }), generateRazorpay(order._id, total)]); 
+    const order = await Order.create({ user: user._id, total, stotal: total, address: '', status: 'Pending', payment: 'razorpay' });
+    const responce = await generateRazorpay(order._id, total);
+    console.log(user)
     res.json({ responce, user, payment: "razorpay",});
   } catch (error) {
     throw error;
@@ -432,8 +434,8 @@ const loadWallet = asyncHandler(async (req, res) => {
       Wishlist.findOne({ user_id: user?._id }, { product: 1 }),
       Cart.findOne({ user_id: user?._id }),
       Wallet.findOne({ user: user._id }).populate({ path: 'orderId', }),])
-    const orders = await Order.find({ _id: { $in: wallet.orderId } }).populate('item.product')
-    const sdf = wallet.orderId.map((item) => item.populate())
+    const orders = wallet?.orderId && await Order.find({ _id: { $in: wallet.orderId } }).populate('item.product')
+    const sdf = wallet?.orderId.map((item) => item.populate())
     const cartNum = cart?.product?.length;
     res.render("userView/wallet", { wallet,user,cartNum ,orders,wishlist});
   } catch (error) {

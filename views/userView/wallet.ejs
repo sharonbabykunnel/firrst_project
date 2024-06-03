@@ -31,12 +31,12 @@
                           </tr>
                         </thead>
                         <tbody class="table-border-bottom-0">
-                          <% if (orders.length === 0) { %>
+                          <% if (orders?.length === 0) { %>
                             <tr>
                               <td colspan="7" class="text-center">No refunded orders available</td>
                             </tr>
                           <% } else { %>
-                            <%let n = 1; orders.reverse().forEach((order, index) => { %>
+                            <%let n = 1; orders?.reverse().forEach((order, index) => { %>
                             <% if(order.address == ''){%>
                               <tr class="justify-content-end bg-success">
                                 <td ></td>
@@ -142,7 +142,7 @@
         var rzp1 = new Razorpay(options)
         
         rzp1.on('payment.failed', function (response) {
-            alert(response.error.code,"Payment failed");
+            console.log(response,"Payment failed");
         })
         rzp1.open()
     }
@@ -289,6 +289,7 @@ document.head.appendChild(style);
     function addMoney() {
       // Add logic to handle adding money to the cart with RazorPay
       // You can customize this function based on your needs
+      console.log('add Money')
       const amountInput = document.getElementById('amount');
       const amount = Number(amountInput.value);
       if(amount < 0 || isNaN(amount) || !amount){

@@ -1,6 +1,7 @@
 const user = require('../model/userModel');
 
 const isLogged = ((req, res, next) => {
+    console.log(req)
     if (req.session.user) {
         user.findById(req.session.user._id).lean()
             .then((data) => {
