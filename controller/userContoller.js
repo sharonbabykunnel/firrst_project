@@ -236,21 +236,38 @@ const verifyotp = asyncHandler(async (req, res) => {
 });
 
 const sentOtp = asyncHandler(async (email, otp) => {
-    try {
+  try {
         const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            auth: {
-                user: process.env.USER,
-                pass: 'mqrt vpym ersh yhug',
-            },
+          host: "smtp.gmail.com",
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.USER,
+            pass: process.env.Pass,
+          },
         });
         const mailOptios = {
-            form: process.env.USER,
-            to: email,
-            subject: "Verify Your Signup",
-            text: `Your OTP id ${otp} `,
+          form: process.env.USER,
+          to: email,
+          subject: "Verify Your Fast Cart Account",
+          html: `
+        <h2>Welcome to Fast Cart!</h2>
+        <p>Thank you for signing up with Fast Cart, your go-to destination for quick and convenient online shopping!</p>
+        <p>To ensure the security of your account, we need to verify your email address. Please use the following One-Time Password (OTP) to complete your registration:</p>
+        <h3>Your OTP: ${otp}</h3>
+        <p>This OTP will expire in 10 minutes for security reasons. If you don't use it within this time, you'll need to request a new one.</p>
+        <p><strong>Important:</strong></p>
+        <ul>
+          <li>Never share this OTP with anyone.</li>
+          <li>Our customer service will never ask for your OTP.</li>
+          <li>If you didn't request this OTP, please ignore this email and contact our support team.</li>
+        </ul>
+        <p>If you have any questions or need assistance, please don't hesitate to reach out to our customer support at support@fastcart.com.</p>
+        <p>Happy shopping with Fast Cart!</p>
+        <p>Best regards,<br>The Fast Cart Team</p>
+        <hr>
+        <small>This is an automated message. Please do not reply to this email.</small>
+      `,
         };
         transporter.sendMail(mailOptios, (error, info) => {
             if (error) {
