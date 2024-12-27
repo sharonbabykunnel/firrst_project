@@ -62,7 +62,8 @@ const loadCheckout = asyncHandler(async (req, res) => {
         "product.product_id"
       );
       product = cart?.product;
-      const check = cart.product.reduce((total, products) => {
+      console.log(product)
+      const check = cart.product?.reduce((total, products) => {
         if (products.quantity > products.product_id.quantity) {
           return [products.product_id.quantity, products.product_id.title]
         }
